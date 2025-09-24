@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ page_title }}{% endblock %}
+    
+    {% block stylesheets %}
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+     {% endblock %}
+
+{% block body %}
+
+<header class="site-header">
+    <img src="{{ asset('images/logo1.png') }}" alt="Cadu Drive Logo" class="logo">
+  
+
+  <nav class="main-nav">
+    <a href="#home" class="nav-link">Home</a>
+    <a href="#about" class="nav-link">About</a>
+    <a href="#contact" class="nav-link">Contact</a>
+    <a href="/rides/request" class="nav-link cta">Book a Ride</a>
+  </nav>
+</header>
+
+  <section class="hero">
+  <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <h1 class="page-title">{{ page_title }}</h1>
+
+    <p class="tagline"> {{ tagline }} </p>
+    <a href="/rides/request" class="btn btn-primary">Book a Ride</a>
+  </section>
+{% endblock %}
