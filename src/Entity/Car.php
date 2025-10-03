@@ -32,6 +32,9 @@ class Car
     #[ORM\Column(length: 255, options: ["default" => "available"])]
     private ?string $status = 'available';
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $image = null;
+
     // Getters & setters
 
     public function getId(): ?int
@@ -102,6 +105,18 @@ class Car
     public function setStatus(string $status): static
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(?string $image): static
+    {
+        $this->image = $image;
 
         return $this;
     }

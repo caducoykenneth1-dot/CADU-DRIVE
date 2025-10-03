@@ -2,50 +2,73 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Cadu Drive{% endblock %}</title>
+        <title>{% block title %}{% endblock %}</title>
 
-        {# Bootstrap/compiled styles first #}
+        {# Tailwind-generated styles #}
         <link rel="stylesheet" href="{{ asset('build/app.css') }}">
 
-        {# Your custom styles AFTER Bootstrap so they override it #}
+        {# Your custom styles AFTER Tailwind #}
         {% block stylesheets %}
             <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-            <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
+            {# navbar.css is no longer needed, styles will be in style.css #}
             <link rel="stylesheet" href="{{ asset('css/rentalH.css') }}">
             <link rel="stylesheet" href="{{ asset('css/upgrade.css') }}">
             <link rel="stylesheet" href="{{ asset('css/show.css') }}">
             <link rel="stylesheet" href="{{ asset('css/rent.css') }}">
         {% endblock %}
 
-        <link rel="icon" href="data:image/svg+xml,
-            <svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22>
-                <text y=%221.2em%22 font-size=%2296%22>⚫️</text>
-                <text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text>
-            </svg>">
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
     </head>
-    <body>
+    <body class="bg-gray-900 text-gray-300">
+
         <header>
-            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-                <div class="container">
-                    <a class="navbar-brand" href="{{ path('app_car_index') }}">Cadu Drive</a>
-                    <div class="collapse navbar-collapse" id="navbarNav">
-                        <ul class="navbar-nav">
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ path('app_rental_index') }}">Rental History</a>
-                            </li>
-                        </ul>
+            <nav id="main-nav" class="fixed top-0 left-0 right-0 z-30 transition-all duration-300 ease-in-out">
+                <div class="container mx-auto flex items-center justify-between p-4">
+                    <!-- Logo -->
+                    <div>
+                        <a class="text-white text-2xl font-bold tracking-wider" href="{{ path('app_home') }}">Cadu Drive</a>
+                    </div>
+
+                    <!-- Desktop Menu -->
+                    <div class="hidden lg:flex items-center space-x-8">
+                        <a href="{{ path('app_home') }}" class="nav-link">Home</a>
+                        <a href="#" class="nav-link">About</a>
+                        <a href="{{ path('app_car_index') }}" class="nav-link">Cars</a>
+                        <a href="#" class="nav-link">Contact</a>
+                        <a href="#" class="btn-book">Book a Ride</a>
+                    </div>
+
+                    <!-- Mobile Menu Button -->
+                    <div class="lg:hidden">
+                        <button id="mobile-menu-button" class="text-white focus:outline-none">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-4 6h16"></path></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu -->
+                <div id="mobile-menu" class="hidden lg:hidden bg-gray-800 bg-opacity-90">
+                    <a href="{{ path('app_home') }}" class="block text-white text-center py-3">Home</a>
+                    <a href="#" class="block text-white text-center py-3">About</a>
+                    <a href="{{ path('app_car_index') }}" class="block text-white text-center py-3">Cars</a>
+                    <a href="#" class="block text-white text-center py-3">Contact</a>
+                    <div class="text-center py-4">
+                        <a href="#" class="btn-book inline-block">Book a Ride</a>
                     </div>
                 </div>
             </nav>
         </header>
 
-        <main role="main" class="container mt-4">
+        {% block body_full_width %}{% endblock %}
+
+        <main role="main" class="container mx-auto mt-4">
             {% block body %}{% endblock %}
         </main>
 
         {% block javascripts %}
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
             <script>
+                // SweetAlert for delete confirmation
                 function confirmDelete(form) {
                     Swal.fire({
                         title: 'Are you sure?',
@@ -61,6 +84,23 @@
                         }
                     });
                 }
+
+                // Navbar scroll and mobile toggle
+                const mainNav = document.getElementById('main-nav');
+                const mobileMenuButton = document.getElementById('mobile-menu-button');
+                const mobileMenu = document.getElementById('mobile-menu');
+
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > 50) {
+                        mainNav.classList.add('scrolled');
+                    } else {
+                        mainNav.classList.remove('scrolled');
+                    }
+                });
+
+                mobileMenuButton.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
             </script>
         {% endblock %}
     </body>

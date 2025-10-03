@@ -160,3 +160,24 @@ body {
     transform: translateY(-2px);
 }
 
+.btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.25s ease-in-out;
+    min-width: 120px;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    opacity: 0.92;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.btn-back { background: #374151; }

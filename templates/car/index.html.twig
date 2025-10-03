@@ -4,10 +4,11 @@
 
 {% block body %}
 <div class="container">
-    <h1 class="page-title">Our Fleet</h1>
+    <h1 class="page-title">OUR FLEET</h1>
 
     <div class="create-new-container">
         <a href="{{ path('app_car_new') }}" class="btn-create">Create New Car</a>
+        <a href="{{ path('app_rental_index') }}" class="btn-create">Rental History</a>
     </div>
 
     <div class="car-grid">
@@ -24,11 +25,14 @@
                         <p>{{ car.description }}</p>
                     </div>
                     <span class="card-status status-{{ car.status|lower }}">
-                        {{ car.status }}
+                    {{ car.status }}
                     </span>
                     <div class="card-actions">
                         <a href="{{ path('app_car_show', {'id': car.id}) }}" class="btn btn-show">Show</a>
-                        <a href="{{ path('app_car_edit', {'id': car.id}) }}" class="btn btn-edit">Edit</a>
+                        <a href="{{ path('app_car_edit', {'id': car.id}) }}" class="btn btn-edit">Edit</a> 
+                         <div class="delete-form">
+                    {{ include('car/_delete_form.html.twig') }}
+                       </div>
                         {% if car.status == 'available' %}
                             <a href="{{ path('app_car_rent', {'id': car.id}) }}" class="btn btn-rent">Rent</a>
                         {% endif %}
