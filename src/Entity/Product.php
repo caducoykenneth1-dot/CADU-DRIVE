@@ -23,6 +23,11 @@ class Product
     #[ORM\Column]
     private ?int $size = null;
 
+    #[ORM\Column]
+    private ?int $price = null;
+
+    // Getters & setters
+
     public function getId(): ?int
     {
         return $this->id;
@@ -36,7 +41,6 @@ class Product
     public function setName(string $name): static
     {
         $this->name = $name;
-
         return $this;
     }
 
@@ -48,7 +52,6 @@ class Product
     public function setDescription(?string $description): static
     {
         $this->description = $description;
-
         return $this;
     }
 
@@ -60,7 +63,17 @@ class Product
     public function setSize(int $size): static
     {
         $this->size = $size;
+        return $this;
+    }
 
+    public function getPrice(): ?int
+    {
+        return $this->price;
+    }
+
+    public function setPrice(int $price): static
+    {
+        $this->price = $price;
         return $this;
     }
 }
