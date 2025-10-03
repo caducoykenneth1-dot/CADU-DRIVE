@@ -1,0 +1,64 @@
+    {% extends 'base.html.twig' %}
+
+    {% block title %}Car Details{% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/show.css') }}">
+{% endblock %}
+
+    {% block body %}
+        <h1 class="page-title">Car Details</h1>
+
+        <div class="car-details">
+            <table class="details-table">
+                <tbody>
+                    <tr>
+                        <th>Id</th>
+                        <td>{{ car.id }}</td>
+                    </tr>
+                    <tr>
+                        <th>Make</th>
+                        <td>{{ car.make }}</td>
+                    </tr>
+                    <tr>
+                        <th>Model</th>
+                        <td>{{ car.model }}</td>
+                    </tr>
+                    <tr>
+                        <th>Description</th>
+                        <td>{{ car.description }}</td>
+                    </tr>
+                    <tr>
+                        <th>Year</th>
+                        <td>{{ car.year }}</td>
+                    </tr>
+                    <tr>
+                        <th>Price</th>
+                        <td>${{ car.price }}</td>
+                    </tr>
+                    <tr>
+                        <th>Status</th>
+                        <td>
+                            {% if car.status == 'available' %}
+                                <span class="badge badge-available">Available</span>
+                            {% elseif car.status == 'rented' %}
+                                <span class="badge badge-rented">Rented</span>
+                            {% else %}
+                                <span class="badge badge-maintenance">Maintenance</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="actions">
+                <a class="btn btn-back" href="{{ path('app_car_index') }}">Back to List</a>
+                <a class="btn btn-edit" href="{{ path('app_car_edit', {'id': car.id}) }}">Edit</a>
+                {% if car.status == 'available' %}
+                    <a class="btn btn-rent" href="{{ path('app_car_rent', {'id': car.id}) }}">Rent</a>
+                {% endif %} 
+            </div>
+        </div>
+    {% endblock %}
+
+    

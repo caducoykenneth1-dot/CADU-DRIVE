@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Car Index{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1 class="page-title">Our Fleet</h1>
+
+    <div class="create-new-container">
+        <a href="{{ path('app_car_new') }}" class="btn-create">Create New Car</a>
+    </div>
+
+    <div class="car-grid">
+        {% for car in cars %}
+            <div class="car-card">
+                <img src="https://placehold.co/600x400/555/white?text={{ car.make|escape('url') }}" alt="{{ car.make }} {{ car.model }}" class="card-img">
+                <div class="card-body">
+                    <h2 class="card-title">{{ car.make }} {{ car.model }}</h2>
+                    <div class="card-text">
+                        <p>
+                            <strong>Year:</strong> {{ car.year }}<br>
+                            <strong>Price:</strong> ${{ car.price }}/day
+                        </p>
+                        <p>{{ car.description }}</p>
+                    </div>
+                    <span class="card-status status-{{ car.status|lower }}">
+                        {{ car.status }}
+                    </span>
+                    <div class="card-actions">
+                        <a href="{{ path('app_car_show', {'id': car.id}) }}" class="btn btn-show">Show</a>
+                        <a href="{{ path('app_car_edit', {'id': car.id}) }}" class="btn btn-edit">Edit</a>
+                        {% if car.status == 'available' %}
+                            <a href="{{ path('app_car_rent', {'id': car.id}) }}" class="btn btn-rent">Rent</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="no-records-found">
+                <p>No cars found in the fleet. <a href="{{ path('app_car_new') }}">Add the first one!</a></p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

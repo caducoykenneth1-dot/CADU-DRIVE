@@ -1,0 +1,103 @@
+/* ===== Rental History Cards ===== */
+body {
+    background: linear-gradient(135deg, #1f2937, #111827);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #111;
+}
+
+/* Page Title */
+.page-title {
+    text-align: center;
+    font-size: 2.4rem;
+    margin: 2rem 0;
+    font-weight: 700;
+    color: #f9fafb;
+    letter-spacing: 0.5px;
+}
+
+/* Rental Card Grid */
+.rental-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Each Card */
+.rental-card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+    position: relative;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+.rental-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.3);
+}
+
+/* Car name */
+.rental-card .car-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: #1f2937;
+}
+
+/* Card Text */
+.rental-card p {
+    margin: 0.5rem 0;
+    font-size: 0.95rem;
+    color: #374151;
+}
+
+/* Rental ID as badge in corner */
+.rental-id {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #f1c40f;
+    color: #111;
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 0.3rem 0.7rem;
+    border-radius: 50px;
+}
+
+/* Empty state */
+.no-records {
+    text-align: center;
+    font-style: italic;
+    font-size: 1.2rem;
+    color: #aaa;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 8px;
+    max-width: 400px;
+    margin: 2rem auto;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.car-grid {
+    background-color: #0f172a; /* dark navy for grid section */
+    padding: 2rem;
+    border-radius: 8px;
+}

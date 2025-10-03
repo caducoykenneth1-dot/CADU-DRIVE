@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Rental History{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/rentalH.css') }}">
+{% endblock %}
+
+{% block body %}
+    <h1 class="page-title">Rental History</h1>
+
+    <div class="rental-cards">
+        {% for rental in rentals %}
+            <div class="rental-card">
+                <h2 class="car-name">{{ rental.car.make }} {{ rental.car.model }}</h2>
+                <p><strong>Customer:</strong> {{ rental.customerName }}</p>
+                <p><strong>Start Date:</strong> {{ rental.startDate|date('Y-m-d H:i') }}</p>
+                <p><strong>End Date:</strong> {{ rental.endDate|date('Y-m-d H:i') }}</p>
+                <span class="rental-id">#{{ rental.id }}</span>
+            </div>
+        {% else %}
+            <p class="no-records">No rental records found.</p>
+        {% endfor %}
+    </div>
+{% endblock %}

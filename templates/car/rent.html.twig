@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Rent a Car{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/rent.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="rent-container">
+    <h1>Rent {{ car.make }} {{ car.model }}</h1>
+
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button class="btn-rent-confirm">Confirm Rental</button>
+    {{ form_end(form) }}
+
+    <a href="{{ path('app_car_index') }}" class="back-link">Cancel</a>
+</div>
+{% endblock %}
+

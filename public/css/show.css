@@ -1,0 +1,126 @@
+/* ===== Car Details Page ===== */
+body {
+    background: linear-gradient(135deg, #1f2937, #111827);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #2c3e50;
+    margin: 0;
+    padding: 0;
+}
+
+/* Page Title */
+.page-title {
+    text-align: center;
+    font-size: 2.4rem;
+    margin: 1.5rem 0 2rem;
+    color: #f9fafb;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+/* Container Card */
+.car-details {
+    max-width: 800px;
+    margin: 0 auto 3rem auto;
+    padding: 2rem;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Details Table */
+.details-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+}
+.details-table th,
+.details-table td {
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+.details-table th {
+    width: 30%;
+    background: #f3f4f6;
+    font-weight: 600;
+    color: #1f2937;
+}
+.details-table td {
+    color: #374151;
+}
+
+/* Alternate Row Shading */
+.details-table tr:nth-child(even) td {
+    background: #fafafa;
+}
+
+/* Status Badges */
+.badge {
+    display: inline-block;
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.badge-available {
+    background: #d1fae5;
+    color: #065f46;
+}
+.badge-rented {
+    background: #fee2e2;
+    color: #991b1b;
+}
+.badge-maintenance {
+    background: #fef9c3;
+    color: #92400e;
+}
+
+/* Actions */
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+/* Buttons */
+.actions .btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.25s ease-in-out;
+    min-width: 120px;
+}
+
+.btn-back { background: #374151; }
+.btn-edit { background: #f59e0b; }
+.btn-rent { background: #10b981; }
+.btn-delete { background: #ef4444; }
+
+/* Hover Effects */
+.actions .btn:hover {
+    transform: translateY(-3px);
+    opacity: 0.92;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.car-grid {
+    background-color: #0f172a; /* dark navy for grid section */
+    padding: 2rem;
+    border-radius: 8px;
+}
