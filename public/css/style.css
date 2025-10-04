@@ -73,7 +73,7 @@ p, .card-text {
     width: 100%;
 }
 
-.btn-book {
+.btn {
     background: var(--gradient);
     color: white !important;
     border-radius: 50px;
@@ -81,11 +81,22 @@ p, .card-text {
     font-weight: 600;
     transition: all 0.3s ease;
     box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+    border: 0;
+    text-decoration: none;
+    display: inline-block;
 }
 
-.btn-book:hover {
+.btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+.btn-danger {
+    background: var(--status-rented);
+}
+
+.btn-danger:hover {
+    background: #c82333;
 }
 
 #main-nav.scrolled #mobile-menu {
@@ -204,6 +215,30 @@ p, .card-text {
     color: var(--text-dark);
 }
 
+.car-card .card-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column; /* Mobile-first: stack vertically */
+    gap: 0.5rem;
+}
+
+/* On medium screens and up, switch to a row */
+@media (min-width: 768px) {
+    .car-card .card-actions {
+        flex-direction: row;
+    }
+}
+
+.car-card .card-actions .btn,
+.car-card .card-actions .delete-form {
+    flex-grow: 1; /* Make all items share space equally */
+    text-align: center;
+}
+
+.car-card .card-actions .delete-form .btn {
+    width: 100%; /* Make delete button fill the form */
+} 
+ 
 .card-status {
     display: inline-block;
     padding: 4px 12px;
