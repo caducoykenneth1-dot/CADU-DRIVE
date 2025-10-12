@@ -74,13 +74,13 @@ p, .card-text {
 }
 
 .btn {
-    background: var(--gradient);
+    background: var(--primary-color);
     color: white !important;
     border-radius: 50px;
     padding: 10px 25px;
     font-weight: 600;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+    box-shadow: none;
     border: 0;
     text-decoration: none;
     display: inline-block;
@@ -88,7 +88,8 @@ p, .card-text {
 
 .btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+    background-color: var(--primary-color-dark);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
 }
 
 .btn-danger {
@@ -186,58 +187,70 @@ p, .card-text {
 /* === Cards === */
 .car-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem; /* Compact */
+    grid-template-columns: 1fr; /* 1 column on mobile */
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .car-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns on tablet */
+    }
+}
+
+@media (min-width: 1200px) {
+    .car-grid {
+        grid-template-columns: repeat(3, 1fr); /* 3 columns on desktop */
+    }
 }
 
 .car-card {
-    background-color: var(--card-bg);
-    color: var(--text-dark);
+    background-color: var(--bg-dark-secondary);
     border-radius: 12px;
     overflow: hidden;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    border: 1px solid transparent;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .car-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 0 20px rgba(0, 123, 255, 0.15); /* Border glow effect */
-    border-color: rgba(0, 123, 255, 0.3);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 0 15px rgba(0, 123, 255, 0.2); /* Shadow + Glow */
 }
 
 .car-card .card-body {
-    padding: 1.25rem; /* Compact */
+    padding: 1rem; /* Compact padding */
+}
+
+.car-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
 }
 
 .car-card .card-title {
-    font-size: 16px; /* Inter Semi-Bold 16px */
+    font-size: 1.1rem;
     font-weight: 600;
-    color: var(--text-dark);
+    color: var(--text-light);
+}
+
+.car-card .card-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.car-card .card-price span {
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--text-gray);
 }
 
 .car-card .card-actions {
-    margin-top: 1.5rem;
-    display: flex;
-    flex-direction: column; /* Mobile-first: stack vertically */
-    gap: 0.5rem;
+    margin-top: 1rem;
 }
-
-/* On medium screens and up, switch to a row */
-@media (min-width: 768px) {
-    .car-card .card-actions {
-        flex-direction: row;
-    }
-}
-
-.car-card .card-actions .btn,
-.car-card .card-actions .delete-form {
-    flex-grow: 1; /* Make all items share space equally */
-    text-align: center;
-}
-
-.car-card .card-actions .delete-form .btn {
-    width: 100%; /* Make delete button fill the form */
-} 
  
 .card-status {
     display: inline-block;
@@ -259,7 +272,85 @@ p, .card-text {
     color: white;
 }
 
+/* === Why Choose Us Section === */
+.why-choose-us .feature-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: 1fr; /* 1 column on mobile */
+}
+
+@media (min-width: 768px) {
+    .why-choose-us .feature-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns on tablet */
+    }
+}
+
+@media (min-width: 1200px) {
+    .why-choose-us .feature-grid {
+        grid-template-columns: repeat(4, 1fr); /* 4 columns on desktop */
+    }
+}
+
+.feature-card {
+    background-color: var(--bg-dark-secondary); /* Dark background */
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color); /* Soft border */
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover */
+}
+
+.feature-card:hover {
+    transform: translateY(-5px); /* Hover lift */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25); /* Soft shadow */
+}
+
+.feature-card .icon {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.feature-card h5 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-light);
+    margin-bottom: 0.75rem;
+}
+
+.feature-card p {
+    font-size: 1rem;
+    color: var(--text-gray);
+    line-height: 1.6;
+}
+
 /* === How It Works Section === */
+.how-it-works .step-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: 1fr; /* 1 column on mobile */
+}
+
+@media (min-width: 992px) {
+    .how-it-works .step-grid {
+        grid-template-columns: repeat(3, 1fr); /* 3 columns on desktop */
+    }
+}
+
+.how-it-works .step-card {
+    background-color: var(--bg-dark-secondary);
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.how-it-works .step-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+}
+
 .how-it-works .step-number {
     display: flex;
     align-items: center;
@@ -276,7 +367,18 @@ p, .card-text {
 }
 
 .how-it-works h4 {
-    font-size: 16px; /* Inter Semi-Bold 16px */
+    font-size: 1.2rem;
     font-weight: 600;
     color: var(--text-light);
+    margin-bottom: 0.5rem;
+}
+
+.how-it-works p {
+    color: var(--text-gray);
+    font-size: 1rem;
+    margin-bottom: 0;
+}
+
+.footer {
+    background-color: var(--bg-dark-secondary);
 }

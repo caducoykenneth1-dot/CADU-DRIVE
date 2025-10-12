@@ -47,14 +47,13 @@
                     <div class="car-card">
                         <img src="https://placehold.co/600x400/555/white?text={{ car.make|escape('url') }}" alt="{{ car.make }} {{ car.model }}" class="card-img">
                         <div class="card-body">
-                            <h3 class="card-title">{{ car.make }} {{ car.model }}</h3>
-                            <p class="card-text"><strong>Price:</strong> ${{ car.price }}/day</p>
-                            <p class="card-text">
-                                <strong>Status:</strong>
+                            <div class="card-header">
+                                <h3 class="card-title">{{ car.make }} {{ car.model }}</h3>
                                 <span class="card-status status-{{ car.status|lower }}">{{ car.status }}</span>
-                            </p>
+                            </div>
+                            <p class="card-price">${{ car.price }}<span>/day</span></p>
                             <div class="card-actions">
-                                <a href="{{ path('app_car_show', {'id': car.id}) }}" class="btn btn-show">View Details</a>
+                                <a href="{{ path('app_car_show', {'id': car.id}) }}" class="btn">View Details</a>
                             </div>
                         </div>
                     </div>
@@ -68,55 +67,53 @@
     </section>
 
     {# Why Choose Us Section #}
-    <section class="why-choose-us py-5">
+    <section class="why-choose-us">
         <div class="container">
             <h2 class="text-center mb-5">Why Choose Us</h2>
-            <div class="row text-center">
-                <div class="col-md-3">
-                    <i class="bi bi-car-front-fill" style="font-size: 3rem; color: #007bff;"></i>
-                    <h4 class="mt-3">Wide Selection of Cars</h4>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="icon"><i class="bi bi-car-front-fill"></i></div>
+                    <h5>Wide Selection</h5>
+                    <p>From luxury to budget-friendly, we’ve got the right ride for you.</p>
                 </div>
-                <div class="col-md-3">
-                    <i class="bi bi-cash-coin" style="font-size: 3rem; color: #007bff;"></i>
-                    <h4 class="mt-3">Affordable Rates</h4>
+                <div class="feature-card">
+                    <div class="icon"><i class="bi bi-cash-coin"></i></div>
+                    <h5>Affordable Rates</h5>
+                    <p>Transparent pricing with no hidden fees.</p>
                 </div>
-                <div class="col-md-3">
-                    <i class="bi bi-shield-check" style="font-size: 3rem; color: #007bff;"></i>
-                    <h4 class="mt-3">Secure & Trusted</h4>
+                <div class="feature-card">
+                    <div class="icon"><i class="bi bi-shield-check"></i></div>
+                    <h5>Secure & Trusted</h5>
+                    <p>Safe, verified, and trusted by thousands of customers.</p>
                 </div>
-                <div class="col-md-3">
-                    <i class="bi bi-calendar2-check-fill" style="font-size: 3rem; color: #007bff;"></i>
-                    <h4 class="mt-3">Easy Online Booking</h4>
+                <div class="feature-card">
+                    <div class="icon"><i class="bi bi-calendar2-check-fill"></i></div>
+                    <h5>Easy Booking</h5>
+                    <p>Reserve your car in just a few clicks.</p>
                 </div>
             </div>
         </div>
     </section>
 
     {# How It Works Section #}
-    <section class="how-it-works py-5 bg-dark">
+    <section class="how-it-works">
         <div class="container">
             <h2 class="text-center mb-5">How It Works</h2>
-            <div class="row text-center">
-                <div class="col-md-4">
-                    <div class="step">
-                        <div class="step-number">1</div>
-                        <h4 class="mt-3">Choose Your Car</h4>
-                        <p>Browse our collection and find the perfect vehicle for your needs.</p>
-                    </div>
+            <div class="step-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h4>Choose Your Car</h4>
+                    <p>Browse our collection and find the perfect vehicle for your needs.</p>
                 </div>
-                <div class="col-md-4">
-                    <div class="step">
-                        <div class="step-number">2</div>
-                        <h4 class="mt-3">Select Rental Dates</h4>
-                        <p>Pick your desired dates and confirm the availability.</p>
-                    </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h4>Select Dates</h4>
+                    <p>Pick your rental dates and confirm availability in real-time.</p>
                 </div>
-                <div class="col-md-4">
-                    <div class="step">
-                        <div class="step-number">3</div>
-                        <h4 class="mt-3">Confirm & Drive</h4>
-                        <p>Finalize your booking online and hit the road.</p>
-                    </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h4>Confirm & Drive</h4>
+                    <p>Book online in minutes and get ready to hit the road.</p>
                 </div>
             </div>
         </div>
@@ -127,10 +124,13 @@
         <div class="container">
             <p class="mb-1">&copy; 2025 Cadu Drive — All Rights Reserved</p>
             <p class="mb-0">
-                <a href="#">About</a> |
-                <a href="#">Contact</a> |
-                <a href="#">Privacy Policy</a>
+                <a href="#" class="text-white text-decoration-none mx-1">About</a> | {# You can create an 'app_about' route for this #}
+                <a href="{{ path('app_contact') }}" class="text-white text-decoration-none mx-1">Contact</a> |
+                <a href="#" class="text-white text-decoration-none mx-1">Privacy Policy</a> {# And an 'app_privacy' route for this #}
             </p>
         </div>
     </footer>
+
+    {# Reusable Footer #}
+    {% include 'home/_footer.html.twig' %}
 {% endblock %}

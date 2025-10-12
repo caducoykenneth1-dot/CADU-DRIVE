@@ -1,0 +1,55 @@
+/* === Contact Page Styles === */
+
+body {
+    background-color: hsl(211, 74%, 4%);
+}
+
+.contact-container {
+    max-width: 700px;
+    margin: 8rem auto 2rem auto; /* Increased top margin to push it below the nav */
+    padding: 2rem 2.5rem;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+}
+
+.contact-container h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+}
+
+.contact-container label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #34495e;
+}
+
+.contact-container .form-control {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    color: #111827; /* Dark text for light background */
+    background-color: #f9fafb; /* Light background for inputs */
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.contact-container .form-control:focus {
+    border-color: var(--primary-color, #007bff);
+    outline: none;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+}
+
+.contact-container textarea.form-control {
+    min-height: 140px;
+    resize: vertical;
+}
+
+.contact-container .btn {
+    width: 100%;
+    margin-top: 1rem;
+}

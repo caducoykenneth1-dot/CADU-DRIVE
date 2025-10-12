@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/car')]
 final class CarController extends AbstractController
 {
-    #[Route(name: 'app_car_index', methods: ['GET'])]
+    #[Route('/', name: 'app_car_index', methods: ['GET'])]
     public function index(CarRepository $carRepository): Response
     {
         return $this->render('car/index.html.twig', [

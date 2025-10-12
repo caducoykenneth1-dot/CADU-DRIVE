@@ -1,0 +1,53 @@
+{%extends 'base.html.twig'%}
+{% block title %}Contact Us{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/contact.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="contact-container">
+        <h1>Contact Us</h1>
+
+        {# Display flash messages #}
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label }} text-center" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        <form method="post" action="{{ path('app_contact') }}">
+            {# Add a hidden field for the CSRF token #}
+            <input type="hidden" name="_token" value="{{ csrf_token('contact-form') }}">
+
+            <div class="mb-3">
+                <label for="name">Name</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="mb-3">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="mb-3">
+                <label for="message">Message</label>
+                <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn">Send Message</button>
+        </form>
+    </div>
+
+    {# Footer #}
+    <footer class="footer text-center py-4 mt-5">
+        <div class="container">
+            <p class="mb-1">&copy; 2025 Cadu Drive — All Rights Reserved</p>
+            <p class="mb-0">
+                <a href="#" class="text-white text-decoration-none mx-1">About</a> |
+                <a href="{{ path('app_contact') }}" class="text-white text-decoration-none mx-1">Contact</a> |
+                <a href="#" class="text-white text-decoration-none mx-1">Privacy Policy</a>
+            </p>
+        </div>
+    </footer>
+{% endblock %}
