@@ -56,7 +56,7 @@
                 <a class="btn btn-back" href="{{ path('app_car_index') }}">Back to List</a>
                 <a class="btn btn-edit" href="{{ path('app_car_edit', {'id': car.id}) }}">Edit</a>
                 {% if car.status == 'available' %}
-                    <a class="btn btn-rent" href="{{ path('app_car_rent', {'id': car.id}) }}">Rent</a>
+                    <button class="btn btn-rent" onclick="confirmRent('{{ path('app_car_rent', {'id': car.id}) }}', '{{ car.make }} {{ car.model }}')">Rent Now</button>
                 {% endif %} 
             </div>
         </div>

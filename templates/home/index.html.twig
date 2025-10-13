@@ -8,6 +8,8 @@
         <h1>Welcome to Cadu Drive</h1>
         <p class="lead">Your trusted car rental service. Drive anytime, anywhere.</p>
         <a href="{{ path('app_car_index') }}" class="btn mt-4">Browse Cars</a>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     </header>
 {% endblock %}
 
@@ -119,17 +121,6 @@
         </div>
     </section>
 
-    {# Footer #}
-    <footer class="footer text-center py-4 mt-auto">
-        <div class="container">
-            <p class="mb-1">&copy; 2025 Cadu Drive — All Rights Reserved</p>
-            <p class="mb-0">
-                <a href="#" class="text-white text-decoration-none mx-1">About</a> | {# You can create an 'app_about' route for this #}
-                <a href="{{ path('app_contact') }}" class="text-white text-decoration-none mx-1">Contact</a> |
-                <a href="#" class="text-white text-decoration-none mx-1">Privacy Policy</a> {# And an 'app_privacy' route for this #}
-            </p>
-        </div>
-    </footer>
 
     {# Reusable Footer #}
     {% include 'home/_footer.html.twig' %}

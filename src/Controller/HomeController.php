@@ -30,5 +30,9 @@ class HomeController extends AbstractController
         return $this->render('home/contact.html.twig');
     }
 
-    
+    #[Route('/about', name: 'app_about', methods: ['GET'])]
+    public function about(): Response
+    {
+        return $this->render('home/about.html.twig');
+    }
 }

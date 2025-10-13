@@ -24,22 +24,29 @@ final class CarController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_car_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/new', name: 'app_car_new', methods: ['GET','POST'])]  // ✅ FIXED
+    public function new(Request $request, EntityManagerInterface $em): Response
     {
         $car = new Car();
         $form = $this->createForm(CarType::class, $car);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($car);
-            $entityManager->flush();
+            $imageFile = $form->get('imageFile')->getData();
 
-            return $this->redirectToRoute('app_car_index', [], Response::HTTP_SEE_OTHER);
+            if ($imageFile) {
+                $newFilename = uniqid().'.'.$imageFile->guessExtension();
+                $imageFile->move($this->getParameter('car_images_directory'), $newFilename);
+                $car->setImage($newFilename);
+            }
+
+            $em->persist($car);
+            $em->flush();
+
+            return $this->redirectToRoute('app_car_index');
         }
 
         return $this->render('car/new.html.twig', [
-            'car' => $car,
             'form' => $form,
         ]);
     }
@@ -52,20 +59,31 @@ final class CarController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_car_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Car $car, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}/edit', name: 'app_car_edit', methods: ['GET','POST'])]  // ✅ FIXED
+    public function edit(Request $request, Car $car, EntityManagerInterface $em): Response
     {
         $form = $this->createForm(CarType::class, $car);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+            $imageFile = $form->get('imageFile')->getData();
 
-            return $this->redirectToRoute('app_car_index', [], Response::HTTP_SEE_OTHER);
+            if ($imageFile) {
+                if ($car->getImage()) {
+                    @unlink($this->getParameter('car_images_directory') . '/' . $car->getImage());
+                }
+
+                $newFilename = uniqid().'.'.$imageFile->guessExtension();
+                $imageFile->move($this->getParameter('car_images_directory'), $newFilename);
+                $car->setImage($newFilename);
+            }
+
+            $em->flush();
+
+            return $this->redirectToRoute('app_car_index');
         }
 
         return $this->render('car/edit.html.twig', [
-            'car' => $car,
             'form' => $form,
         ]);
     }
@@ -78,7 +96,7 @@ final class CarController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_car_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_car_index');
     }
 
     #[Route('/{id}/rent', name: 'app_car_rent', methods: ['GET', 'POST'])]
@@ -95,7 +113,7 @@ final class CarController extends AbstractController
             $entityManager->persist($rental);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_car_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_car_index');
         }
 
         return $this->render('car/rent.html.twig', [

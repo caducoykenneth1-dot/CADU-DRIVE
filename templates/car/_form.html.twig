@@ -1,4 +1,55 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="{{ button_class|default('btn-save') }}">{{ button_label|default('Save') }}</button>
+{# Expecting a 'form' variable from controller #}
+{{ form_start(form, {
+    'attr': {
+        'class': 'car-form',
+        'enctype': 'multipart/form-data'  # ✅ Required for file upload
+    }
+}) }}
+
+<div class="form-group">
+  {{ form_label(form.make, 'Make') }}
+  {{ form_widget(form.make, {'attr': {'class': 'form-control'}}) }}
+  {{ form_errors(form.make) }}
+</div>
+
+<div class="form-group">
+  {{ form_label(form.model, 'Model') }}
+  {{ form_widget(form.model, {'attr': {'class': 'form-control'}}) }}
+  {{ form_errors(form.model) }}
+</div>
+
+<div class="form-group">
+  {{ form_label(form.description, 'Description') }}
+  {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
+  {{ form_errors(form.description) }}
+</div>
+
+<div class="form-group">
+  {{ form_label(form.year, 'Year') }}
+  {{ form_widget(form.year, {
+      'attr': {
+          'class': 'form-control',
+          'maxlength': '4',
+          'oninput': "this.value = this.value.replace(/[^0-9]/g,'').slice(0,4)"
+      }
+  }) }}
+  {{ form_errors(form.year) }}
+</div>
+
+<div class="form-group">
+  {{ form_label(form.price, 'Price') }}
+  {{ form_widget(form.price, {'attr': {'class': 'form-control'}}) }}
+  {{ form_errors(form.price) }}
+</div>
+
+<div class="form-group">
+    {{ form_label(form.imageFile, 'Car Image (JPG or PNG)') }}
+    {{ form_widget(form.imageFile, {'attr': {'class': 'form-control-file'}}) }}
+    {{ form_errors(form.imageFile) }}
+</div>
+
+<div class="form-actions">
+  <button class="{{ button_class|default('btn') }}">{{ button_label|default('Save') }}</button>
+</div>
+
 {{ form_end(form) }}

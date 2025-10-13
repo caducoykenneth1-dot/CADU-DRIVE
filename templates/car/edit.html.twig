@@ -11,12 +11,16 @@
 <div class="form-container">
     <h1>Edit Car</h1>
 
-    {{ include('car/_form.html.twig', {'button_label': 'Update', 'button_class': 'btn-update'}) }}
+    {# Renders the Symfony form with nice classes #}
+    {{ include('car/_form.html.twig', {
+        button_label: 'Update',
+        button_class: 'btn-update'
+    }) }}
 
     <div class="form-links">
         <a href="{{ path('app_car_index') }}" class="btn btn-back">Back to List</a>
         <div class="delete-form">
-            {{ include('car/_delete_form.html.twig') }}
+           {{ include('car/_delete_form.html.twig', { car: form.vars.value }) }}
         </div>
     </div>
 </div>

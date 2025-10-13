@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}About Cadu Drive{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/about.css') }}">
+{% endblock %}
+
+{% block body %}
+<section class="about-header">
+    <div class="overlay">
+        <h1>About Cadu Drive</h1>
+        <p>Reliable, Affordable, On-Demand Car Rentals</p>
+    </div>
+</section>
+
+<section class="about-section">
+    <div class="about-wrapper">
+        <h1 class="about-title">About Cadu Drive</h1>
+        <div class="about-divider"></div>
+
+        <p>
+            Welcome to <strong>Cadu Drive</strong>, a trusted provider of premium and dependable car rental
+            solutions. We are committed to delivering a seamless rental experience built on professionalism,
+            efficiency, and customer satisfaction.
+        </p>
+        <p>
+            Established in <strong>2025</strong>, Cadu Drive was founded with a clear vision: to transform the
+            car rental industry through innovation, integrity, and service excellence. From our early beginnings
+            as a local startup, we have grown into a reputable nationwide platform serving a diverse range of
+            clients, including corporate professionals, travelers, and families.
+        </p>
+        <p>
+            At Cadu Drive, we prioritize <strong>safety, reliability, and convenience</strong>. Our fleet is
+            meticulously maintained, and our team is dedicated to delivering exceptional support at every stage
+            of your journey. Whether for business or personal use, we provide flexible rental solutions designed
+            to meet your needs with confidence and peace of mind.
+        </p>
+    </div>
+</section>
+
+
+<section class="cta-section explore-section">
+    <h2>Explore Our Cars</h2>
+    <p>Browse our fleet and choose the perfect car for your next journey.</p>
+    <a href="/car" class="cta-btn">View Cars</a>
+</section>
+
+
+
+<section class="values">
+    <div class="container">
+        <h2>Why Choose Us?</h2>
+        <div class="value-cards">
+            <div class="card">🚗 Wide Range of Vehicles</div>
+            <div class="card">💰 Affordable Pricing</div>
+            <div class="card">⚙️ Easy Booking</div>
+            <div class="card">⭐ Trusted by Customers</div>
+        </div>
+    </div>
+</section>
+
+ <div class="footer-wrapper">
+        {% include 'home/_footer.html.twig' %}
+    </div>
+{% endblock %}

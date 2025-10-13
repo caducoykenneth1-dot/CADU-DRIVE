@@ -16,7 +16,7 @@
             <link rel="stylesheet" href="{{ asset('css/show.css') }}">
             <link rel="stylesheet" href="{{ asset('css/rent.css') }}">
         {% endblock %}
-
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
     </head>
     <body class="bg-gray-900 text-gray-300">
@@ -35,7 +35,6 @@
                     <!-- Desktop Menu -->
                     <div class="hidden lg:flex items-center space-x-8">
                         <a href="{{ path('app_home') }}" class="nav-link">Home</a>
-                        <a href="#" class="nav-link">About</a>
                         <a href="{{ path('app_about') }}" class="nav-link">About</a>
                         <a href="{{ path('app_car_index') }}" class="nav-link">Cars</a>
                         <a href="{{ path('app_contact') }}" class="nav-link">Contact</a>
@@ -53,15 +52,15 @@
                 <!-- Mobile Menu -->
                 <div id="mobile-menu" class="hidden lg:hidden bg-gray-800 bg-opacity-90">
                     <a href="{{ path('app_home') }}" class="block text-white text-center py-3">Home</a>
-                    <a href="#" class="block text-white text-center py-3">About</a>
                     <a href="{{ path('app_about') }}" class="block text-white text-center py-3">About</a>
                     <a href="{{ path('app_car_index') }}" class="block text-white text-center py-3">Cars</a>
-                    <a href="{{ path('app_contact') }}" class="block text-white text-center py-3">Contact</a>
+                    <a href="{{ path('app_contact') }}" class="block text-black text-center py-3">Contact</a>
                     <div class="text-center py-4">
-                        <a href="#" class="btn-book inline-block">Book a Ride</a>
+                        <a href="#" class="btn">Book a Ride</a>
                     </div>
                 </div>
             </nav>
+            
         </header>
 
         {% block body_full_width %}{% endblock %}
@@ -86,6 +85,23 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             form.submit();
+                        }
+                    });
+                }
+
+                // SweetAlert for rent confirmation
+                function confirmRent(rentUrl, carName) {
+                    Swal.fire({
+                        title: 'Confirm Rental',
+                        text: `Are you sure you want to rent the ${carName}?`,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#10b981', // Matches .btn-rent color
+                        cancelButtonColor: '#374151',  // Matches .btn-back color
+                        confirmButtonText: 'Yes, rent it!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = rentUrl;
                         }
                     });
                 }

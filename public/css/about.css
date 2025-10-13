@@ -1,0 +1,156 @@
+/* ===== Global Page Style ===== */
+body {
+    font-family: "Poppins", sans-serif;
+    background: #0b0f19;
+    color: #d1d5db;
+    margin: 0;
+}
+
+/* ===== Hero Section ===== */
+.about-header {
+    background: linear-gradient(rgba(5, 10, 20, 0.85), rgba(5, 10, 20, 0.85)), url('../images/about-bg.jpg') no-repeat center center/cover;
+    height: 360px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+}
+
+.about-header h1 {
+    font-size: 42px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.about-header p {
+    font-size: 18px;
+    opacity: 0.85;
+}
+
+/* ===== About Section ===== */
+.about-section {
+    background: #0f172a;
+    padding: 100px 25px;
+    display: flex;
+    justify-content: center;
+}
+
+.about-wrapper {
+    max-width: 900px;
+}
+
+.about-title {
+    font-size: 48px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+.about-divider {
+    width: 70px;
+    height: 5px;
+    background: #3b82f6;
+    margin-bottom: 40px;
+    border-radius: 4px;
+}
+
+.about-wrapper p {
+    margin-bottom: 28px;
+    font-size: 20px;
+    line-height: 1.9;
+    color: #d1d5db;
+}
+
+.about-wrapper strong {
+    color: #ffffff;
+}
+
+/* ===== Explore Cars CTA (Replaces Contact CTA) ===== */
+.explore-section {
+    background: linear-gradient(to right, #1e3a8a, #2563eb);
+    text-align: center;
+    color: white;
+    padding: 80px 20px;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+}
+
+.explore-section h2 {
+    font-size: 32px;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.explore-section p {
+    font-size: 18px;
+    margin-bottom: 25px;
+    opacity: 0.9;
+}
+
+.explore-section .cta-btn {
+    display: inline-block;
+    padding: 14px 28px;
+    background: white;
+    color: #1e3a8a;
+    font-weight: 600;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: 0.3s ease;
+}
+
+.explore-section .cta-btn:hover {
+    background: #dbeafe;
+}
+
+/* ===== Values / Feature Cards ===== */
+.values {
+    background: #111827;
+    padding: 80px 20px;
+}
+
+.values h2 {
+    text-align: center;
+    font-size: 30px;
+    margin-bottom: 40px;
+    color: #ffffff;
+}
+
+.value-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 25px;
+    max-width: 1000px;
+    margin: auto;
+}
+
+.card {
+    background: #1f2937;
+    padding: 25px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: 500;
+    border: 1px solid transparent;
+    transition: 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-6px);
+    border-color: #3b82f6;
+    background-color: #273549;
+}
+
+/* ===== Responsive Fixes ===== */
+@media (max-width: 768px) {
+    .about-header h1 {
+        font-size: 30px;
+    }
+    .about-title {
+        font-size: 36px;
+    }
+    .about-wrapper p {
+        font-size: 18px;
+    }
+}

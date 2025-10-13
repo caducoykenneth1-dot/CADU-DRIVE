@@ -1,5 +1,8 @@
 /* === Import Font: Inter === */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+html, body {
+    font-family: 'Inter', sans-serif !important;
+}
 
 /* === Root Variables === */
 :root {
@@ -184,37 +187,37 @@ p, .card-text {
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
 }
 
+/* Override for forms on light backgrounds (e.g., contact page) */
+.form-on-light .form-control,
+.form-on-light .form-select {
+    background-color: #fff;
+    color: var(--text-dark);
+    border-color: #ced4da;
+}
 /* === Cards === */
 .car-grid {
     display: grid;
-    grid-template-columns: 1fr; /* 1 column on mobile */
+    /* Use auto-fit to create a responsive grid without media queries */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 1.5rem;
-}
-
-@media (min-width: 768px) {
-    .car-grid {
-        grid-template-columns: repeat(2, 1fr); /* 2 columns on tablet */
-    }
-}
-
-@media (min-width: 1200px) {
-    .car-grid {
-        grid-template-columns: repeat(3, 1fr); /* 3 columns on desktop */
-    }
 }
 
 .car-card {
     background-color: var(--bg-dark-secondary);
     border-radius: 12px;
     overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
     border: 1px solid var(--border-color);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Makes the card stretch correctly */
 }
 
 .car-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 0 15px rgba(0, 123, 255, 0.2); /* Shadow + Glow */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 0 15px rgba(0, 123, 255, 0.2);
+    /* Shadow + Glow */
 }
 
 .car-card .card-body {
@@ -248,9 +251,47 @@ p, .card-text {
     color: var(--text-gray);
 }
 
-.car-card .card-actions {
-    margin-top: 1rem;
+.car-card .badge {
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: white;
+    align-self: center; /* Better vertical alignment */
 }
+
+.car-card .card-actions {
+    margin-top: auto; /* Pushes actions to the bottom */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+/* Button variations for cards */
+.car-card .btn {
+    flex-grow: 1; /* Allow buttons to grow and fill space */
+    padding: 8px 12px;
+    font-size: 14px;
+}
+
+.btn-outline-light {
+    background: transparent;
+    border: 1px solid var(--text-gray);
+    color: var(--text-gray) !important;
+}
+.btn-outline-light:hover {
+    background: var(--text-gray);
+    color: var(--bg-dark-primary) !important;
+}
+.btn-primary {
+    background: var(--primary-color);
+}
+
+.bg-success { background-color: var(--status-available) !important; }
+.bg-danger { background-color: var(--status-rented) !important; }
+
  
 .card-status {
     display: inline-block;
@@ -381,4 +422,38 @@ p, .card-text {
 
 .footer {
     background-color: var(--bg-dark-secondary);
+}
+.footer {
+    background: #0b0f19;
+    color: #d1d5db;
+    text-align: center;
+    padding: 25px 0;
+    width: 100%;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    margin-top: 80px;
+}
+
+.footer-inner {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.footer a {
+    color: #3b82f6;
+    text-decoration: none;
+    margin: 0 6px;
+    font-weight: 500;
+}
+
+.footer a:hover {
+    color: white;
+    text-decoration: underline;
+}
+/* === Car Grid Layout === */
+.car-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
 }
