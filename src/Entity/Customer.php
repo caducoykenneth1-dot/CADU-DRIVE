@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\CustomerRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -44,11 +46,15 @@ class Customer
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    #[ORM\OneToMany(mappedBy: 'customer', targetEntity: Rental::class, cascade: ['remove'])]
+    private Collection $rentals;
+
     public function __construct()
     {
         $now = new \DateTimeImmutable();
         $this->createdAt = $now;
         $this->updatedAt = $now;
+        $this->rentals = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -150,5 +156,34 @@ class Customer
     public function getDisplayName(): string
     {
         return trim(sprintf('%s %s', $this->firstName ?? '', $this->lastName ?? '')) ?: ($this->email ?? 'Customer');
+    }
+
+    /**
+     * @return Collection<int, Rental>
+     */
+    public function getRentals(): Collection
+    {
+        return $this->rentals;
+    }
+
+    public function addRental(Rental $rental): static
+    {
+        if (!$this->rentals->contains($rental)) {
+            $this->rentals->add($rental);
+            if ($rental->getCustomer() !== $this) {
+                $rental->setCustomer($this);
+            }
+        }
+
+        return $this;
+    }
+
+    public function removeRental(Rental $rental): static
+    {
+        if ($this->rentals->removeElement($rental) && $rental->getCustomer() === $this) {
+            // Owning side update handled where rentals are reassigned or removed.
+        }
+
+        return $this;
     }
 }

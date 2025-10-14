@@ -67,7 +67,19 @@ class Rental
      */
     public function setCar(?Car $car): static
     {
+        if ($this->car === $car) {
+            return $this;
+        }
+
+        if ($this->car !== null) {
+            $this->car->removeRental($this);
+        }
+
         $this->car = $car;
+
+        if ($car !== null && !$car->getRentals()->contains($this)) {
+            $car->addRental($this);
+        }
 
         return $this;
     }
@@ -85,7 +97,19 @@ class Rental
      */
     public function setCustomer(?Customer $customer): static
     {
+        if ($this->customer === $customer) {
+            return $this;
+        }
+
+        if ($this->customer !== null) {
+            $this->customer->removeRental($this);
+        }
+
         $this->customer = $customer;
+
+        if ($customer !== null && !$customer->getRentals()->contains($this)) {
+            $customer->addRental($this);
+        }
 
         return $this;
     }

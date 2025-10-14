@@ -3,6 +3,8 @@
 namespace App\Form;
 
 use App\Entity\Car;
+use App\Entity\CarStatus;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -21,6 +23,15 @@ class CarType extends AbstractType
             ->add('description')
             ->add('year')
             ->add('price')
+            ->add('status', EntityType::class, [
+                'class' => CarStatus::class,
+                'choice_label' => 'label',
+                'placeholder' => 'Select status',
+                'label' => 'Status',
+                'attr' => [
+                    'class' => 'form-select',
+                ],
+            ])
             ->add('imageFile', FileType::class, [
                 'label' => 'Car Image (JPG or PNG)',
                 'mapped' => false,

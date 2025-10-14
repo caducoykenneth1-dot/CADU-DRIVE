@@ -19,12 +19,13 @@
 
         <div class="car-content">
             <div class="status-price">
+                {% set status_code = car.status.code|default('unknown') %}
                 {% set status_class = {
                     'available': 'status-available',
                     'rented': 'status-rented'
-                }[car.status|lower] ?? 'status-maintenance' %}
+                }[status_code] ?? 'status-maintenance' %}
 
-                <span class="status-pill {{ status_class }}">{{ car.status|capitalize }}</span>
+                <span class="status-pill {{ status_class }}">{{ car.status.label|default('Unknown') }}</span>
                 <div class="price-tag">
                     <span class="price-amount">&#8369;{{ car.price|number_format(0, '.', ',') }}</span>
                     <span class="price-period">per day</span>
@@ -59,7 +60,7 @@
             <div class="cta-group">
                 <a class="btn-secondary" href="{{ path('app_car_index') }}">Back to Fleet</a>
 
-                {% if car.status == 'available' %}
+                {% if status_code == 'available' %}
                     <button class="btn-primary" onclick="confirmRent('{{ path('app_car_rent', {'id': car.id}) }}', '{{ car.make }} {{ car.model }}')">
                         Rent This Car
                     </button>
@@ -76,7 +77,7 @@
         <div class="info-panel">
             <h2>Vehicle Snapshot</h2>
             <ul>
-                <li><span>Status</span><span>{{ car.status|capitalize }}</span></li>
+                <li><span>Status</span><span>{{ car.status.label|default('Unknown') }}</span></li>
                 <li><span>Daily Rate</span><span>&#8369;{{ car.price|number_format(0, '.', ',') }}</span></li>
                 <li><span>Model Year</span><span>{{ car.year }}</span></li>
                 <li><span>Build</span><span>{{ car.make }}</span></li>

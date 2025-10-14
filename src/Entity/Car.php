@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\CarRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -15,6 +17,11 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: CarRepository::class)]
 class Car
 {
+    public function __construct()
+    {
+        $this->rentals = new ArrayCollection();
+    }
+
     /**
      * Surrogate primary key.
      */
@@ -56,8 +63,15 @@ class Car
     /**
      * Current availability marker (available, rented, maintenance, etc.).
      */
-    #[ORM\Column(length: 255, options: ["default" => "available"])]
-    private ?string $status = 'available';
+    #[ORM\ManyToOne(targetEntity: CarStatus::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?CarStatus $status = null;
+
+    /**
+     * Rentals that use this car.
+     */
+    #[ORM\OneToMany(mappedBy: 'car', targetEntity: Rental::class)]
+    private Collection $rentals;
 
     /**
      * Filename of the uploaded image stored under `public/images`.
@@ -161,17 +175,30 @@ class Car
     /**
      * Return the current availability status.
      */
-    public function getStatus(): ?string
+    public function getStatus(): ?CarStatus
     {
         return $this->status;
     }
 
     /**
-     * Change the availability status string.
+     * Change the availability status record.
      */
-    public function setStatus(string $status): static
+    public function setStatus(CarStatus $status): static
     {
+        if ($this->status === $status) {
+            return $this;
+        }
+
+        if ($this->status !== null) {
+            $this->status->removeCar($this);
+        }
+
         $this->status = $status;
+
+        if ($status !== null) {
+            $status->addCar($this);
+        }
+
         return $this;
     }
 
@@ -189,6 +216,35 @@ class Car
     public function setImage(?string $image): static
     {
         $this->image = $image;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Rental>
+     */
+    public function getRentals(): Collection
+    {
+        return $this->rentals;
+    }
+
+    public function addRental(Rental $rental): static
+    {
+        if (!$this->rentals->contains($rental)) {
+            $this->rentals->add($rental);
+            if ($rental->getCar() !== $this) {
+                $rental->setCar($this);
+            }
+        }
+
+        return $this;
+    }
+
+    public function removeRental(Rental $rental): static
+    {
+        if ($this->rentals->removeElement($rental) && $rental->getCar() === $this) {
+            // Let doctrine handle the owning side when the rental is removed or reassigned.
+        }
+
         return $this;
     }
 }

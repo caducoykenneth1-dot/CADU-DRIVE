@@ -7,6 +7,7 @@ use App\Entity\Rental;
 use App\Form\CarType;
 use App\Form\RentalType;
 use App\Repository\CarRepository;
+use App\Repository\CarStatusRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,9 +37,12 @@ final class CarController extends AbstractController
      * Create a new car record and optionally attach an uploaded image.
      */
     #[Route('/new', name: 'app_car_new', methods: ['GET','POST'])]  // �o. FIXED
-    public function new(Request $request, EntityManagerInterface $em): Response
+    public function new(Request $request, EntityManagerInterface $em, CarStatusRepository $statusRepository): Response
     {
         $car = new Car();
+        if (null !== ($defaultStatus = $statusRepository->findOneByCode('available'))) {
+            $car->setStatus($defaultStatus);
+        }
         $form = $this->createForm(CarType::class, $car);
         $form->handleRequest($request);
 
@@ -123,7 +127,7 @@ final class CarController extends AbstractController
      * Collect rental information, persist it, and flip the car status.
      */
     #[Route('/{id}/rent', name: 'app_car_rent', methods: ['GET', 'POST'])]
-    public function rent(Request $request, Car $car, EntityManagerInterface $entityManager): Response
+    public function rent(Request $request, Car $car, EntityManagerInterface $entityManager, CarStatusRepository $statusRepository): Response
     {
         $rental = new Rental();
         $form = $this->createForm(RentalType::class, $rental);
@@ -131,7 +135,11 @@ final class CarController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $rental->setCar($car);
-            $car->setStatus('rented');
+            if (null === ($rentedStatus = $statusRepository->findOneByCode('rented'))) {
+                $this->addFlash('warning', 'Car status "rented" is not configured. Please update status definitions.');
+            } else {
+                $car->setStatus($rentedStatus);
+            }
 
             $entityManager->persist($rental);
             $entityManager->flush();

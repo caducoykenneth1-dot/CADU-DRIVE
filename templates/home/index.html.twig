@@ -66,7 +66,9 @@
                         <div class="card-body">
                             <div class="card-header">
                                 <h3 class="card-title">{{ car.make }} {{ car.model }}</h3>
-                                <span class="card-status status-{{ car.status|lower }}">{{ car.status }}</span>
+                                <span class="card-status status-{{ car.status.code|default('unknown')|lower }}">
+                                    {{ car.status.label|default('Unknown') }}
+                                </span>
                             </div>
                             <p class="card-price">&#8369;{{ car.price }}<span>/day</span></p>
                             <div class="card-actions">
