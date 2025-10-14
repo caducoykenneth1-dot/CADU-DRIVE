@@ -20,7 +20,7 @@
 
         <div class="info-item">
             <i class="fas fa-phone"></i>
-            <span>+1 (555) 234-5678</span>
+            <span> +63 921 695 1190 </span>
         </div>
         <div class="info-item">
             <i class="fas fa-envelope"></i>
@@ -28,24 +28,31 @@
         </div>
         <div class="info-item">
             <i class="fas fa-map-marker-alt"></i>
-            <span>123 Mobility Street, Accra, Ghana</span>
+            <span> Dumaguete City, Negros Oriental </span>
         </div>
     </div>
 
     <div class="contact-card">
-        <form>
+        {% if app.request.hasPreviousSession %}
+            {% for message in app.flashes('success') %}
+                <div class="flash-success">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form action="{{ path('app_contact') }}" method="post" class="contact-form">
             <div class="form-group">
-                <label>Name</label>
-                <input type="text" placeholder="Enter your name" class="form-control">
+                <label for="contact_name">Name</label>
+                <input id="contact_name" name="name" type="text" placeholder="Enter your name" class="form-control" required>
             </div>
             <div class="form-group">
-                <label>Email</label>
-                <input type="email" placeholder="Enter your email" class="form-control">
+                <label for="contact_email">Email</label>
+                <input id="contact_email" name="email" type="email" placeholder="Enter your email" class="form-control" required>
             </div>
             <div class="form-group">
-                <label>Message</label>
-                <textarea rows="5" placeholder="Write your message here" class="form-control"></textarea>
+                <label for="contact_message">Message</label>
+                <textarea id="contact_message" name="message" rows="5" placeholder="Write your message here" class="form-control" required></textarea>
             </div>
+            <input type="hidden" name="_token" value="{{ csrf_token('contact-form') }}">
             <button type="submit" class="btn">Send Message</button>
         </form>
     </div>

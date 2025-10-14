@@ -1,0 +1,79 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Customers{% endblock %}
+
+{% block body %}
+    <section class="customer-section space-y-6">
+        {% for message in app.flashes('success') %}
+            <div class="alert-success">{{ message }}</div>
+        {% endfor %}
+
+        <div class="customer-toolbar">
+            <div>
+                <p class="eyebrow">Customer Directory</p>
+                <h1 class="page-title mb-1">Profiles</h1>
+                <p class="text-gray-400 text-sm">Track renter details, contact information, and licensing at a glance.</p>
+            </div>
+            <div class="flex gap-3 flex-wrap">
+                <a href="{{ path('app_car_index') }}" class="btn btn-secondary">Back to Cars</a>
+            </div>
+        </div>
+
+        <form method="get" class="customer-search">
+            <input
+                type="search"
+                name="search"
+                value="{{ searchTerm }}"
+                class="form-control flex-1"
+                placeholder="Search by name or email"
+            >
+            <button class="btn" type="submit">Search</button>
+        </form>
+
+        <div class="customer-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>License</th>
+                        <th class="text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for customer in customers %}
+                        <tr>
+                            <td>
+                                <a href="{{ path('app_customer_show', {'id': customer.id}) }}" class="customer-name">
+                                    {{ customer.displayName }}
+                                </a>
+                                <span class="customer-created">Joined {{ customer.createdAt|date('M d, Y') }}</span>
+                            </td>
+                            <td>{{ customer.email }}</td>
+                            <td>{{ customer.phone|default('—') }}</td>
+                            <td>
+                                {% if customer.licenseNumber %}
+                                    <span class="tag">{{ customer.licenseNumber }}</span>
+                                {% else %}
+                                    <span class="tag tag-muted">Not provided</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-right">
+                                <a href="{{ path('app_customer_show', {'id': customer.id}) }}" class="btn btn-sm btn-outline-light">Details</a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="empty-state">
+                                <h3>No customers found</h3>
+                                <p>Create a profile to start tracking renter details.</p>
+                                <a class="btn btn-primary mt-3" href="{{ path('app_customer_register') }}">Invite customers to register</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+{% endblock %}

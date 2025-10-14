@@ -30,14 +30,18 @@
                         </span>
                     </div>
 
-                    <p class="card-price">${{ car.price }}<span>/day</span></p>
+                    <p class="card-price">&#8369;{{ car.price }}<span>/day</span></p>
                     <p class="small"><strong>Year:</strong> {{ car.year }}</p>
                     <p class="description">{{ car.description|default('No description')|slice(0, 80) ~ '...' }}</p>
 
                     <div class="card-actions mt-3 d-flex flex-wrap gap-2">
                         <a href="{{ path('app_car_show', {'id': car.id}) }}" class="btn btn-sm btn-outline-light flex-grow-1">Details</a>
-                        <a href="{{ path('app_car_edit', {'id': car.id}) }}" class="btn btn-sm btn-outline-secondary flex-grow-1">Edit</a>
-                        {{ include('car/_delete_form.html.twig', { car: car }) }}
+                        <div class="d-flex gap-2">
+                            <a href="{{ path('app_car_edit', {'id': car.id}) }}" class="btn btn-sm btn-edit" title="Edit">
+                                <i class="bi bi-pencil-fill"></i>
+                            </a>
+                            {{ include('car/_delete_form.html.twig', { car: car }) }}
+                        </div>
                     </div>
                 </div>
             </div>

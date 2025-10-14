@@ -1,126 +1,282 @@
-/* ===== Car Details Page ===== */
+/* ===== Car Details Page Refresh ===== */
 body {
-    background: linear-gradient(135deg, #1f2937, #111827);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    color: #2c3e50;
-    margin: 0;
-    padding: 0;
+    background: linear-gradient(135deg, rgba(17, 24, 39, 0.95), rgba(8, 47, 73, 0.9));
 }
 
-/* Page Title */
-.page-title {
-    text-align: center;
-    font-size: 2.4rem;
-    margin: 1.5rem 0 2rem;
-    color: #f9fafb;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-}
-
-/* Container Card */
-.car-details {
-    max-width: 800px;
-    margin: 0 auto 3rem auto;
-    padding: 2rem;
-    background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-/* Details Table */
-.details-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 2rem;
-}
-.details-table th,
-.details-table td {
-    padding: 14px 16px;
-    text-align: left;
-    border-bottom: 1px solid #e5e7eb;
-}
-.details-table th {
-    width: 30%;
-    background: #f3f4f6;
-    font-weight: 600;
-    color: #1f2937;
-}
-.details-table td {
-    color: #374151;
-}
-
-/* Alternate Row Shading */
-.details-table tr:nth-child(even) td {
-    background: #fafafa;
-}
-
-/* Status Badges */
-.badge {
-    display: inline-block;
-    padding: 0.4rem 0.9rem;
-    border-radius: 999px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-.badge-available {
-    background: #d1fae5;
-    color: #065f46;
-}
-.badge-rented {
-    background: #fee2e2;
-    color: #991b1b;
-}
-.badge-maintenance {
-    background: #fef9c3;
-    color: #92400e;
-}
-
-/* Actions */
-.actions {
+.car-details-wrapper {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
     display: flex;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-    gap: 12px;
+    flex-direction: column;
+    gap: 2rem;
+    color: var(--text-light, #f9fafb);
 }
 
-/* Buttons */
-.actions .btn {
-    padding: 12px 20px;
-    border: none;
-    border-radius: 6px;
-    text-align: center;
-    font-size: 0.95rem;
+.car-details-card {
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(59, 130, 246, 0.15);
+    border-radius: 20px;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: minmax(280px, 1fr) 1.2fr;
+    box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(14px);
+}
+
+.car-media {
+    position: relative;
+    background: radial-gradient(circle at top, rgba(59, 130, 246, 0.35), transparent 65%);
+}
+
+.car-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    min-height: 100%;
+}
+
+.car-content {
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+}
+
+.status-price {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 1.1rem;
+    border-radius: 999px;
     font-weight: 600;
-    color: #fff;
-    cursor: pointer;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    background: rgba(59, 130, 246, 0.12);
+}
+
+.status-available {
+    color: #38f2a1;
+    background: rgba(56, 242, 161, 0.12);
+}
+
+.status-rented {
+    color: #f97373;
+    background: rgba(249, 115, 115, 0.12);
+}
+
+.status-maintenance {
+    color: #facc15;
+    background: rgba(250, 204, 21, 0.12);
+}
+
+.price-tag {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.price-amount {
+    font-size: 2.1rem;
+    font-weight: 700;
+    color: #f9fafb;
+}
+
+.price-period {
+    color: rgba(209, 213, 219, 0.75);
+    font-size: 0.9rem;
+    letter-spacing: 0.3px;
+}
+
+.car-title {
+    font-size: 2.4rem;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    margin: 0;
+}
+
+.car-description {
+    color: rgba(229, 231, 235, 0.82);
+    line-height: 1.7;
+    max-width: 48ch;
+}
+
+.spec-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+}
+
+.spec-item {
+    background: rgba(30, 41, 59, 0.75);
+    border: 1px solid rgba(59, 130, 246, 0.15);
+    border-radius: 12px;
+    padding: 1rem 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.spec-label {
+    font-size: 0.8rem;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: rgba(148, 163, 184, 0.85);
+}
+
+.spec-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.cta-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 0.85rem 1.6rem;
+    border-radius: 999px;
+    font-weight: 600;
     text-decoration: none;
-    transition: all 0.25s ease-in-out;
-    min-width: 120px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    border: none;
 }
 
-.btn-back { background: #374151; }
-.btn-edit { background: #f59e0b; }
-.btn-rent { background: #10b981; }
-.btn-delete { background: #ef4444; }
+.btn-primary {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: #fff;
+}
 
-/* Hover Effects */
-.actions .btn:hover {
-    transform: translateY(-3px);
+.btn-secondary {
+    background: rgba(148, 163, 184, 0.12);
+    color: #e5e7eb;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.btn-primary:hover,
+.btn-secondary:hover {
+    transform: translateY(-2px);
     opacity: 0.92;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 12px 26px rgba(59, 130, 246, 0.25);
 }
 
-/* Animation */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
+.unavailable-note {
+    color: rgba(248, 113, 113, 0.9);
+    font-weight: 600;
 }
 
-.car-grid {
-    background-color: #0f172a; /* dark navy for grid section */
-    padding: 2rem;
-    border-radius: 8px;
+.car-extra-panels {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+}
+
+.info-panel {
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(59, 130, 246, 0.12);
+    border-radius: 16px;
+    padding: 1.75rem;
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.info-panel h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0;
+    color: #f9fafb;
+}
+
+.info-panel ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    color: rgba(229, 231, 235, 0.85);
+}
+
+.info-panel ul li {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+    padding-bottom: 0.6rem;
+}
+
+.info-panel ul li span:first-child {
+    color: rgba(148, 163, 184, 0.85);
+    font-weight: 500;
+}
+
+.info-panel p {
+    color: rgba(226, 232, 240, 0.8);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.panel-link {
+    align-self: flex-start;
+    margin-top: 0.5rem;
+    color: #93c5fd;
+    text-decoration: none;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.panel-link:hover {
+    color: #fff;
+    transform: translateX(4px);
+}
+
+@media (max-width: 1024px) {
+    .car-details-card {
+        grid-template-columns: 1fr;
+    }
+
+    .car-media {
+        min-height: 260px;
+    }
+}
+
+@media (max-width: 640px) {
+    .car-content {
+        padding: 2rem 1.5rem;
+    }
+
+    .status-price {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .price-tag {
+        align-items: flex-start;
+    }
+
+    .car-title {
+        font-size: 2rem;
+    }
 }

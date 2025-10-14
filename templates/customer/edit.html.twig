@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Customer{% endblock %}
+
+{% block body %}
+    <section class="customer-section max-w-3xl mx-auto space-y-6">
+        <div class="customer-toolbar justify-between">
+            <div>
+                <p class="eyebrow">Update Profile</p>
+                <h1 class="page-title mb-1">{{ customer.displayName }}</h1>
+                <p class="text-gray-400 text-sm">Keep renter contact and licensing details current.</p>
+            </div>
+            <div class="flex gap-3 flex-wrap items-start">
+                <a href="{{ path('app_customer_show', {'id': customer.id}) }}" class="btn btn-secondary">Back to Details</a>
+                {{ include('customer/_delete_form.html.twig', { customer: customer }) }}
+            </div>
+        </div>
+
+        <div class="customer-card">
+            {% include 'customer/_form.html.twig' with {
+                form: form,
+                button_label: 'Update',
+                back_path: path('app_customer_show', {'id': customer.id})
+            } %}
+        </div>
+    </section>
+{% endblock %}

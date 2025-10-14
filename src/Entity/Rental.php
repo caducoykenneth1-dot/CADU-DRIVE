@@ -6,37 +6,65 @@ use App\Repository\RentalRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Records a booking for a specific car between two dates.
+ */
 #[ORM\Entity(repositoryClass: RentalRepository::class)]
 class Rental
 {
+    /**
+     * Surrogate primary key for the rental record.
+     */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    /**
+     * The car being reserved for the rental period.
+     */
     #[ORM\ManyToOne(targetEntity: Car::class)]
     #[ORM\JoinColumn(nullable: false)]
     private ?Car $car = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $customerName = null;
+    /**
+     * The customer profile responsible for the rental.
+     */
+    #[ORM\ManyToOne(targetEntity: Customer::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Customer $customer = null;
 
+    /**
+     * Start timestamp for the rental.
+     */
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $startDate = null;
 
+    /**
+     * Expected return timestamp for the rental.
+     */
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $endDate = null;
 
+    /**
+     * Unique identifier accessor.
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    /**
+     * Retrieve the car that was booked.
+     */
     public function getCar(): ?Car
     {
         return $this->car;
     }
 
+    /**
+     * Associate a car with this rental.
+     */
     public function setCar(?Car $car): static
     {
         $this->car = $car;
@@ -44,23 +72,35 @@ class Rental
         return $this;
     }
 
-    public function getCustomerName(): ?string
+    /**
+     * Return the linked customer profile.
+     */
+    public function getCustomer(): ?Customer
     {
-        return $this->customerName;
+        return $this->customer;
     }
 
-    public function setCustomerName(string $customerName): static
+    /**
+     * Associate a customer profile with this rental.
+     */
+    public function setCustomer(?Customer $customer): static
     {
-        $this->customerName = $customerName;
+        $this->customer = $customer;
 
         return $this;
     }
 
+    /**
+     * Retrieve the rental start time.
+     */
     public function getStartDate(): ?\DateTimeInterface
     {
         return $this->startDate;
     }
 
+    /**
+     * Store the start date/time.
+     */
     public function setStartDate(\DateTimeInterface $startDate): static
     {
         $this->startDate = $startDate;
@@ -68,11 +108,17 @@ class Rental
         return $this;
     }
 
+    /**
+     * Retrieve the expected end time.
+     */
     public function getEndDate(): ?\DateTimeInterface
     {
         return $this->endDate;
     }
 
+    /**
+     * Store the expected return date/time.
+     */
     public function setEndDate(\DateTimeInterface $endDate): static
     {
         $this->endDate = $endDate;

@@ -10,13 +10,25 @@
 {% block body %}
 <div class="rent-container">
     <h1>Rent {{ car.make }} {{ car.model }}</h1>
+    <p class="rent-subtitle">Select a customer profile and confirm rental dates.</p>
 
-    {{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn-rent-confirm">Confirm Rental</button>
+    {{ form_start(form, { attr: { class: 'rent-form' } }) }}
+        <div class="rent-field">
+            {{ form_row(form.customer) }}
+            {% if form.customer.vars.choices is empty %}
+                <p class="rent-hint">
+                    No customers available. Ask the renter to complete the
+                    <a href="{{ path('app_customer_register') }}">customer registration form</a> first.
+                </p>
+            {% endif %}
+        </div>
+        <div class="rent-grid">
+            {{ form_row(form.startDate) }}
+            {{ form_row(form.endDate) }}
+        </div>
+        <button class="btn-rent-confirm"{% if form.customer.vars.choices is empty %} disabled{% endif %}>Confirm Rental</button>
     {{ form_end(form) }}
 
     <a href="{{ path('app_car_index') }}" class="back-link">Cancel</a>
 </div>
 {% endblock %}
-

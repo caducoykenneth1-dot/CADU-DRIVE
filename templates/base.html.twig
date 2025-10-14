@@ -6,6 +6,7 @@
 
         {# Tailwind-generated styles #}
         <link rel="stylesheet" href="{{ asset('build/app.css') }}">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
         {# Your custom styles AFTER Tailwind #}
         {% block stylesheets %}
@@ -26,9 +27,8 @@
                 <div class="container mx-auto flex items-center justify-between p-4">
                     <!-- Logo -->
                     <div>
-                        <a class="text-white text-2xl font-bold tracking-wider flex items-center" href="{{ path('app_home') }}">
-                            <img src="{{ asset('images/cadudrive_clean_transparent.png') }}" alt="Cadu Drive Logo" class="h-6 mr-2">
-                            <span>Cadu Drive</span>
+                        <a class="text-white flex items-center" href="{{ path('app_home') }}">
+                            <img src="{{ asset('images/cadudriving_brandblue.png') }}" alt="Cadu Driving" style="height: 2.6rem; width: auto;">
                         </a>
                     </div>
 
@@ -38,28 +38,38 @@
                         <a href="{{ path('app_about') }}" class="nav-link">About</a>
                         <a href="{{ path('app_car_index') }}" class="nav-link">Cars</a>
                         <a href="{{ path('app_contact') }}" class="nav-link">Contact</a>
-                        <a href="#" class="btn">Book a Ride</a>
+                        <a href="{{ path('app_customer_register') }}" class="nav-link">Register</a>
+                        <a href="{{ path('app_customer_index') }}" class="nav-link">Customers</a>
+                        <a href="{{ path('app_car_index') }}" class="btn">Book a Ride</a>
                     </div>
 
                     <!-- Mobile Menu Button -->
                     <div class="lg:hidden">
-                        <button id="mobile-menu-button" class="text-white focus:outline-none">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-4 6h16"></path></svg>
+                        <button id="mobile-menu-button" class="text-white focus:outline-none" aria-label="Open navigation">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                         </button>
                     </div>
                 </div>
 
-                <!-- Mobile Menu -->
-                <div id="mobile-menu" class="hidden lg:hidden bg-gray-800 bg-opacity-90">
-                    <a href="{{ path('app_home') }}" class="block text-white text-center py-3">Home</a>
-                    <a href="{{ path('app_about') }}" class="block text-white text-center py-3">About</a>
-                    <a href="{{ path('app_car_index') }}" class="block text-white text-center py-3">Cars</a>
-                    <a href="{{ path('app_contact') }}" class="block text-black text-center py-3">Contact</a>
-                    <div class="text-center py-4">
-                        <a href="#" class="btn">Book a Ride</a>
-                    </div>
-                </div>
-            </nav>
+              <!-- Mobile Menu -->
+<!-- Side Drawer -->
+<div id="drawer-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"></div>
+<nav id="mobile-menu" class="mobile-drawer lg:hidden" aria-hidden="true">
+    <button id="mobile-menu-close" class="drawer-close" aria-label="Close navigation">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+    </button>
+    <a href="{{ path('app_home') }}" class="drawer-link">Home</a>
+    <a href="{{ path('app_about') }}" class="drawer-link">About</a>
+    <a href="{{ path('app_car_index') }}" class="drawer-link">Cars</a>
+    <a href="{{ path('app_contact') }}" class="drawer-link">Contact</a>
+    <a href="{{ path('app_customer_register') }}" class="drawer-link">Register</a>
+    <a href="{{ path('app_customer_index') }}" class="drawer-link">Customers</a>
+    <a href="{{ path('app_car_index') }}" class="btn mt-4 w-full text-center">Book a Ride</a>
+</nav>
+
+
             
         </header>
 
@@ -110,6 +120,8 @@
                 const mainNav = document.getElementById('main-nav');
                 const mobileMenuButton = document.getElementById('mobile-menu-button');
                 const mobileMenu = document.getElementById('mobile-menu');
+                const mobileMenuClose = document.getElementById('mobile-menu-close');
+                const drawerOverlay = document.getElementById('drawer-overlay');
 
                 window.addEventListener('scroll', () => {
                     if (window.scrollY > 50) {
@@ -119,8 +131,25 @@
                     }
                 });
 
-                mobileMenuButton.addEventListener('click', () => {
-                    mobileMenu.classList.toggle('hidden');
+                const closeDrawer = () => {
+                    mobileMenu.classList.remove('open');
+                    drawerOverlay.classList.add('hidden');
+                    mobileMenu.setAttribute('aria-hidden', 'true');
+                    document.body.classList.remove('overflow-hidden');
+                };
+
+                const openDrawer = () => {
+                    mobileMenu.classList.add('open');
+                    drawerOverlay.classList.remove('hidden');
+                    mobileMenu.setAttribute('aria-hidden', 'false');
+                    document.body.classList.add('overflow-hidden');
+                };
+
+                mobileMenuButton.addEventListener('click', openDrawer);
+                mobileMenuClose.addEventListener('click', closeDrawer);
+                drawerOverlay.addEventListener('click', closeDrawer);
+                mobileMenu.querySelectorAll('a').forEach((link) => {
+                    link.addEventListener('click', closeDrawer);
                 });
             </script>
         {% endblock %}

@@ -14,7 +14,7 @@
         {% for rental in rentals %}
             <div class="rental-card">
                 <h2 class="car-name">{{ rental.car.make }} {{ rental.car.model }}</h2>
-                <p><strong>Customer:</strong> {{ rental.customerName }}</p>
+                <p><strong>Customer:</strong> {{ rental.customer ? rental.customer.displayName : '—' }}</p>
                 <p><strong>Start Date:</strong> {{ rental.startDate|date('Y-m-d H:i') }}</p>
                 <p><strong>End Date:</strong> {{ rental.endDate|date('Y-m-d H:i') }}</p>
                 <span class="rental-id">#{{ rental.id }}</span>

@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Customer Registration{% endblock %}
+
+{% block body %}
+    <section class="customer-section max-w-3xl mx-auto space-y-6">
+        {% for message in app.flashes('success') %}
+            <div class="alert-success">{{ message }}</div>
+        {% endfor %}
+
+        <div class="customer-hero">
+            <div>
+                <p class="eyebrow">Create Your Profile</p>
+                <h1 class="page-title mb-1">Customer Registration</h1>
+                <p class="text-gray-400 text-sm">
+                    Share your contact and licensing details once so future bookings are fast and accurate.
+                </p>
+            </div>
+            <a href="{{ path('app_home') }}" class="btn btn-secondary">Back to Home</a>
+        </div>
+
+        <div class="customer-card">
+            {% include 'customer/_form.html.twig' with {
+                form: form,
+                button_label: 'Create Profile',
+                back_path: path('app_home')
+            } %}
+        </div>
+    </section>
+{% endblock %}

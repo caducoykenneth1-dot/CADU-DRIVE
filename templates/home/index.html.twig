@@ -20,22 +20,33 @@
             <h2 class="text-center mb-4">Featured Cars</h2>
 
             {# Search / Quick Filter #}
-            <form class="car-filters mb-5">
+            <form class="car-filters mb-5" method="get" action="{{ path('app_home') }}">
                 <div class="flex flex-col md:flex-row items-center justify-center gap-4">
                     <div class="w-full md:w-1/3">
-                        <select class="form-select w-full">
-                            <option selected>Car Type</option>
-                            <option value="1">Sedan</option>
-                            <option value="2">SUV</option>
-                            <option value="3">Truck</option>
+                        <select
+                            class="form-select w-full"
+                            name="car_type"
+                            aria-label="Filter by car type"
+                        >
+                            <option value="">{{ 'All Types' }}</option>
+                            {% for type in carTypes %}
+                                <option value="{{ type }}" {{ type == selectedType ? 'selected' : '' }}>{{ type }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                     <div class="w-full md:w-1/3">
-                        <select class="form-select w-full">
-                            <option selected>Price Range</option>
-                            <option value="1">$50 - $100</option>
-                            <option value="2">$100 - $200</option>
-                            <option value="3">$200+</option>
+                        <select
+                            class="form-select w-full"
+                            name="price_range"
+                            aria-label="Filter by price range"
+                            {% if priceRanges is empty %}disabled{% endif %}
+                        >
+                            <option value="">{{ priceRanges is empty ? 'No price data' : 'All Prices' }}</option>
+                            {% for key, range in priceRanges %}
+                                <option value="{{ key }}" {{ key == selectedPriceRange ? 'selected' : '' }}>
+                                    {{ range.label }}
+                                </option>
+                            {% endfor %}
                         </select>
                     </div>
                     <div class="w-full md:w-auto">
@@ -47,13 +58,17 @@
             <div class="car-grid">
                 {% for car in cars %}
                     <div class="car-card">
-                        <img src="https://placehold.co/600x400/555/white?text={{ car.make|escape('url') }}" alt="{{ car.make }} {{ car.model }}" class="card-img">
+                        {% if car.image %}
+                            <img src="{{ asset('images/' ~ car.image) }}" alt="{{ car.make }} {{ car.model }}" class="card-img">
+                        {% else %}
+                            <img src="https://placehold.co/600x400/555/white?text={{ (car.make ~ ' ' ~ car.model)|url_encode }}" alt="{{ car.make }} {{ car.model }}" class="card-img">
+                        {% endif %}
                         <div class="card-body">
                             <div class="card-header">
                                 <h3 class="card-title">{{ car.make }} {{ car.model }}</h3>
                                 <span class="card-status status-{{ car.status|lower }}">{{ car.status }}</span>
                             </div>
-                            <p class="card-price">${{ car.price }}<span>/day</span></p>
+                            <p class="card-price">&#8369;{{ car.price }}<span>/day</span></p>
                             <div class="card-actions">
                                 <a href="{{ path('app_car_show', {'id': car.id}) }}" class="btn">View Details</a>
                             </div>
@@ -61,9 +76,13 @@
                     </div>
                 {% else %}
                     <div class="col">
-                        <p class="text-center">No cars featured at the moment.</p>
+                        <p class="text-center">No cars match your filters right now.</p>
                     </div>
                 {% endfor %}
+            </div>
+
+            <div class="text-center mt-8">
+                <a href="{{ path('app_car_index') }}" class="btn btn-primary text-lg px-8 py-3">See All Cars</a>
             </div>
         </div>
     </section>

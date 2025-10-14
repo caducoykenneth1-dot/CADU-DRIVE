@@ -6,60 +6,90 @@
     <link rel="stylesheet" href="{{ asset('css/show.css') }}">
 {% endblock %}
 
-    {% block body %}
-        <h1 class="page-title">Car Details</h1>
+{% block body %}
+<div class="car-details-wrapper">
+    <div class="car-details-card">
+        <div class="car-media">
+            {% if car.image %}
+                <img src="{{ asset('images/' ~ car.image) }}" alt="{{ car.make }} {{ car.model }}" class="car-photo">
+            {% else %}
+                <img src="https://placehold.co/900x600/111827/ffffff?text={{ (car.make ~ '%20' ~ car.model)|url_encode }}" alt="{{ car.make }} {{ car.model }}" class="car-photo">
+            {% endif %}
+        </div>
 
-        <div class="car-details">
-            <table class="details-table">
-                <tbody>
-                    <tr>
-                        <th>Id</th>
-                        <td>{{ car.id }}</td>
-                    </tr>
-                    <tr>
-                        <th>Build</th>
-                        <td>{{ car.make }}</td>
-                    </tr>
-                    <tr>
-                        <th>Model</th>
-                        <td>{{ car.model }}</td>
-                    </tr>
-                    <tr>
-                        <th>Description</th>
-                        <td>{{ car.description }}</td>
-                    </tr>
-                    <tr>
-                        <th>Year</th>
-                        <td>{{ car.year }}</td>
-                    </tr>
-                    <tr>
-                        <th>Price</th>
-                        <td>${{ car.price }}</td>
-                    </tr>
-                    <tr>
-                        <th>Status</th>
-                        <td>
-                            {% if car.status == 'available' %}
-                                <span class="badge badge-available">Available</span>
-                            {% elseif car.status == 'rented' %}
-                                <span class="badge badge-rented">Rented</span>
-                            {% else %}
-                                <span class="badge badge-maintenance">Maintenance</span>
-                            {% endif %}
-                        </td>
-                    </tr>
+        <div class="car-content">
+            <div class="status-price">
+                {% set status_class = {
+                    'available': 'status-available',
+                    'rented': 'status-rented'
+                }[car.status|lower] ?? 'status-maintenance' %}
 
-                </tbody>
-            </table>
+                <span class="status-pill {{ status_class }}">{{ car.status|capitalize }}</span>
+                <div class="price-tag">
+                    <span class="price-amount">&#8369;{{ car.price|number_format(0, '.', ',') }}</span>
+                    <span class="price-period">per day</span>
+                </div>
+            </div>
 
-            <div class="actions">
-                <a class="btn btn-back" href="{{ path('app_car_index') }}">Back to List</a>
-                <a class="btn btn-edit" href="{{ path('app_car_edit', {'id': car.id}) }}">Edit</a>
+            <h1 class="car-title">{{ car.make }} {{ car.model }}</h1>
+
+            <p class="car-description">
+                {{ car.description|default('No description provided for this vehicle yet. Reach out to learn more about availability and features.') }}
+            </p>
+
+            <div class="spec-grid">
+                <div class="spec-item">
+                    <span class="spec-label">Build</span>
+                    <span class="spec-value">{{ car.make }}</span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-label">Model</span>
+                    <span class="spec-value">{{ car.model }}</span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-label">Year</span>
+                    <span class="spec-value">{{ car.year }}</span>
+                </div>
+                <div class="spec-item">
+                    <span class="spec-label">Vehicle ID</span>
+                    <span class="spec-value">#{{ car.id }}</span>
+                </div>
+            </div>
+
+            <div class="cta-group">
+                <a class="btn-secondary" href="{{ path('app_car_index') }}">Back to Fleet</a>
+
                 {% if car.status == 'available' %}
-                    <button class="btn btn-rent" onclick="confirmRent('{{ path('app_car_rent', {'id': car.id}) }}', '{{ car.make }} {{ car.model }}')">Rent Now</button>
-                {% endif %} 
+                    <button class="btn-primary" onclick="confirmRent('{{ path('app_car_rent', {'id': car.id}) }}', '{{ car.make }} {{ car.model }}')">
+                        Rent This Car
+                    </button>
+                {% else %}
+                    <span class="unavailable-note">
+                        Currently unavailable. Check back soon!
+                    </span>
+                {% endif %}
             </div>
         </div>
-    {% endblock %}
+    </div>
 
-    
+    <div class="car-extra-panels">
+        <div class="info-panel">
+            <h2>Vehicle Snapshot</h2>
+            <ul>
+                <li><span>Status</span><span>{{ car.status|capitalize }}</span></li>
+                <li><span>Daily Rate</span><span>&#8369;{{ car.price|number_format(0, '.', ',') }}</span></li>
+                <li><span>Model Year</span><span>{{ car.year }}</span></li>
+                <li><span>Build</span><span>{{ car.make }}</span></li>
+            </ul>
+        </div>
+        <div class="info-panel">
+            <h2>Need Something Else?</h2>
+            <p>
+                Browse our full fleet to find the perfect match for your upcoming trip,
+                or reach out to our team for tailored recommendations.
+            </p>
+            <a class="panel-link" href="{{ path('app_contact') }}">Contact Support</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

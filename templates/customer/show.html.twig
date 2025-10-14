@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Customer Details{% endblock %}
+
+{% block body %}
+    <section class="customer-section max-w-4xl mx-auto space-y-6">
+        {% for message in app.flashes('success') %}
+            <div class="alert-success">{{ message }}</div>
+        {% endfor %}
+
+        <div class="customer-hero">
+            <div>
+                <p class="eyebrow">Customer Profile</p>
+                <h1 class="page-title mb-2">{{ customer.displayName }}</h1>
+                <div class="customer-meta">
+                    <span class="tag">{{ customer.email }}</span>
+                    <span class="tag tag-muted">Joined {{ customer.createdAt|date('M d, Y') }}</span>
+                </div>
+            </div>
+            <div class="flex gap-3 flex-wrap">
+                <a href="{{ path('app_customer_edit', {'id': customer.id}) }}" class="btn btn-primary">Edit</a>
+                <a href="{{ path('app_customer_index') }}" class="btn btn-secondary">Back</a>
+                {{ include('customer/_delete_form.html.twig', { customer: customer }) }}
+            </div>
+        </div>
+
+        <div class="customer-card space-y-6">
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="info-block">
+                    <h3>Email</h3>
+                    <p>{{ customer.email }}</p>
+                </div>
+                <div class="info-block">
+                    <h3>Phone</h3>
+                    <p>{{ customer.phone|default('—') }}</p>
+                </div>
+                <div class="info-block">
+                    <h3>Driver License</h3>
+                    <p>{{ customer.licenseNumber|default('—') }}</p>
+                </div>
+                <div class="info-block">
+                    <h3>Last Updated</h3>
+                    <p>{{ customer.updatedAt|date('M d, Y H:i') }}</p>
+                </div>
+            </div>
+
+            {% if customer.notes %}
+                <div class="notes-block">
+                    <h3>Notes</h3>
+                    <p>{{ customer.notes }}</p>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}
