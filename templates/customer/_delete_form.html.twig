@@ -1,4 +1,14 @@
-<form method="post" action="{{ path('app_customer_delete', {'id': customer.id}) }}" onsubmit="return confirm('Are you sure you want to delete {{ customer.displayName }}?');">
+<form method="post"
+      action="{{ path('app_customer_delete', {'id': customer.id}) }}"
+      class="delete-form delete-form--customer"
+      data-confirm-title="Delete {{ customer.displayName|e('html_attr') }}?"
+      data-confirm-message="This will permanently remove {{ customer.displayName|e('html_attr') }} from the system.">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ customer.id) }}">
-    <button class="btn btn-danger" type="submit">Delete</button>
+    <button type="button"
+            class="btn btn-danger btn-delete"
+            title="Delete {{ customer.displayName|e('html_attr') }}"
+            onclick="confirmDelete(this.form)">
+        <i class="bi bi-trash-fill"></i>
+        <span class="sr-only">Delete {{ customer.displayName }}</span>
+    </button>
 </form>

@@ -84,14 +84,20 @@
             <script>
                 // SweetAlert for delete confirmation
                 function confirmDelete(form) {
+                    const {
+                        confirmTitle = 'Are you sure?',
+                        confirmMessage = 'This car will be permanently deleted!',
+                        confirmButton = 'Yes, delete it!',
+                    } = form.dataset;
+
                     Swal.fire({
-                        title: 'Are you sure?',
-                        text: "This car will be permanently deleted!",
+                        title: confirmTitle,
+                        text: confirmMessage,
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#e74c3c',
                         cancelButtonColor: '#3085d6',
-                        confirmButtonText: 'Yes, delete it!'
+                        confirmButtonText: confirmButton
                     }).then((result) => {
                         if (result.isConfirmed) {
                             form.submit();

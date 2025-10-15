@@ -18,9 +18,13 @@
                 </div>
             </div>
             <div class="flex gap-3 flex-wrap">
-                <a href="{{ path('app_customer_edit', {'id': customer.id}) }}" class="btn btn-primary">Edit</a>
-                <a href="{{ path('app_customer_index') }}" class="btn btn-secondary">Back</a>
+                <a href="{{ path('app_customer_edit', {'id': customer.id}) }}" class="btn btn-primary btn-with-icon">
+                    <i class="bi bi-pencil-fill"></i>
+                    <span class="btn-label">Edit</span>
+                </a>
+                
                 {{ include('customer/_delete_form.html.twig', { customer: customer }) }}
+                <a href="{{ path('app_customer_index') }}" class="btn btn-secondary">Back</a>
             </div>
         </div>
 

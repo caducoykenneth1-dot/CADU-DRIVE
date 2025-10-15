@@ -1,6 +1,11 @@
-<form method="post" action="{{ path('app_car_delete', {'id': car.id}) }}" onsubmit="return confirm('Are you sure you want to delete this car?');">
+<form method="post"
+      action="{{ path('app_car_delete', {'id': car.id}) }}"
+      class="delete-form">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ car.id) }}">
-    <button class="btn btn-sm btn-delete" title="Delete">
+    <button type="button"
+            class="btn btn-compact btn-delete"
+            title="Delete"
+            onclick="confirmDelete(this.form)">
         <i class="bi bi-trash-fill"></i>
     </button>
 </form>

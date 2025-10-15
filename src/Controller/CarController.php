@@ -116,6 +116,11 @@ final class CarController extends AbstractController
     public function delete(Request $request, Car $car, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$car->getId(), $request->getPayload()->getString('_token'))) {
+            foreach ($car->getRentals()->toArray() as $rental) {
+                // Remove dependent rentals first to avoid FK violations.
+                $entityManager->remove($rental);
+            }
+
             $entityManager->remove($car);
             $entityManager->flush();
         }
