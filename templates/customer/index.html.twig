@@ -2,6 +2,11 @@
 
 {% block title %}Customers{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.7/css/dataTables.dataTables.min.css">
+{% endblock %}
+
 {% block body %}
     <section class="customer-section space-y-6">
         {% for message in app.flashes('success') %}
@@ -12,26 +17,15 @@
             <div>
                 <p class="eyebrow">Customer Directory</p>
                 <h1 class="page-title mb-1">Profiles</h1>
-                <p class="text-gray-400 text-sm">Track renter details, contact information, and licensing at a glance.</p>
+
             </div>
             <div class="flex gap-3 flex-wrap">
-                <a href="{{ path('app_car_index') }}" class="btn btn-secondary">Back to Cars</a>
+               <a href="{{ path('app_admin_dashboard') }}" class="btn">Back to Dashboard</a>
             </div>
         </div>
 
-        <form method="get" class="customer-search">
-            <input
-                type="search"
-                name="search"
-                value="{{ searchTerm }}"
-                class="form-control flex-1"
-                placeholder="Search by name or email"
-            >
-            <button class="btn" type="submit">Search</button>
-        </form>
-
         <div class="customer-table">
-            <table>
+            <table id="customerTable" class="display text-white w-full">
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -51,7 +45,7 @@
                                 <span class="customer-created">Joined {{ customer.createdAt|date('M d, Y') }}</span>
                             </td>
                             <td>{{ customer.email }}</td>
-                            <td>{{ customer.phone|default('—') }}</td>
+                            <td>{{ customer.phone|default('N/A') }}</td>
                             <td>
                                 {% if customer.licenseNumber %}
                                     <span class="tag">{{ customer.licenseNumber }}</span>
@@ -60,9 +54,24 @@
                                 {% endif %}
                             </td>
                             <td class="text-right">
-                                <a href="{{ path('app_customer_show', {'id': customer.id}) }}" class="btn btn-sm btn-outline-light">Details</a>
+                                <div class="customer-actions">
+                                    <a href="{{ path('app_customer_edit', {'id': customer.id}) }}" class="customer-action customer-action-edit" title="Edit">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    <form action="{{ path('app_customer_delete', {'id': customer.id}) }}" method="post" class="customer-delete-form" style="display: inline;">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ customer.id) }}">
+                                        <button type="button"
+                                                class="customer-action customer-action-delete confirm-delete-btn"
+                                                title="Delete"
+                                                data-confirm-title="Delete this customer?"
+                                                data-confirm-text="Are you sure you want to delete {{ customer.displayName }}? This action cannot be undone."
+                                                data-confirm-button="Yes, Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
-                        </tr>
+                  </tr>
                     {% else %}
                         <tr>
                             <td colspan="5" class="empty-state">
@@ -76,4 +85,29 @@
             </table>
         </div>
     </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        $(document).ready(function() {
+            const $table = $('#customerTable');
+            if ($table.length === 0) return;
+
+            $table.DataTable({
+                pageLength: 10,
+                order: [[0, 'asc']],
+                language: {
+                    search: 'Search Customer',
+                    lengthMenu: 'Show _MENU_ entries per page',
+                    info: 'Showing _START_ to _END_ of _TOTAL_ customers',
+                    paginate: {
+                        previous: 'Prev',
+                        next: 'Next'
+                    },
+                    emptyTable: 'No Customers Found'
+                }
+            });
+        });
+    </script>
 {% endblock %}

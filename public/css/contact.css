@@ -25,6 +25,30 @@ body {
     font-weight: 500;
 }
 
+.contact-admin-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    padding: 0.8rem 1.8rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #0f172a;
+    background: #f9fafb;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    box-shadow: 0 14px 30px -20px rgba(255, 255, 255, 0.6);
+}
+
+.contact-admin-link:hover,
+.contact-admin-link:focus {
+    transform: translateY(-2px);
+    background: #e2e8f0;
+    color: #0f172a;
+    box-shadow: 0 18px 35px -22px rgba(255, 255, 255, 0.65);
+}
+
 /* ==== Wrapper Layout ==== */
 .contact-wrapper {
     display: flex;
@@ -97,7 +121,7 @@ label {
     display: block;
     font-weight: 700;
     margin-bottom: 6px;
-    color: #1d4ed8;
+    color: #fdfdfd;
 }
 
 .form-control {
@@ -109,6 +133,7 @@ label {
     font-size: 16px;
     color: #111827;
     transition: 0.2s;
+
 }
 
 .form-control::placeholder {
@@ -122,7 +147,7 @@ label {
 }
 
 /* ==== Submit Button ==== */
-.btn {
+.contact-card .btn {
     background: #0066ff;
     color: white;
     border: none;
@@ -134,7 +159,7 @@ label {
     transition: 0.25s;
 }
 
-.btn:hover {
+.contact-card .btn:hover {
     background: #0052cc;
 }
 
@@ -159,6 +184,6 @@ label {
 
 /* Optional: Change label color too */
 .form-group label {
-    color: rgb(11, 11, 15);
+    color: rgb(248, 248, 248);
 }
 

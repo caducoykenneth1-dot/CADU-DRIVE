@@ -59,16 +59,6 @@
 
             <div class="cta-group">
                 <a class="btn-secondary" href="{{ path('app_car_index') }}">Back to Fleet</a>
-
-                {% if status_code == 'available' %}
-                    <button class="btn-primary" onclick="confirmRent('{{ path('app_car_rent', {'id': car.id}) }}', '{{ car.make }} {{ car.model }}')">
-                        Rent This Car
-                    </button>
-                {% else %}
-                    <span class="unavailable-note">
-                        Currently unavailable. Check back soon!
-                    </span>
-                {% endif %}
             </div>
         </div>
     </div>

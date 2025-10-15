@@ -4,8 +4,8 @@
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ car.id) }}">
     <button type="button"
             class="btn btn-compact btn-delete"
-            title="Delete"
-            onclick="confirmDelete(this.form)">
+            title="Delete" class="btn btn-compact btn-delete confirm-delete-btn">
         <i class="bi bi-trash-fill"></i>
     </button>
 </form>
+    

@@ -14,17 +14,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-/**
- * Handles CRUD interactions and rental flow for the Car entity.
- *
- * Every route defined here is automatically prefixed with `/car`.
- */
+/*HANDLE SA CRUD AND ROUTES FOR `/car` */   
+
 #[Route('/car')]
 final class CarController extends AbstractController
 {
-    /**
-     * Display the full fleet so users can browse every car.
-     */
+    /* Display the full fleet so users can browse every car*/
     #[Route('/', name: 'app_car_index', methods: ['GET'])]
     public function index(CarRepository $carRepository): Response
     {
@@ -33,10 +28,8 @@ final class CarController extends AbstractController
         ]);
     }
 
-    /**
-     * Create a new car record and optionally attach an uploaded image.
-     */
-    #[Route('/new', name: 'app_car_new', methods: ['GET','POST'])]  // �o. FIXED
+    /*Create a new car record and optionally attach an uploaded image*/
+    #[Route('/new', name: 'app_car_new', methods: ['GET','POST'])]
     public function new(Request $request, EntityManagerInterface $em, CarStatusRepository $statusRepository): Response
     {
         $car = new Car();
@@ -66,9 +59,8 @@ final class CarController extends AbstractController
         ]);
     }
 
-    /**
-     * Show the complete details for a single car.
-     */
+    /* Show the complete details for a single car*/
+
     #[Route('/{id}', name: 'app_car_show', methods: ['GET'])]
     public function show(Car $car): Response
     {
@@ -77,10 +69,8 @@ final class CarController extends AbstractController
         ]);
     }
 
-    /**
-     * Update a car and replace the stored photo when a new file is provided.
-     */
-    #[Route('/{id}/edit', name: 'app_car_edit', methods: ['GET','POST'])]  // �o. FIXED
+    /* Update a car and replace the stored photo when a new file is provided*/
+    #[Route('/{id}/edit', name: 'app_car_edit', methods: ['GET','POST'])]
     public function edit(Request $request, Car $car, EntityManagerInterface $em): Response
     {
         $form = $this->createForm(CarType::class, $car);
@@ -109,18 +99,14 @@ final class CarController extends AbstractController
         ]);
     }
 
-    /**
-     * Remove a car once the CSRF check passes.
-     */
+    
+
+    /* Remove a car once the CSRF check passes*/
+
     #[Route('/{id}', name: 'app_car_delete', methods: ['POST'])]
     public function delete(Request $request, Car $car, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$car->getId(), $request->getPayload()->getString('_token'))) {
-            foreach ($car->getRentals()->toArray() as $rental) {
-                // Remove dependent rentals first to avoid FK violations.
-                $entityManager->remove($rental);
-            }
-
             $entityManager->remove($car);
             $entityManager->flush();
         }
@@ -128,9 +114,7 @@ final class CarController extends AbstractController
         return $this->redirectToRoute('app_car_index');
     }
 
-    /**
-     * Collect rental information, persist it, and flip the car status.
-     */
+    /* Collect rental information, persist it, and flip the car status*/
     #[Route('/{id}/rent', name: 'app_car_rent', methods: ['GET', 'POST'])]
     public function rent(Request $request, Car $car, EntityManagerInterface $entityManager, CarStatusRepository $statusRepository): Response
     {

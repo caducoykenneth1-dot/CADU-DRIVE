@@ -6,49 +6,64 @@
 <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="page-title mb-0 text-center w-100">Our Fleet</h1>
-        <div class="d-flex gap-2">
-            <a href="{{ path('app_car_new') }}" class="btn btn-primary">Create New Car</a>
-            <a href="{{ path('app_rental_index') }}" class="btn btn-outline-light">Rental History</a>
-        </div>
     </div>
 
     <div class="car-grid">
         {% for car in cars %}
-            <div class="car-card">
-              {% if car.image %}
-    <img src="{{ asset('images/' ~ car.image) }}" alt="{{ car.make }} {{ car.model }}">
-{% else %}
-    <img src="https://placehold.co/600x400/1f2937/adb5bd?text={{ car.make|escape('url') }}" alt="Car Image">
-{% endif %}
-
+            {% set status_code = car.status.code|default('unknown') %}
+            <article class="car-card">
+                <div class="car-card-image">
+                    {% if car.image %}
+                        <img src="{{ asset('images/' ~ car.image) }}" alt="{{ car.make }} {{ car.model }}">
+                    {% else %}
+                        <img src="https://placehold.co/600x400/1f2937/adb5bd?text={{ car.make|escape('url') }}" alt="{{ car.make }} {{ car.model }}">
+                    {% endif %}
+                </div>
 
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h5 class="card-title">{{ car.make }} {{ car.model }}</h5>
-                        {% set status_code = car.status.code|default('unknown') %}
+                    <header class="card-header">
+                        <div class="card-title-group">
+                            <h3 class="card-title">{{ car.make }} {{ car.model }}</h3>
+                            <p class="card-subtitle">Year {{ car.year }}</p>
+                        </div>
                         <span class="badge {{ status_code == 'available' ? 'bg-success' : 'bg-danger' }}">
                             {{ car.status.label|default('Unknown') }}
                         </span>
-                    </div>
+                    </header>
 
-                    <p class="card-price">&#8369;{{ car.price }}<span>/day</span></p>
-                    <p class="small"><strong>Year:</strong> {{ car.year }}</p>
-                    <p class="description">{{ car.description|default('No description')|slice(0, 80) ~ '...' }}</p>
+                    <p class="card-price">
+                        &#8369;{{ car.price|number_format(0, '.', ',') }}
+                        <span>/day</span>
+                    </p>
 
-                    <div class="card-actions mt-3 d-flex flex-wrap gap-2">
-                        <a href="{{ path('app_car_show', {'id': car.id}) }}" class="btn btn-compact btn-details">Details</a>
-                        <div class="d-flex gap-2">
-                            <a href="{{ path('app_car_edit', {'id': car.id}) }}" class="btn btn-compact btn-edit" title="Edit">
-                                <i class="bi bi-pencil-fill"></i>
-                            </a>
-                            {{ include('car/_delete_form.html.twig', { car: car }) }}
-                        </div>
+                    <p class="description">
+                        {{ car.description ? car.description|slice(0, 120) ~ (car.description|length > 120 ? '…' : '') : 'No description available for this vehicle yet.' }}
+                    </p>
+
+                    <div class="card-actions">
+                        <a href="{{ path('app_car_show', {'id': car.id}) }}" class="btn btn-compact btn-details">
+                            View Details
+                        </a>
+
+                        {% if status_code == 'available' %}
+                            <button class="btn btn-primary" onclick="confirmRent('{{ path('app_car_rent', {'id': car.id}) }}', '{{ car.make }} {{ car.model }}')">
+                                Rent This Car
+                            </button>
+                        {% else %}
+                            <span class="unavailable-note">
+                                Currently unavailable. Check back soon!
+                            </span>
+                        {% endif %}
                     </div>
                 </div>
-            </div>
+            </article>
         {% else %}
             <p class="text-center mt-5">No cars available yet. <a href="{{ path('app_car_new') }}">Add one now</a>.</p>
         {% endfor %}
     </div>
 </div>
+
+<div class="footer-wrapper">
+        {% include 'home/_footer.html.twig' %}
+    </div>
 {% endblock %}

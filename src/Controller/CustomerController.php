@@ -11,9 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-/**
- * CRUD endpoints for customer profiles.
- */
+/* CRUD endpoints for customer profiles */
 #[Route('/customer')]
 class CustomerController extends AbstractController
 {
@@ -28,27 +26,7 @@ class CustomerController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'app_customer_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $customer = new Customer();
-        $form = $this->createForm(CustomerType::class, $customer);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($customer);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Customer profile created successfully.');
-
-            return $this->redirectToRoute('app_customer_index');
-        }
-
-        return $this->render('customer/new.html.twig', [
-            'form' => $form,
-        ]);
-    }
-
+  
     #[Route('/register', name: 'app_customer_register', methods: ['GET', 'POST'])]
     public function register(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -90,7 +68,7 @@ class CustomerController extends AbstractController
 
             $this->addFlash('success', 'Customer profile updated.');
 
-            return $this->redirectToRoute('app_customer_show', ['id' => $customer->getId()]);
+            return $this->redirectToRoute('app_customer_index');
         }
 
         return $this->render('customer/edit.html.twig', [

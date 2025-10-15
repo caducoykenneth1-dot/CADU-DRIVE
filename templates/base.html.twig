@@ -7,101 +7,115 @@
         {# Tailwind-generated styles #}
         <link rel="stylesheet" href="{{ asset('build/app.css') }}">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-
-        {# Your custom styles AFTER Tailwind #}
+  
+        {# PAGE STYLES #}
         {% block stylesheets %}
             <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-            {# navbar.css is no longer needed, styles will be in style.css #}
             <link rel="stylesheet" href="{{ asset('css/rentalH.css') }}">
             <link rel="stylesheet" href="{{ asset('css/upgrade.css') }}">
             <link rel="stylesheet" href="{{ asset('css/show.css') }}">
             <link rel="stylesheet" href="{{ asset('css/rent.css') }}">
         {% endblock %}
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        {# GOOGLE FONTS & FAVICON #}
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+  
+    {# PARA SA DATATABLES #}
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/2.0.7/js/dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.7/css/dataTables.dataTables.min.css">
+   
     </head>
     <body class="bg-gray-900 text-gray-300">
+            {# Determine if we are in admin context based on route name #}
+        {% set __current_route = app.request.attributes.get('_route') ?? '' %}
+        {% set __is_admin_context = __current_route starts with 'app_admin_' %}
+            {# Navigation Bar - only show if not in admin context #}
+        {% if not __is_admin_context %}
+            <header>
+                <nav id="main-nav" class="fixed top-0 left-0 right-0 z-30 transition-all duration-300 ease-in-out">
+                    <div class="container mx-auto flex items-center justify-between p-4">
+                        <!-- Logo -->
+                        <div>
+                            <a class="text-white flex items-center" href="{{ path('app_home') }}">
+                                <img src="{{ asset('images/cadudriving_brandblue.png') }}" alt="Cadu Driving" style="height: 2.6rem; width: auto;">
+                            </a>
+                        </div>
 
-        <header>
-            <nav id="main-nav" class="fixed top-0 left-0 right-0 z-30 transition-all duration-300 ease-in-out">
-                <div class="container mx-auto flex items-center justify-between p-4">
-                    <!-- Logo -->
-                    <div>
-                        <a class="text-white flex items-center" href="{{ path('app_home') }}">
-                            <img src="{{ asset('images/cadudriving_brandblue.png') }}" alt="Cadu Driving" style="height: 2.6rem; width: auto;">
-                        </a>
+                        <!-- Desktop Menu -->
+                        <div class="hidden lg:flex items-center space-x-8">
+                            <a href="{{ path('app_home') }}" class="nav-link">Home</a>
+                            <a href="{{ path('app_about') }}" class="nav-link">About</a>
+                            <a href="{{ path('app_car_index') }}" class="nav-link">Cars</a>
+                            <a href="{{ path('app_contact') }}" class="nav-link">Contact</a>
+                            <a href="{{ path('app_customer_register') }}" class="nav-link">Register</a>
+                            <a href="{{ path('app_car_index') }}" class="btn">Book a Ride</a>
+                            <a href="{{ path('app_admin_dashboard') }}" class="btn">Admin Panel</a>
+                            
+                        </div>
+
+                        <!-- Mobile Menu Button -->
+                        <div class="lg:hidden">
+                            <button id="mobile-menu-button" class="text-white focus:outline-none" aria-label="Open navigation">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Desktop Menu -->
-                    <div class="hidden lg:flex items-center space-x-8">
-                        <a href="{{ path('app_home') }}" class="nav-link">Home</a>
-                        <a href="{{ path('app_about') }}" class="nav-link">About</a>
-                        <a href="{{ path('app_car_index') }}" class="nav-link">Cars</a>
-                        <a href="{{ path('app_contact') }}" class="nav-link">Contact</a>
-                        <a href="{{ path('app_customer_register') }}" class="nav-link">Register</a>
-                        <a href="{{ path('app_customer_index') }}" class="nav-link">Customers</a>
-                        <a href="{{ path('app_car_index') }}" class="btn">Book a Ride</a>
-                    </div>
-
-                    <!-- Mobile Menu Button -->
-                    <div class="lg:hidden">
-                        <button id="mobile-menu-button" class="text-white focus:outline-none" aria-label="Open navigation">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <!-- Mobile Menu -->
+                    <div id="drawer-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"></div>
+                    <nav id="mobile-menu" class="mobile-drawer lg:hidden" aria-hidden="true">
+                        <button id="mobile-menu-close" class="drawer-close" aria-label="Close navigation">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
                         </button>
-                    </div>
-                </div>
-
-              <!-- Mobile Menu -->
-<!-- Side Drawer -->
-<div id="drawer-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"></div>
-<nav id="mobile-menu" class="mobile-drawer lg:hidden" aria-hidden="true">
-    <button id="mobile-menu-close" class="drawer-close" aria-label="Close navigation">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
-    </button>
-    <a href="{{ path('app_home') }}" class="drawer-link">Home</a>
-    <a href="{{ path('app_about') }}" class="drawer-link">About</a>
-    <a href="{{ path('app_car_index') }}" class="drawer-link">Cars</a>
-    <a href="{{ path('app_contact') }}" class="drawer-link">Contact</a>
-    <a href="{{ path('app_customer_register') }}" class="drawer-link">Register</a>
-    <a href="{{ path('app_customer_index') }}" class="drawer-link">Customers</a>
-    <a href="{{ path('app_car_index') }}" class="btn mt-4 w-full text-center">Book a Ride</a>
-</nav>
-
-
-            
-        </header>
+                        <a href="{{ path('app_home') }}" class="drawer-link">Home</a>
+                        <a href="{{ path('app_about') }}" class="drawer-link">About</a>
+                        <a href="{{ path('app_car_index') }}" class="drawer-link">Cars</a>
+                        <a href="{{ path('app_contact') }}" class="drawer-link">Contact</a>
+                        <a href="{{ path('app_customer_register') }}" class="drawer-link">Register</a>
+                        <a href="{{ path('app_admin_dashboard') }}" class="btn mt-4 w-full text-center">Admin Panel</a>
+                        <a href="{{ path('app_car_index') }}" class="btn mt-4 w-full text-center">Book a Ride</a>
+                    </nav>
+                </nav>
+            </header>
+        {% endif %}
 
         {% block body_full_width %}{% endblock %}
 
-        <main role="main" class="container mx-auto mt-4">
+        <main role="main" class="{{ __is_admin_context ? 'mt-0 w-full' : 'container mx-auto mt-4' }}">
             {% block body %}{% endblock %}
         </main>
 
         {% block javascripts %}
+          
+            
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
             <script>
-                // SweetAlert for delete confirmation
-                function confirmDelete(form) {
-                    const {
-                        confirmTitle = 'Are you sure?',
-                        confirmMessage = 'This car will be permanently deleted!',
-                        confirmButton = 'Yes, delete it!',
-                    } = form.dataset;
+                // Generic SweetAlert for confirmation dialogs
+                function setupConfirmationModals() {
+                    document.body.addEventListener('click', function(e) {
+                        const trigger = e.target.closest('.confirm-delete-btn');
+                        if (!trigger) return;
 
-                    Swal.fire({
-                        title: confirmTitle,
-                        text: confirmMessage,
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#e74c3c',
-                        cancelButtonColor: '#3085d6',
-                        confirmButtonText: confirmButton
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            form.submit();
-                        }
+                        e.preventDefault();
+                        const form = trigger.closest('form');
+                        if (!form) return;
+
+                        Swal.fire({
+                            title: trigger.dataset.confirmTitle || 'Are you sure?',
+                            text: trigger.dataset.confirmText || "This action cannot be undone!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#e74c3c',
+                            cancelButtonColor: '#3085d6',
+                            confirmButtonText: trigger.dataset.confirmButton || 'Yes, do it!'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                form.submit();
+                            }
+                        });
                     });
                 }
 
@@ -129,34 +143,40 @@
                 const mobileMenuClose = document.getElementById('mobile-menu-close');
                 const drawerOverlay = document.getElementById('drawer-overlay');
 
-                window.addEventListener('scroll', () => {
-                    if (window.scrollY > 50) {
-                        mainNav.classList.add('scrolled');
-                    } else {
-                        mainNav.classList.remove('scrolled');
-                    }
-                });
+                if (mainNav) {
+                    window.addEventListener('scroll', () => {
+                        if (window.scrollY > 50) {
+                            mainNav.classList.add('scrolled');
+                        } else {
+                            mainNav.classList.remove('scrolled');
+                        }
+                    });
+                }
+                // Mobile menu toggle
+                if (mobileMenuButton && mobileMenu && mobileMenuClose && drawerOverlay) {
+                    const closeDrawer = () => {
+                        mobileMenu.classList.remove('open');
+                        drawerOverlay.classList.add('hidden');
+                        mobileMenu.setAttribute('aria-hidden', 'true');
+                        document.body.classList.remove('overflow-hidden');
+                    };
+                    
+                    const openDrawer = () => {
+                        mobileMenu.classList.add('open');
+                        drawerOverlay.classList.remove('hidden');
+                        mobileMenu.setAttribute('aria-hidden', 'false');
+                        document.body.classList.add('overflow-hidden');
+                    };
 
-                const closeDrawer = () => {
-                    mobileMenu.classList.remove('open');
-                    drawerOverlay.classList.add('hidden');
-                    mobileMenu.setAttribute('aria-hidden', 'true');
-                    document.body.classList.remove('overflow-hidden');
-                };
+                    mobileMenuButton.addEventListener('click', openDrawer);
+                    mobileMenuClose.addEventListener('click', closeDrawer);
+                    drawerOverlay.addEventListener('click', closeDrawer);
+                    mobileMenu.querySelectorAll('a').forEach((link) => {
+                        link.addEventListener('click', closeDrawer);
+                    });
+                }
 
-                const openDrawer = () => {
-                    mobileMenu.classList.add('open');
-                    drawerOverlay.classList.remove('hidden');
-                    mobileMenu.setAttribute('aria-hidden', 'false');
-                    document.body.classList.add('overflow-hidden');
-                };
-
-                mobileMenuButton.addEventListener('click', openDrawer);
-                mobileMenuClose.addEventListener('click', closeDrawer);
-                drawerOverlay.addEventListener('click', closeDrawer);
-                mobileMenu.querySelectorAll('a').forEach((link) => {
-                    link.addEventListener('click', closeDrawer);
-                });
+                document.addEventListener('DOMContentLoaded', setupConfirmationModals);
             </script>
         {% endblock %}
     </body>
