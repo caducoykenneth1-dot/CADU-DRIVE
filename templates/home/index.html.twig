@@ -28,7 +28,7 @@
                             name="car_type"
                             aria-label="Filter by car type"
                         >
-                            <option value="">{{ 'All Types' }}</option>
+                            <option value="">{{ 'All  Brands' }}</option>
                             {% for type in carTypes %}
                                 <option value="{{ type }}" {{ type == selectedType ? 'selected' : '' }}>{{ type }}</option>
                             {% endfor %}

@@ -8,12 +8,9 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Represents a vehicle offered in the rental fleet.
- *
- * Stores basic descriptive information together with operational status
- * and an optional image filename for display in the UI.
- */
+/* Represents a vehicle offered in the rental fleet.
+ Stores basic descriptive information together with operational status
+ and an optional image filename for display in the UI*/
 #[ORM\Entity(repositoryClass: CarRepository::class)]
 class Car
 {
@@ -22,17 +19,13 @@ class Car
         $this->rentals = new ArrayCollection();
     }
 
-    /**
-     * Surrogate primary key.
-     */
+    /* Surrogate primary key.*/
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    /**
-     * Manufacturer or brand (e.g. Toyota, BMW).
-     */
+    /* Manufacturer or brand (e.g. Toyota, BMW) */
     #[ORM\Column(length: 128)]
     private ?string $make = null;
 

@@ -91,7 +91,7 @@ final class CarController extends AbstractController
 
             $em->flush();
 
-            return $this->redirectToRoute('app_car_index');
+            return $this->redirectToRoute('app_admin_dashboard');
         }
 
         return $this->render('car/edit.html.twig', [

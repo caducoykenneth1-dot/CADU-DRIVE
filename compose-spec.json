@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "Docker Compose Schema",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": ["string", "null"]
+    },
+    "services": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "image": {
+            "type": ["string", "null"]
+          },
+          "container_name": {
+            "type": ["string", "null"]
+          },
+          "build": {
+            "type": ["string", "object", "null"]
+          },
+          "command": {
+            "type": ["string", "array", "null"]
+          },
+          "ports": {
+            "type": "array",
+            "items": {
+              "type": ["string", "object"]
+            }
+          },
+          "environment": {
+            "type": ["object", "array", "null"]
+          },
+          "volumes": {
+            "type": ["array", "null"],
+            "items": {
+              "type": ["string", "object"]
+            }
+          },
+          "networks": {
+            "type": ["array", "object", "null"]
+          },
+          "depends_on": {
+            "type": ["array", "object", "null"]
+          },
+          "restart": {
+            "type": ["string", "null"]
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "volumes": {
+      "type": ["object", "null"],
+      "additionalProperties": {
+        "type": ["object", "null"],
+        "additionalProperties": true
+      }
+    },
+    "networks": {
+      "type": ["object", "null"],
+      "additionalProperties": {
+        "type": ["object", "null"],
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

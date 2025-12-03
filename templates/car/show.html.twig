@@ -12,8 +12,6 @@
         <div class="car-media">
             {% if car.image %}
                 <img src="{{ asset('images/' ~ car.image) }}" alt="{{ car.make }} {{ car.model }}" class="car-photo">
-            {% else %}
-                <img src="https://placehold.co/900x600/111827/ffffff?text={{ (car.make ~ '%20' ~ car.model)|url_encode }}" alt="{{ car.make }} {{ car.model }}" class="car-photo">
             {% endif %}
         </div>
 

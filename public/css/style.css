@@ -18,6 +18,22 @@ html, body {
     --card-bg: #ffffff;
     --status-available: #28a745;
     --status-rented: #dc3545;
+    /* CSS variable for the site header height. Adjust as needed. */
+    --site-header-height: 3.5rem;
+}
+
+@media (min-width: 1024px) {
+    :root { --site-header-height: 5rem; }
+}
+
+/* Admin main offset: ensure main content clears the admin drawer on large screens */
+.admin-main--offset {
+    margin-left: 0;
+}
+@media (min-width: 1024px) {
+    .admin-main--offset {
+        margin-left: 16rem; /* same as w-64 */
+    }
 }
 
 /* === General Body & Typography === */
@@ -27,7 +43,7 @@ body {
     background-color: var(--bg-dark-primary);
     color: var(--text-gray);
     line-height: 1.7;
-    padding-top: 80px; /* Offset for fixed navbar */
+    padding-top: var(--site-header-height); /* Offset for fixed navbar (responsive) */
 }
 
 h1, h2, h3, h4, h5, h6, .page-title {

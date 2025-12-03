@@ -1,26 +1,4 @@
-{% extends 'admin/layout.html.twig' %}
-
-{% block admin_title %}Admin Dashboard{% endblock %}
-
-{% block admin_content %}
-    {% set stats = stats|default({}) %}
-    {% set nowDate = date() %}
-
-    <div class="admin-dashboard">
-        {% for message in app.flashes('success') %}
-            <div class="alert-success">{{ message }}</div>
-        {% endfor %}
-        <section id="overview" class="dashboard-section" data-dashboard-section>
-            <div class="dashboard-hero">
-                <div>
-                    <p class="dashboard-eyebrow">Control Center</p>
-                    <h1 class="dashboard-heading">Operations Dashboard</h1>
-                    <p class="dashboard-subheading">
-                        Monitor customers, fleet health, and rental activity without leaving this page.
-                        Use the quick actions to jump straight into the work that matters today.
-                    </p>
-                </div>
-                <div class="dashboard-hero-actions">
+  <div class="dashboard-hero-actions">
                     <a href="{{ path('app_car_new') }}" class="dashboard-action">
                         <span class="bi bi-car-front-fill"></span>
                         Add Vehicle
@@ -68,7 +46,7 @@
             </div>
         </section>
 
-{#         
+        
         <section id="fleet" class="dashboard-section" data-dashboard-section>
             <div class="section-header">
                 <div>
@@ -183,5 +161,4 @@
                 </div>
             {% endif %}
         </section>
-    </div> #}
-{% endblock %}
+    </div>

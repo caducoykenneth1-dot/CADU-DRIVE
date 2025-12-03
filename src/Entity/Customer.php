@@ -40,6 +40,10 @@ class Customer
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $notes = null;
 
+    #[ORM\OneToOne(inversedBy: 'customer', targetEntity: User::class, cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    private ?User $user = null;
+
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $createdAt = null;
 
@@ -125,6 +129,26 @@ class Customer
     public function setNotes(?string $notes): static
     {
         $this->notes = $notes;
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        if ($user === null && $this->user !== null && $this->user->getCustomer() === $this) {
+            $this->user->setCustomer(null);
+        }
+
+        $this->user = $user;
+
+        if ($user !== null && $user->getCustomer() !== $this) {
+            $user->setCustomer($this);
+        }
+
         return $this;
     }
 

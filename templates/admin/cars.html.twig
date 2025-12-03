@@ -1,0 +1,72 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block admin_title %}Fleet{% endblock %}
+
+{% block admin_content %}
+    <section id="fleet" class="dashboard-section" data-dashboard-section>
+        <div class="section-header">
+            <div>
+                <h2>Fleet Snapshot</h2>
+                <p>Recently updated vehicles and their current availability.</p>
+            </div>
+            <div class="section-actions">
+                <a href="{{ path('app_car_new') }}" class="section-link">
+                    <span class="bi bi-plus-lg"></span>
+                    Add Vehicle
+                </a>
+            </div>
+        </div>
+
+        {% if cars is defined and cars is not empty %}
+            <div class="fleet-grid">
+                {% for car in cars %}
+                    {% set status = car.status ?? null %}
+                    {% set statusCode = status ? status.code|default('')|lower : '' %}
+                    {% set badgeClass = statusCode == 'available' ? 'is-green' : (statusCode in ['maintenance', 'service'] ? 'is-amber' : 'is-slate') %}
+                    <article class="fleet-card">
+                        <div class="fleet-card-header">
+                            <h3>{{ car.make }} {{ car.model }}</h3>
+                            <span class="status-badge {{ badgeClass }}">
+                                {{ status ? status.label : 'Unassigned' }}
+                            </span>
+                        </div>
+                        <div class="fleet-card-meta">
+                            <span><span class="bi bi-calendar3"></span> {{ car.year }}</span>
+                            <span><span class="bi bi-cash-stack"></span> &#8369;{{ car.price is defined ? car.price|number_format(2, '.', ',') : '0.00' }}/day</span>
+                            <span><span class="bi bi-diagram-3"></span> {{ car.rentals is defined ? car.rentals|length : 0 }} rentals</span>
+                        </div>
+                        {% set lastRental = (car.rentals is defined and car.rentals|length) ? car.rentals|last : null %}
+                        <div class="fleet-card-footer">
+                            <span>Car ID #{{ car.id }}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-gray-400">
+                                    Last booking {{ lastRental ? lastRental.endDate|date('M d, Y') : 'N/A' }}
+                                </span>
+                                <a href="{{ path('app_car_edit', { id: car.id }) }}" class="section-link">
+                                    <span class="bi bi-pencil-square"></span>
+                                    Edit
+                                </a>
+                                <form method="post" action="{{ path('app_car_delete', { id: car.id }) }}" class="inline-delete-form">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ car.id) }}">
+                                    <button type="submit"
+                                            class="section-link section-link-danger confirm-delete-btn"
+                                            data-confirm-title="Delete this vehicle?"
+                                            data-confirm-text="This vehicle and its related rentals will be removed. This action cannot be undone."
+                                            data-confirm-button="Yes, Delete It">
+                                        <span class="bi bi-trash"></span>
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-placeholder">
+                <strong>No vehicles recorded</strong>
+                Add your first car to start building out the fleet roster.
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}

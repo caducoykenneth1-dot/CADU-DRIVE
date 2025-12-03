@@ -6,6 +6,7 @@
     <div class="grid md:grid-cols-2 gap-5">
         {{ form_row(form.email, { attr: { class: 'form-control' } }) }}
         {{ form_row(form.phone, { attr: { class: 'form-control' } }) }}
+        
     </div>
     {{ form_row(form.licenseNumber, { attr: { class: 'form-control' } }) }}
     <div>
@@ -16,4 +17,3 @@
         <button class="btn btn-primary">{{ button_label|default('Save') }}</button>
     </div>
 {{ form_end(form) }}
-

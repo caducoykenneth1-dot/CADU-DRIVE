@@ -16,6 +16,7 @@
             <link rel="stylesheet" href="{{ asset('css/show.css') }}">
             <link rel="stylesheet" href="{{ asset('css/rent.css') }}">
         {% endblock %}
+        {# Header height variable moved to `public/css/style.css` for easier tweaking #}
         {# GOOGLE FONTS & FAVICON #}
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
@@ -28,10 +29,15 @@
     </head>
     <body class="bg-gray-900 text-gray-300">
             {# Determine if we are in admin context based on route name #}
-        {% set __current_route = app.request.attributes.get('_route') ?? '' %}
-        {% set __is_admin_context = __current_route starts with 'app_admin_' %}
-            {# Navigation Bar - only show if not in admin context #}
-        {% if not __is_admin_context %}
+  {# 1. Get the current route name #}
+{% set __current_route = app.request.attributes.get('_route') ?? '' %}
+
+{# 2. Check if we are on ANY route that looks like an admin page or a CRUD form. #}
+{# This is a robust check to ensure forms and the dashboard are excluded. #}
+{% set __is_admin_context = 'app_admin' in __current_route or 'edit' in __current_route or 'new' in __current_route or 'rent' in __current_route or 'customer' in __current_route %}
+
+{# The original fix: Header is hidden if __is_admin_context is TRUE #}
+{% if not __is_admin_context %}
             <header>
                 <nav id="main-nav" class="fixed top-0 left-0 right-0 z-30 transition-all duration-300 ease-in-out">
                     <div class="container mx-auto flex items-center justify-between p-4">
@@ -84,7 +90,7 @@
 
         {% block body_full_width %}{% endblock %}
 
-        <main role="main" class="{{ __is_admin_context ? 'mt-0 w-full' : 'container mx-auto mt-4' }}">
+        <main role="main" class="{{ __is_admin_context ? 'mt-0 w-full' : 'container mx-auto' }}" {% if not __is_admin_context %}style="padding-top: var(--site-header-height);"{% endif %}>
             {% block body %}{% endblock %}
         </main>
 

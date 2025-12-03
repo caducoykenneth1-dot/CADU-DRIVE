@@ -1,0 +1,51 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block admin_title %}Rental Timeline{% endblock %}
+
+{% block admin_content %}
+    {% set nowDate = date() %}
+    <div class="admin-dashboard">
+        <section id="rentals" class="dashboard-section" data-dashboard-section>
+            <div class="section-header">
+                <div>
+                    <h2>Rental Timeline</h2>
+                    <p>Latest bookings with quick visibility into status and key dates.</p>
+                </div>
+                <div class="section-actions">
+                    <a href="{{ path('app_rental_index') }}" class="section-link">
+                        <span class="bi bi-calendar-event"></span>
+                        View All Rentals
+                    </a>
+                </div>
+            </div>
+
+            {% if recentRentals is not empty %}
+                <div class="timeline">
+                    {% for rental in recentRentals %}
+                        {% set isActive = rental.startDate <= nowDate and rental.endDate >= nowDate %}
+                        {% set isUpcoming = rental.startDate > nowDate %}
+                        <div class="timeline-item">
+                            <span class="timeline-dot"></span>
+                            <div class="timeline-content">
+                                <h4>{{ rental.car.make }} {{ rental.car.model }}</h4>
+                                <p>
+                                    <span class="bi bi-person"></span>
+                                    {{ rental.customer.displayName }}
+                                </p>
+                                <div class="meta">
+                                    <span><span class="bi bi-clock"></span> {{ rental.startDate|date('M d, Y') }} to {{ rental.endDate|date('M d, Y') }}</span>
+                                    <span>{% if isActive %}<span class="status-badge is-green">Active</span>{% elseif isUpcoming %}<span class="status-badge is-amber">Upcoming</span>{% else %}<span class="status-badge is-slate">Completed</span>{% endif %}</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-placeholder">
+                    <strong>No rentals recorded</strong>
+                    Once bookings are created they will appear on the timeline.
+                </div>
+            {% endif %}
+        </section>
+    </div>
+{% endblock %}

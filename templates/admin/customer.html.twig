@@ -1,0 +1,69 @@
+{% extends 'admin/layout.html.twig' %}
+
+{# ❌ DELETE the first incorrect block override: {% block body %} Manage Customer {% endblock %} #}
+
+{# ✅ Use the correct block name for the main admin content area #}
+{% block admin_content %}
+
+    {# ------------------------------------- #}
+    {# Set the title for the browser tab. This is usually defined in admin/layout.html.twig #}
+    {% block admin_title %}Manage Customer{% endblock %}
+    {# ------------------------------------- #}
+
+    <section id="customers" class="dashboard-section" data-dashboard-section>
+        <div class="section-header">
+            <div>
+                <h2>Latest Customers</h2>
+                <p>Fresh signups ready to be verified and welcomed.</p>
+            </div>
+            <div class="section-actions">
+                <a href="{{ path('app_customer_index') }}" class="section-link">
+                    <span class="bi bi-people"></span>
+                    Manage Customers
+                </a>
+            </div>
+        </div>
+
+        {% if recentCustomers is not empty %}
+            <div class="dashboard-table-wrapper">
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Contact</th>
+                            <th>Phone</th>
+                            <th>Joined</th>
+                            <th>Rentals</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for customer in recentCustomers %}
+                            <tr>
+                                <td>
+                                    {{ customer.displayName }}
+                                    {% if customer.notes %}
+                                        <span class="subtle">Notes: {{ customer.notes|length > 80 ? customer.notes|slice(0, 80) ~ '...' : customer.notes }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="mailto:{{ customer.email }}" class="text-blue-300 hover:underline">
+                                        {{ customer.email }}
+                                    </a>
+                                </td>
+                                <td>{{ customer.phone|default('N/A') }}</td>
+                                <td>{{ customer.createdAt ? customer.createdAt|date('M d, Y') : 'N/A' }}</td>
+                                <td>{{ customer.rentals|length }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-placeholder">
+                <strong>No customers yet</strong>
+                Once customers register or are created manually they will appear here automatically.
+            </div>
+        {% endif %}
+    </section>
+
+{% endblock %}

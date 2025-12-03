@@ -8,14 +8,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-/**
- * Renders the public-facing pages such as home, contact, and about.
- */
+/*Renders the pages such as home, contact, and about */
 class HomeController extends AbstractController
 {
-    /**
-     * Show the landing page with dynamic featured-car filters.
-     */
+    /* Show the landing page with dynamic featured-car filtersb */
     #[Route('/', name: 'app_home', methods: ['GET'])]
     public function index(Request $request, CarRepository $carRepository): Response
     {
@@ -48,7 +44,7 @@ class HomeController extends AbstractController
         $cars = $carRepository->findFeaturedCars(
             $selectedType ?: null,
             $activePriceFilter,
-            3
+            4
         );
 
         return $this->render('home/index.html.twig', [
@@ -60,9 +56,7 @@ class HomeController extends AbstractController
         ]);
     }
 
-    /**
-     * Render the contact form and process submissions with a flash message.
-     */
+    /* Render the contact form and process submissions with a flash message */
     #[Route('/contact', name: 'app_contact', methods: ['GET', 'POST'])]
     public function contact(Request $request): Response
     {
@@ -75,27 +69,21 @@ class HomeController extends AbstractController
         return $this->render('home/contact.html.twig');
     }
 
-    /**
-     * Provide the static "About" page.
-     */
+    /* Provide the static "About" page */
     #[Route('/about', name: 'app_about', methods: ['GET'])]
     public function about(): Response
     {
         return $this->render('home/about.html.twig');
     }
 
-    /**
-     * Build price buckets tailored to the current dataset.
-     *
-     * @return array<string, array{label: string, min: int, max: int|null}>
-     */
+    /*Build price buckets tailored to the current dataset. */
     private function buildPriceRanges(?int $minPrice, ?int $maxPrice): array
     {
         if ($minPrice === null || $maxPrice === null) {
             return [];
         }
 
-        $currency = "\u{20B1}";
+        $currency = "\u{20B1}"; // Philippine Peso symbol
 
         if ($minPrice === $maxPrice) {
             return [
@@ -105,16 +93,16 @@ class HomeController extends AbstractController
                     'max' => $maxPrice,
                 ],
             ];
-        }
+        } // if both min and max are equal, just show one range
 
         $diff = $maxPrice - $minPrice;
         $firstMax = $minPrice + (int) floor($diff / 3);
-        $secondMax = $minPrice + (int) floor(($diff * 2) / 3);
+        $secondMax = $minPrice + (int) floor(($diff * 2) / 3); //calulates my Price range 
 
         $formatLabel = static function (int $min, ?int $max) use ($currency): string {
             if ($max === null) {
                 return sprintf('%s%s+', $currency, number_format($min));
-            }
+            } 
 
             if ($min === $max) {
                 return sprintf('%s%s', $currency, number_format($min));
