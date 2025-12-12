@@ -10,7 +10,6 @@
     </div>
     {{ form_row(form.licenseNumber, { attr: { class: 'form-control' } }) }}
     <div>
-        {{ form_row(form.notes, { attr: { class: 'form-control form-control-textarea', rows: 5 } }) }}
     </div>
     <div class="flex justify-end gap-3">
         <a href="{{ back_path|default(path('app_customer_index')) }}" class="btn btn-secondary">Cancel</a>

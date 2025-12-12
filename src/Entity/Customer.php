@@ -50,15 +50,21 @@ class Customer
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\OneToMany(mappedBy: 'customer', targetEntity: Rental::class, cascade: ['remove'])]
-    private Collection $rentals;
+    // REMOVED: Old Rental relationship
+    // #[ORM\OneToMany(mappedBy: 'customer', targetEntity: Rental::class, cascade: ['remove'])]
+    // private Collection $rentals;
+
+    // ADDED: New RentalRequest relationship
+    #[ORM\OneToMany(mappedBy: 'customer', targetEntity: RentalRequest::class)]
+    private Collection $rentalRequests;
 
     public function __construct()
     {
         $now = new \DateTimeImmutable();
         $this->createdAt = $now;
         $this->updatedAt = $now;
-        $this->rentals = new ArrayCollection();
+        // $this->rentals = new ArrayCollection(); // REMOVED
+        $this->rentalRequests = new ArrayCollection(); // ADDED
     }
 
     public function getId(): ?int
@@ -182,30 +188,37 @@ class Customer
         return trim(sprintf('%s %s', $this->firstName ?? '', $this->lastName ?? '')) ?: ($this->email ?? 'Customer');
     }
 
+    // REMOVED: Old Rental methods
+    // public function getRentals(): Collection
+    // public function addRental(Rental $rental): static
+    // public function removeRental(Rental $rental): static
+
+    // ADDED: New RentalRequest methods
+
     /**
-     * @return Collection<int, Rental>
+     * @return Collection<int, RentalRequest>
      */
-    public function getRentals(): Collection
+    public function getRentalRequests(): Collection
     {
-        return $this->rentals;
+        return $this->rentalRequests;
     }
 
-    public function addRental(Rental $rental): static
+    public function addRentalRequest(RentalRequest $rentalRequest): static
     {
-        if (!$this->rentals->contains($rental)) {
-            $this->rentals->add($rental);
-            if ($rental->getCustomer() !== $this) {
-                $rental->setCustomer($this);
+        if (!$this->rentalRequests->contains($rentalRequest)) {
+            $this->rentalRequests->add($rentalRequest);
+            if ($rentalRequest->getCustomer() !== $this) {
+                $rentalRequest->setCustomer($this);
             }
         }
 
         return $this;
     }
 
-    public function removeRental(Rental $rental): static
+    public function removeRentalRequest(RentalRequest $rentalRequest): static
     {
-        if ($this->rentals->removeElement($rental) && $rental->getCustomer() === $this) {
-            // Owning side update handled where rentals are reassigned or removed.
+        if ($this->rentalRequests->removeElement($rentalRequest) && $rentalRequest->getCustomer() === $this) {
+            $rentalRequest->setCustomer(null);
         }
 
         return $this;

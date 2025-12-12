@@ -45,10 +45,10 @@
                             View Details
                         </a>
 
-                        {% if status_code == 'available' %}
-                            <button class="btn btn-primary" onclick="confirmRent('{{ path('app_car_rent', {'id': car.id}) }}', '{{ car.make }} {{ car.model }}')">
-                                Rent This Car
-                            </button>
+                                {% if status_code == 'available' %}
+                            <a href="{{ path('app_rental_request_new', {'id': car.id}) }}" class="btn btn-primary">
+                            Rent This Car
+                        </a>
                         {% else %}
                             <span class="unavailable-note">
                                 Currently unavailable. Check back soon!

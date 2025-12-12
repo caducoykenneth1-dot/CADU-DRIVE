@@ -7,22 +7,164 @@
     <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
 {% endblock %}
 
-
-{% block body %}
-    <h1 class="page-title">Rental History</h1>
-
-    <div class="rental-cards">
-        {% for rental in rentals %}
-            <div class="rental-card">
-                <h2 class="car-name">{{ rental.car.make }} {{ rental.car.model }}</h2>
-                <p><strong>Customer:</strong> {{ rental.customer ? rental.customer.displayName : '—' }}</p>
-                <p><strong>Start Date:</strong> {{ rental.startDate|date('Y-m-d H:i') }}</p>
-                <p><strong>End Date:</strong> {{ rental.endDate|date('Y-m-d H:i') }}</p>
-                <span class="rental-id">#{{ rental.id }}</span>
+{% block admin_content %}
+    <section class="px-4 py-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+                <div class="mb-4 sm:mb-0">
+                    <h1 class="text-3xl font-bold text-gray-100">Rental History</h1>
+                    <p class="text-sm text-gray-400">All rental bookings and completion status.</p>
+                </div>
+                <a href="{{ path('app_admin_dashboard') }}" class="inline-flex items-center gap-2 bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium py-2 px-4 rounded">
+                    <span class="bi bi-arrow-left"></span>
+                    Back to Dashboard
+                </a>
             </div>
-        {% else %}
-            <p class="no-records">No rental records found.</p>
-        {% endfor %}
-    </div>
-     <a href="{{ path('app_admin_dashboard') }}" class="btn">Back to Dashboard</a>
+
+            {% if app.flashes %}
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="mb-4 p-4 rounded-lg {% if label == 'success' %}bg-green-900/20 border border-green-700 text-green-300{% else %}bg-red-900/20 border border-red-700 text-red-300{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            {% endif %}
+
+            <div class="customer-table">
+                <table id="rentalTable" class="min-w-full text-sm">
+                    <thead>
+                        <tr>
+                            <th class="px-4 py-3 text-left">Vehicle</th>
+                            <th class="px-4 py-3 text-left">Customer</th>
+                            <th class="px-4 py-3 text-left">Start Date</th>
+                            <th class="px-4 py-3 text-left">End Date</th>
+                            <th class="px-4 py-3 text-center">Status</th>
+                            <th class="px-4 py-3 text-center">Duration (hrs)</th>
+                            <th class="px-4 py-3 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if rentals is not empty %}
+                            {% for rental in rentals %}
+                                {% set now = 'now'|date('U') %}
+                                {% set startTime = rental.startDate|date('U') %}
+                                {% set endTime = rental.endDate|date('U') %}
+                                {% set isConfirmed = rental.isConfirmed %}
+                                {% set isCompleted = now > endTime %}
+                                {% set isActive = now >= startTime and now <= endTime %}
+                                {% set isPending = now < startTime %}
+                                {% set duration = (endTime - startTime) / 3600 %}
+                                
+                                <tr>
+                                    <td class="px-4 py-3">
+                                        <div>
+                                            <span class="font-medium text-gray-100">{{ rental.car.make }} {{ rental.car.model }}</span>
+                                            <div class="text-xs text-gray-400">{{ rental.car.year }}</div>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <a href="{{ path('app_customer_show', {'id': rental.customer.id}) }}" class="text-blue-300 hover:underline">
+                                            {{ rental.customer.displayName|default(rental.customer.firstName ~ ' ' ~ rental.customer.lastName) }}
+                                        </a>
+                                        <div class="text-xs text-gray-400">{{ rental.customer.email }}</div>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <div class="text-sm text-gray-100">{{ rental.startDate|date('M d, Y') }}</div>
+                                        <div class="text-xs text-gray-400">{{ rental.startDate|date('H:i') }}</div>
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <div class="text-sm text-gray-100">{{ rental.endDate|date('M d, Y') }}</div>
+                                        <div class="text-xs text-gray-400">{{ rental.endDate|date('H:i') }}</div>
+                                    </td>
+                                    <td class="px-4 py-3 text-center">
+                                        {% if isConfirmed %}
+                                            <span class="inline-block px-3 py-1 bg-green-900/30 text-green-300 border border-green-700 rounded-full text-xs font-medium">✓ Confirmed</span>
+                                        {% elseif isCompleted %}
+                                            <span class="inline-block px-3 py-1 bg-yellow-900/30 text-yellow-300 border border-yellow-700 rounded-full text-xs font-medium">⏱ Awaiting Confirm</span>
+                                        {% elseif isActive %}
+                                            <span class="inline-block px-3 py-1 bg-blue-900/30 text-blue-300 border border-blue-700 rounded-full text-xs font-medium">▶ Active</span>
+                                        {% else %}
+                                            <span class="inline-block px-3 py-1 bg-gray-700 text-gray-300 rounded-full text-xs font-medium">⏳ Pending</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-4 py-3 text-center">
+                                        <span class="text-gray-100">{{ duration|round(1) }}</span>
+                                    </td>
+                                    <td class="px-4 py-3 text-right">
+                                        <div class="inline-flex items-center gap-2">
+                                            {% if isCompleted and not isConfirmed %}
+                                                <form method="post" action="{{ path('app_rental_confirm', {'id': rental.id}) }}" style="display:inline;">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('confirm' ~ rental.id) }}">
+                                                    <button type="submit" class="btn btn-compact" style="background-color:#10b981;color:white;padding:0.4rem 0.8rem;border-radius:0.375rem;font-size:0.875rem;border:none;cursor:pointer;transition:background-color 0.2s;" onmouseover="this.style.backgroundColor='#059669'" onmouseout="this.style.backgroundColor='#10b981'" title="Confirm rental completion">
+                                                        <span class="bi bi-check-circle"></span> Confirm
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                            <a href="{{ path('app_rental_show', {'id': rental.id}) }}" class="btn btn-compact btn-details" style="padding:0.4rem 0.8rem;border-radius:0.375rem;font-size:0.875rem;">
+                                                View
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="7" class="px-4 py-6 text-center text-gray-400">No rental records found.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    {% block javascripts %}
+        {{ parent() }}
+        <script>
+            // Initialize DataTable for rental history
+            (function() {
+                function initDataTable() {
+                    // Only initialize if jQuery and DataTables are loaded
+                    if (typeof $ === 'undefined' || typeof $.fn.DataTable === 'undefined') {
+                        setTimeout(initDataTable, 100);
+                        return;
+                    }
+
+                    // Destroy existing DataTable instance if it exists
+                    if ($.fn.DataTable.isDataTable('#rentalTable')) {
+                        $('#rentalTable').DataTable().destroy();
+                    }
+
+                    // Initialize DataTable
+                    $('#rentalTable').DataTable({
+                        "pageLength": 25,
+                        "order": [[2, 'desc']],
+                        "columnDefs": [
+                            {
+                                "targets": 6,
+                                "orderable": false,
+                                "searchable": false
+                            }
+                        ],
+                        "language": {
+                            "search": "Search rentals:",
+                            "paginate": {
+                                "previous": "Previous",
+                                "next": "Next"
+                            }
+                        },
+                        "dom": '<"top"lf>rt<"bottom"ip><"clear">'
+                    });
+                }
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', initDataTable);
+                } else {
+                    initDataTable();
+                }
+            })();
+        </script>
+    {% endblock %}
+
 {% endblock %}

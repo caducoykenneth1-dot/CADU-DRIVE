@@ -1,0 +1,12 @@
+[22:26:16] Login listener started
+[22:26:16] User: App\Entity\User
+[22:26:16] User email: staff@gmail.com
+[22:26:16] SUCCESS: Activity log saved
+[22:26:16] Login listener finished
+
+[22:26:16] Login listener started
+[22:26:16] User: App\Entity\User
+[22:26:16] User email: staff@gmail.com
+[22:26:16] SUCCESS: Activity log saved
+[22:26:16] Login listener finished
+

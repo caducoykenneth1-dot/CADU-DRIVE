@@ -25,6 +25,8 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/2.0.7/js/dataTables.min.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/2.0.7/css/dataTables.dataTables.min.css">
+    {# DASHBOARD AND ADMIN STYLES - LOADS AFTER DATATABLES TO OVERRIDE #}
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
    
     </head>
     <body class="bg-gray-900 text-gray-300">
@@ -34,7 +36,7 @@
 
 {# 2. Check if we are on ANY route that looks like an admin page or a CRUD form. #}
 {# This is a robust check to ensure forms and the dashboard are excluded. #}
-{% set __is_admin_context = 'app_admin' in __current_route or 'edit' in __current_route or 'new' in __current_route or 'rent' in __current_route or 'customer' in __current_route %}
+{% set __is_admin_context = 'app_admin' in __current_route or 'edit' in __current_route or 'new' in __current_route or 'rent' in __current_route or 'customer' in __current_route or 'register' in __current_route or 'login' in __current_route or 'staff' in __current_route or 'profile' in __current_route or 'unauthorized' in __current_route or 'activity' in __current_route %}
 
 {# The original fix: Header is hidden if __is_admin_context is TRUE #}
 {% if not __is_admin_context %}
@@ -54,10 +56,16 @@
                             <a href="{{ path('app_about') }}" class="nav-link">About</a>
                             <a href="{{ path('app_car_index') }}" class="nav-link">Cars</a>
                             <a href="{{ path('app_contact') }}" class="nav-link">Contact</a>
-                            <a href="{{ path('app_customer_register') }}" class="nav-link">Register</a>
+                            {# <a href="{{ path('app_customer_register') }}" class="nav-link">Register</a> #}
                             <a href="{{ path('app_car_index') }}" class="btn">Book a Ride</a>
-                            <a href="{{ path('app_admin_dashboard') }}" class="btn">Admin Panel</a>
                             
+                            {%if is_granted('ROLE_ADMIN') %}
+                            <a href="{{ path('app_admin_dashboard') }}" class="btn">Admin Panel</a>
+                            {% elseif is_granted('ROLE_STAFF') %}
+                            <a href="{{ path('app_staff_dashboard') }}" class="btn">Staff Panel</a>
+                            {% elseif is_granted('ROLE_USER') %}
+                            <a href="{{ path('app_customer_my_profile') }}" class="btn">My Profile</a>
+                            {% endif %}
                         </div>
 
                         <!-- Mobile Menu Button -->

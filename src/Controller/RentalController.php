@@ -1,26 +1,20 @@
 <?php
 
+// src/Controller/RentalController.php
 namespace App\Controller;
 
-use App\Repository\RentalRepository;
+use App\Entity\RentalRequest;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-/**
- * Surfaces rental history information for administrative review.
- */
-#[Route('/rental')]
-final class RentalController extends AbstractController
+class RentalController extends AbstractController
 {
-    /**
-     * List every rental record in reverse chronological order.
-     */
-    #[Route(name: 'app_rental_index', methods: ['GET'])]
-    public function index(RentalRepository $rentalRepository): Response
+    #[Route('/rental/{id}', name: 'app_rental_show', methods: ['GET'])]
+    public function show(RentalRequest $rental): Response
     {
-        return $this->render('admin/rental_index.html.twig', [
-            'rentals' => $rentalRepository->findAll(),
+        return $this->render('rental/show.html.twig', [
+            'rental' => $rental,
         ]);
     }
 }

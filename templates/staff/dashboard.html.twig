@@ -1,0 +1,560 @@
+    {% extends 'admin/layout.html.twig' %}
+
+{% block stylesheets %} {{ parent() }} <style> /* Updated clean, modern, minimal, professional styles */
+    .staff-header-card {
+        background: #f9fafb;
+        border: 1.5px solid #3b82f6;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+        transition: box-shadow 0.25s ease;
+        padding: 1.5rem 2rem;
+    }
+    .staff-header-card:hover {
+        box-shadow: 0 6px 18px rgba(59, 130, 246, 0.25);
+    }
+
+    .staff-name {
+        color: #1e3a8a; /* Stronger blue */
+        font-weight: 700;
+        font-size: 1.75rem;
+        margin-bottom: 0.25rem;
+        line-height: 1.1;
+    }
+
+    .staff-email {
+        color: #374151;
+        font-weight: 600;
+        font-size: 1rem;
+        letter-spacing: 0.02em;
+        margin-bottom: 1rem;
+    }
+
+    .badge-staff, .badge-active {
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 0.3rem 0.9rem;
+        border-radius: 9999px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        user-select: none;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .badge-staff {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    .badge-active {
+        background: #d1fae5;
+        color: #15803d;
+    }
+    .badge-staff i, .badge-active i {
+        font-size: 1rem;
+    }
+
+    .staff-header-card .text-muted {
+        color: #475569 !important;
+        font-weight: 500;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+        letter-spacing: 0.02em;
+    }
+    .staff-header-card .text-muted span {
+        margin-right: 1.25rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+    .staff-header-card .text-muted i {
+        color: #3b82f6;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    /* Profile initials circle */
+    .staff-header-card .rounded-circle {
+        background-color: #2563eb;
+        color: white;
+        font-weight: 700;
+        font-size: 2rem;
+        user-select: none;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Quick Stats Grid */
+    .quick-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1.75rem;
+        margin: 2rem 0;
+    }
+    .stat-card {
+        background: #fff;
+        border: 1px solid #e0e7ff;
+        border-radius: 14px;
+        box-shadow: 0 4px 16px rgb(226 232 240 / 0.4);
+        padding: 1.75rem 2rem;
+        transition: transform 0.22s ease, box-shadow 0.22s ease;
+        cursor: default;
+    }
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 26px rgb(59 130 246 / 0.3);
+    }
+    .stat-card.urgent {
+        border-left: 5px solid #ef4444;
+    }
+    .stat-card.pending {
+        border-left: 5px solid #f59e0b;
+    }
+    .stat-card.completed {
+        border-left: 5px solid #10b981;
+    }
+
+    .stat-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.25rem;
+        font-size: 1.7rem;
+        box-shadow: 0 3px 8px rgb(0 0 0 / 0.05);
+    }
+    .pending-icon {
+        background: #fef3c7;
+        color: #b45309;
+    }
+    .approved-icon {
+        background: #dcfce7;
+        color: #15803d;
+    }
+    .rejected-icon {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .stat-value {
+        font-size: 2.75rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 0.4rem;
+        line-height: 1;
+        user-select: text;
+    }
+    .stat-label {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+    .stat-card a {
+        font-size: 0.87rem;
+        color: #2563eb;
+        font-weight: 600;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+    .stat-card a:hover {
+        text-decoration: underline;
+        color: #1e40af;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 1.25rem;
+        flex-wrap: wrap;
+        margin-top: 2.25rem;
+    }
+    .action-button {
+        flex: 1 1 250px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+        padding: 0.85rem 1.8rem;
+        background: #fff;
+        border: 2.5px solid #3b82f6;
+        border-radius: 14px;
+        color: #3b82f6;
+        font-weight: 700;
+        font-size: 1.05rem;
+        text-decoration: none;
+        user-select: none;
+        box-shadow: 0 2px 12px rgb(59 130 246 / 0.2);
+        transition: all 0.22s ease;
+        cursor: pointer;
+    }
+    .action-button:hover {
+        background: #3b82f6;
+        color: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgb(59 130 246 / 0.5);
+        text-decoration: none;
+    }
+    .action-button.secondary {
+        border-color: #6b7280;
+        color: #6b7280;
+        box-shadow: 0 2px 8px rgb(107 114 128 / 0.18);
+    }
+    .action-button.secondary:hover {
+        background: #6b7280;
+        color: #f9fafb;
+        box-shadow: 0 10px 22px rgb(107 114 128 / 0.4);
+    }
+    .action-button i {
+        font-size: 1.3rem;
+    }
+
+    /* Recent Activity Section */
+    .recent-activity {
+        background: #fff;
+        border: 1px solid #e0e7ff;
+        border-radius: 14px;
+        padding: 2rem 2.25rem;
+        margin-top: 2.5rem;
+        box-shadow: 0 6px 20px rgb(226 232 240 / 0.3);
+    }
+    .recent-activity h3 {
+        font-weight: 700;
+        font-size: 1.75rem;
+        color: #334155;
+        margin-bottom: 1.25rem;
+    }
+
+    .activity-item {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        padding: 1.1rem 0;
+        border-bottom: 1px solid #e2e8f0;
+        transition: background-color 0.15s ease;
+        border-radius: 8px;
+    }
+    .activity-item:hover {
+        background-color: #f1f5f9;
+    }
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+
+    .activity-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        box-shadow: 0 3px 10px rgb(0 0 0 / 0.08);
+        user-select: none;
+    }
+
+    .activity-icon.pending {
+        background: #fef3c7;
+        color: #b45309;
+    }
+    .activity-icon.approved {
+        background: #dcfce7;
+        color: #15803d;
+    }
+    .activity-icon.rejected {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .activity-content {
+        flex: 1;
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .activity-details {
+        color: #64748b;
+        font-weight: 500;
+        font-size: 0.9rem;
+        margin-top: 0.1rem;
+        letter-spacing: 0.02em;
+    }
+
+    .activity-time {
+        font-size: 0.85rem;
+        color: #94a3b8;
+        font-weight: 500;
+        white-space: nowrap;
+        min-width: 110px;
+        text-align: right;
+    }
+
+    .activity-actions a.btn-outline-warning {
+        font-weight: 600;
+        font-size: 0.9rem;
+        padding: 0.25rem 0.8rem;
+        border-radius: 8px;
+        color: #f59e0b;
+        border-color: #f59e0b;
+        transition: background-color 0.2s ease, color 0.2s ease;
+        user-select: none;
+    }
+    .activity-actions a.btn-outline-warning:hover {
+        background-color: #f59e0b;
+        color: #fff;
+        text-decoration: none;
+    }
+
+    /* No Data Screen */
+    .no-data {
+        text-align: center;
+        padding: 4rem 1rem;
+        color: #94a3b8;
+        user-select: none;
+    }
+    .no-data svg {
+        width: 72px;
+        height: 72px;
+        margin-bottom: 1rem;
+        opacity: 0.35;
+    }
+    .no-data h4 {
+        font-weight: 700;
+        font-size: 1.75rem;
+        margin-bottom: 0.4rem;
+        color: #475569;
+    }
+    .no-data p {
+        font-size: 1.05rem;
+        font-weight: 500;
+        margin-bottom: 1rem;
+    }
+    .no-data .btn {
+        padding: 0.65rem 1.9rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgb(59 130 246 / 0.25);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .quick-stats-grid {
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+        .action-buttons {
+            flex-direction: column;
+        }
+        .action-button {
+            flex: 1 1 auto;
+        }
+        .activity-time {
+            min-width: 80px;
+            font-size: 0.8rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .staff-header-card {
+            padding: 1.25rem 1.5rem;
+        }
+        .staff-name {
+            font-size: 1.45rem;
+        }
+        .staff-email {
+            font-size: 0.9rem;
+        }
+        .stat-value {
+            font-size: 2rem;
+        }
+        .stat-label {
+            font-size: 0.9rem;
+        }
+        .action-button {
+            font-size: 1rem;
+            padding: 0.75rem 1.5rem;
+        }
+        .activity-content {
+            font-size: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+{% block admin_title %}Staff Dashboard{% endblock %}
+{% block admin_content %} {% set stats = stats|default({}) %} {% set pendingRequests = pendingRequests|default([]) %} {% set recentActivity = recentActivity|default([]) %}
+<div class="staff-dashboard">
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success mb-4">{{ message }}</div>
+    {% endfor %}
+
+    <!-- STAFF PROFILE SECTION -->
+    <section id="profile" class="mb-5">
+        <div class="card staff-header-card shadow d-flex align-items-center gap-4 flex-wrap">
+            <div class="rounded-circle d-flex align-items-center justify-content-center" 
+                 style="width: 80px; height: 80px;">
+                {{ app.user.firstName|first|upper }}{{ app.user.lastName|first|upper }}
+            </div>
+            <div class="flex-grow-1 min-w-0">
+                <h2 class="staff-name mb-0">{{ app.user.firstName }} {{ app.user.lastName }}</h2>
+                <p class="staff-email mb-2">{{ app.user.email }}</p>
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <span class="badge-staff"><i class="bi bi-person-badge"></i> STAFF MEMBER</span>
+                    <span class="badge-active"><i class="bi bi-check-circle"></i> ACTIVE</span>
+                </div>
+                {% if app.user.staff is defined and app.user.staff %}
+                    <div class="text-muted small" style="color: #475569 !important;">
+                        <span class="me-3">
+                            <i class="bi bi-building me-1"></i>
+                            Department: {{ app.user.staff.department|default('General') }}
+                        </span>
+                        <span>
+                            <i class="bi bi-calendar me-1"></i>
+                            Joined: {{ app.user.staff.createdAt is defined ? app.user.staff.createdAt|date('M d, Y') : 'N/A' }}
+                        </span>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="d-flex flex-column gap-3 mt-3 mt-md-0">
+                <a href="{{ path('app_staff_profile') }}" 
+                   class="action-button" style="justify-content: center;">
+                    <i class="bi bi-person-circle"></i> My Profile
+                </a>
+                <a href="{{ path('app_staff_profile_edit') }}" 
+                   class="action-button secondary" style="justify-content: center;">
+                    <i class="bi bi-pencil"></i> Edit Profile
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- STAFF QUICK STATS -->
+    <section id="quick-stats" class="mb-5">
+        <h3 class="mb-4" style="font-weight:700; color:white;">Quick Overview</h3>
+        <div class="quick-stats-grid">
+            <div class="stat-card pending">
+                <div class="stat-icon pending-icon">
+                    <i class="bi bi-clock"></i>
+                </div>
+                <div class="stat-value">{{ stats.pendingRequests|default(0) }}</div>
+                <div class="stat-label">Pending Rental Requests</div>
+                {% if (stats.pendingRequests|default(0)) > 0 %}
+                    <div class="mt-2">
+                        <a href="{{ path('app_staff_rental_requests') }}">
+                            Review now <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="stat-card completed">
+                <div class="stat-icon approved-icon">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <div class="stat-value">{{ stats.totalApproved|default(0) }}</div>
+                <div class="stat-label">Total Approved</div>
+            </div>
+            <div class="stat-card urgent">
+                <div class="stat-icon rejected-icon">
+                    <i class="bi bi-x-circle"></i>
+                </div>
+                <div class="stat-value">{{ stats.totalRejected|default(0) }}</div>
+                <div class="stat-label">Total Rejected</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #e0e7ff; color: #4f46e5;">
+                    <i class="bi bi-clipboard-data"></i>
+                </div>
+                <div class="stat-value">{{ stats.totalHandled|default(0) }}</div>
+                <div class="stat-label">Total Requests Handled</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- QUICK ACTIONS -->
+    <section id="quick-actions" class="mb-5">
+        <h3 class="mb-4" style="font-weight:700; color:white;">Quick Actions</h3>
+        <div class="action-buttons">
+            <a href="{{ path('app_staff_rental_requests') }}" class="action-button">
+                <i class="bi bi-clipboard-check"></i>
+                Manage Rental Requests
+            </a>
+            <a href="{{ path('app_car_index') }}" class="action-button secondary">
+                <i class="bi bi-car-front"></i>
+                View Available Cars
+            </a>
+            <a href="{{ path('app_customer_index') }}" class="action-button secondary">
+                <i class="bi bi-people"></i>
+                View Customers
+            </a>
+            <a href="{{ path('app_staff_profile_edit') }}" class="action-button secondary">
+                <i class="bi bi-person-badge"></i>
+                Update Profile
+            </a>
+        </div>
+    </section>
+
+    <!-- PENDING REQUESTS SECTION -->
+    {% set hasPendingRequests = pendingRequests is defined and pendingRequests|length > 0 %}
+    {% if hasPendingRequests %}
+        <section id="pending-requests" class="mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <h3 style="font-weight:700; color:white;">Pending Rental Requests</h3>
+                <a href="{{ path('app_staff_rental_requests') }}" class="btn btn-primary d-inline-flex align-items-center gap-1 py-2 px-3">
+                    View All <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+            <div class="recent-activity" role="region" aria-label="Pending rental requests">
+                {% for request in pendingRequests|slice(0, 5) %}
+                    <div class="activity-item" role="listitem" tabindex="0" aria-describedby="desc-{{ request.id }}">
+                        <div class="activity-icon pending">
+                            <i class="bi bi-clock"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div id="desc-{{ request.id }}">
+                                <strong>Request #{{ request.id }}</strong>
+                                <div class="activity-details">
+                                    {% if request.car is defined and request.car %}
+                                        {{ request.car.make }} {{ request.car.model }} &bull; 
+                                    {% endif %}
+                                    {% if request.startDate is defined and request.endDate is defined %}
+                                        {{ request.startDate|date('M d') }} - {{ request.endDate|date('M d, Y') }}
+                                    {% else %}
+                                        Dates N/A
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="activity-time text-nowrap">
+                            {{ request.createdAt is defined ? request.createdAt|date('M d, h:i A') : 'N/A' }}
+                            <div class="activity-actions mt-1">
+                                <a href="{{ path('app_staff_rental_requests') }}" class="btn btn-outline-warning d-inline-flex align-items-center gap-1 py-1 px-3" aria-label="Review request {{ request.id }}">
+                                    Review
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    {% else %}
+        <section id="no-pending" class="mb-5" role="region" aria-label="No pending rental requests">
+            <div class="card border-success">
+                <div class="card-body text-center py-5 px-3">
+                    <i class="bi bi-check2-circle text-success" style="font-size: 4rem;"></i>
+                    <h4 class="mt-3 text-success" style="font-weight:700;">All Caught Up!</h4>
+                    <p class="text-muted mb-3" style="font-size: 1.1rem;">There are no pending rental requests at the moment.</p>
+                    <a href="{{ path('app_staff_rental_requests') }}" class="btn btn-outline-primary px-4 py-2" style="font-weight: 600;">
+                        Check Rental Requests Anyway
+                    </a>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+</div>
+{% endblock %}
+

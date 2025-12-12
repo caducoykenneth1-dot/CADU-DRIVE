@@ -1,0 +1,149 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}{{ staff.firstName }} {{ staff.lastName }} - Staff Details{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/staff.css') }}">
+{% endblock %}
+
+{% block admin_content %}
+    <div class="staff-detail-container">
+        <!-- Header -->
+        <div class="page-header" style="margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid #e2e8f0;">
+            <h1 style="margin: 0; display: flex; align-items: center; gap: 0.75rem;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1e293b" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                </svg>
+                Staff Member Details
+            </h1>
+            <div style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem;" class="text-muted">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M12 16v-4M12 8h.01"/>
+                </svg>
+                ID: <code style="background: #f1f5f9; color: #475569; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.85rem; border: 1px solid #e2e8f0;">{{ staff.id }}</code>
+            </div>
+        </div>
+
+        <!-- Main Card -->
+        <div class="form-container" style="margin-bottom: 2rem;">
+            <!-- Personal Info Section -->
+            <div style="margin-bottom: 2rem;">
+                <h3 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; color: #475569; font-size: 1rem;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    Personal Information
+                </h3>
+                
+                <div style="display: grid; gap: 1.5rem;">
+                    <!-- Name Row -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div>
+                            <div style="font-size: 0.875rem; color: #64748b; margin-bottom: 0.5rem; font-weight: 500;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.5rem;">
+                                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="12" cy="7" r="4"/>
+                                </svg>
+                                First Name
+                            </div>
+                            <div style="font-size: 1.125rem; color: #1e293b; padding: 0.5rem; background: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0;">
+                                {{ staff.firstName }}
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div style="font-size: 0.875rem; color: #64748b; margin-bottom: 0.5rem; font-weight: 500;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.5rem;">
+                                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="12" cy="7" r="4"/>
+                                </svg>
+                                Last Name
+                            </div>
+                            <div style="font-size: 1.125rem; color: #1e293b; padding: 0.5rem; background: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0;">
+                                {{ staff.lastName }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Email Row -->
+                    <div>
+                        <div style="font-size: 0.875rem; color: #64748b; margin-bottom: 0.5rem; font-weight: 500;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 0.5rem;">
+                                <rect x="2" y="4" width="20" height="16" rx="2"/>
+                                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                            </svg>
+                            Email Address
+                        </div>
+                        <div style="font-size: 1.125rem; padding: 0.5rem; background: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0;">
+                            <a href="mailto:{{ staff.email }}" style="color: #2563eb; text-decoration: none;">
+                                {{ staff.email }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Roles Section -->
+            <div>
+                <h3 style="margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; color: #475569; font-size: 1rem;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
+                    </svg>
+                    Roles & Permissions
+                </h3>
+                
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 1rem; background: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0;">
+                    {% for role in staff.roles %}
+                        <span style="display: inline-flex; align-items: center; gap: 0.5rem; background: white; border: 1px solid #e2e8f0; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.875rem; font-weight: 500; color: #475569;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                {% if role == 'ROLE_ADMIN' %}
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="m9 12 2 2 4-4"/>
+                                {% else %}
+                                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="12" cy="7" r="4"/>
+                                {% endif %}
+                            </svg>
+                            {{ role|replace({'ROLE_': ''})|title }}
+                        </span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: 1rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0;">
+            <a href="{{ path('app_staff_crud_index') }}" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back to List
+            </a>
+            {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_staff_crud_edit', {'id': staff.id}) }}" class="btn-primary" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+                Edit Staff
+            </a>
+            
+            <form method="post" action="{{ path('app_staff_crud_delete', {'id': staff.id}) }}" 
+                  onsubmit="return confirm('Are you sure you want to delete this staff member?');" 
+                  style="display: inline;">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ staff.id) }}">
+                <button type="submit" class="btn btn-danger" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                    </svg>
+                    Delete Staff
+                </button>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+{% endblock %}

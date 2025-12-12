@@ -1,0 +1,812 @@
+{# templates/registration/register.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Create Account - Car Rental{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .registration-container {
+            min-height: calc(100vh - 76px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+        
+        .registration-wrapper {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .registration-card {
+            border: none;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .registration-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .registration-header {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .registration-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+        
+        .registration-header::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -30%;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+        }
+        
+        .registration-logo {
+            width: 70px;
+            height: 70px;
+            background: white;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: #3b82f6;
+            font-size: 28px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            position: relative;
+            z-index: 1;
+            transition: transform 0.3s ease;
+        }
+        
+        .registration-card:hover .registration-logo {
+            transform: scale(1.05);
+        }
+        
+        .registration-header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .registration-header p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .card-body {
+            padding: 2.5rem;
+        }
+        
+        @media (max-width: 576px) {
+            .card-body {
+                padding: 2rem 1.5rem;
+            }
+            
+            .registration-header {
+                padding: 1.75rem 1.5rem;
+            }
+            
+            .registration-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .card-body {
+                padding: 1.75rem 1.25rem;
+            }
+            
+            .registration-header {
+                padding: 1.5rem 1.25rem;
+            }
+            
+            .registration-logo {
+                width: 60px;
+                height: 60px;
+                font-size: 24px;
+            }
+        }
+        
+        .form-control {
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 14px 16px;
+            transition: all 0.3s;
+            font-size: 15px;
+            height: auto;
+        }
+        
+        .form-control:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+        
+        .form-floating > label {
+            padding: 0.9rem 0.75rem;
+            font-size: 15px;
+        }
+        
+        .form-floating > .form-control:focus ~ label,
+        .form-floating > .form-control:not(:placeholder-shown) ~ label {
+            transform: scale(0.85) translateY(-0.75rem) translateX(0.15rem);
+            opacity: 0.8;
+        }
+        
+        .form-control.is-invalid {
+            border-color: #ef4444;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23ef4444'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23ef4444' stroke='none'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+        
+        .form-control.is-valid {
+            border-color: #10b981;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2310b981' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+        
+        .invalid-feedback, .valid-feedback {
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+        
+        .password-strength {
+            margin-top: 0.5rem;
+        }
+        
+        .strength-meter {
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 0.25rem;
+        }
+        
+        .strength-meter-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 3px;
+            transition: width 0.3s ease, background 0.3s ease;
+        }
+        
+        .strength-text {
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+        
+        .btn-register {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 16px;
+            font-weight: 600;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-register:active {
+            transform: translateY(0);
+        }
+        
+        .form-check-input {
+            width: 20px;
+            height: 20px;
+            margin-top: 0.25rem;
+            border: 2px solid #d1d5db;
+            cursor: pointer;
+        }
+        
+        .form-check-input:checked {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+        }
+        
+        .form-check-label {
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .terms-link {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .terms-link:hover {
+            text-decoration: underline;
+        }
+        
+        .login-link {
+            color: #3b82f6;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        
+        .login-link:hover {
+            text-decoration: underline;
+            gap: 8px;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+            gap: 8px;
+        }
+        
+        .step {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            transition: all 0.3s;
+        }
+        
+        .step.active {
+            background: #3b82f6;
+            transform: scale(1.2);
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            z-index: 5;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .password-toggle:hover {
+            color: #374151;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .divider span {
+            padding: 0 15px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .registration-container {
+                padding: 15px;
+                min-height: calc(100vh - 70px);
+            }
+            
+            .registration-wrapper {
+                max-width: 450px;
+            }
+            
+            .registration-header {
+                padding: 1.75rem;
+            }
+            
+            .registration-logo {
+                width: 65px;
+                height: 65px;
+                font-size: 26px;
+            }
+            
+            .card-body {
+                padding: 2rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .registration-wrapper {
+                max-width: 100%;
+            }
+            
+            .card-body {
+                padding: 1.75rem;
+            }
+            
+            .form-control {
+                padding: 13px 15px;
+            }
+            
+            .btn-register {
+                padding: 15px;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .card-body {
+                padding: 1.5rem;
+            }
+            
+            .registration-header {
+                padding: 1.5rem;
+            }
+            
+            .registration-header h1 {
+                font-size: 1.4rem;
+            }
+            
+            .registration-logo {
+                width: 55px;
+                height: 55px;
+                font-size: 22px;
+                margin-bottom: 1rem;
+            }
+            
+            .form-control {
+                padding: 12px 14px;
+            }
+        }
+        .personal-info-title {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            font-weight: 700;
+            color: black;
+        }
+
+         .personal-info-section {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            font-weight: 700;
+            color: black;
+        }
+
+        
+        
+        .password-section {
+           background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            font-weight: 700;
+            color: black;
+        }
+
+        .phone-section {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            font-weight: 700;
+            color: black;
+        }
+
+        .email-section {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            font-weight: 700;
+            color: black;
+        }
+
+        .terms-section {
+           background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            font-weight: 700;
+            color: black;
+        }
+
+        .alrea-section {
+           background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            font-weight: 700;
+            color: black;
+        }
+        
+        /* Animation for form */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .registration-card {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="registration-container">
+    <div class="registration-wrapper">
+        <div class="registration-card">
+            <!-- Header -->
+            <div class="registration-header">
+                <div class="registration-logo">
+                    <i class="fas fa-car"></i>
+                </div>
+                <h1 class="h3 mb-2 text-white">Create Your Account</h1>
+                <p class="text-white-50 mb-0">Join our car rental service and start your journey</p>
+            </div>
+            
+            <!-- Form -->
+            <div class="card-body">
+                <!-- Flash Messages -->
+                {% for message in app.flashes('success') %}
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+                
+                {% for message in app.flashes('error') %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+                
+                <!-- Step Indicator -->
+                <div class="step-indicator">
+                    <div class="step active"></div>
+                    <div class="step"></div>
+                    <div class="step"></div>
+                </div>
+                
+                {{ form_start(registrationForm, {
+                    'attr': {
+                        'class': 'needs-validation',
+                        'novalidate': 'novalidate',
+                        'id': 'registrationForm'
+                    }
+                }) }}
+                
+                    <h5 class="mb-4 fw-bold personal-info-title">Personal Information</h5>
+
+                <!-- Name Fields -->
+                <div class="row g-3 mb-4 personal-info-section">
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            {{ form_widget(registrationForm.firstName, {
+                                'attr': {
+                                    'class': 'form-control' ~ (registrationForm.firstName.vars.valid ? '' : ' is-invalid'),
+                                    'placeholder': 'John',
+                                    'autocomplete': 'given-name',
+                                    'required': 'required'
+                                }
+                            }) }}
+                            {{ form_label(registrationForm.firstName, 'First Name', {
+                                'label_attr': {'class': 'form-label'}
+                            }) }}
+                            <div class="invalid-feedback">
+                                Please enter your first name
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            {{ form_widget(registrationForm.lastName, {
+                                'attr': {
+                                    'class': 'form-control' ~ (registrationForm.lastName.vars.valid ? '' : ' is-invalid'),
+                                    'placeholder': 'Doe',
+                                    'autocomplete': 'family-name',
+                                    'required': 'required'
+                                }
+                            }) }}
+                            {{ form_label(registrationForm.lastName, 'Last Name', {
+                                'label_attr': {'class': 'form-label'}
+                            }) }}
+                            <div class="invalid-feedback">
+                                Please enter your last name
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Email -->
+                <div class="mb-4 email-section">
+                    <div class="form-floating">
+                        {{ form_widget(registrationForm.email, {
+                            'attr': {
+                                'class': 'form-control' ~ (registrationForm.email.vars.valid ? '' : ' is-invalid'),
+                                'placeholder': 'you@example.com',
+                                'autocomplete': 'email',
+                                'required': 'required'
+                            }
+                        }) }}
+                        {{ form_label(registrationForm.email, 'Email Address', {
+                            'label_attr': {'class': 'form-label'}
+                        }) }}
+                        <div class="invalid-feedback">
+                            Please enter a valid email address
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Phone -->
+                <div class="mb-4 phone-section">
+                    <div class="form-floating">
+                        {{ form_widget(registrationForm.phone, {
+                            'attr': {
+                                'class': 'form-control' ~ (registrationForm.phone.vars.valid ? '' : ' is-invalid'),
+                                'placeholder': '+63 912 345 6789',
+                                'autocomplete': 'tel'
+                            }
+                        }) }}
+                        {{ form_label(registrationForm.phone, 'Phone Number (Optional)', {
+                            'label_attr': {'class': 'form-label'}
+                        }) }}
+                        <div class="invalid-feedback">
+                            Please enter a valid phone number
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Password -->
+                <div class="mb-4 password-section">
+                    <div class="form-floating position-relative">
+                        {{ form_widget(registrationForm.plainPassword, {
+                            'attr': {
+                                'class': 'form-control' ~ (registrationForm.plainPassword.vars.valid ? '' : ' is-invalid'),
+                                'placeholder': 'Create password',
+                                'autocomplete': 'new-password',
+                                'required': 'required',
+                                'id': 'password',
+                                'oninput': 'checkPasswordStrength()'
+                            }
+                        }) }}
+                        {{ form_label(registrationForm.plainPassword, 'Password', {
+                            'label_attr': {'class': 'form-label'}
+                        }) }}
+                        <button type="button" class="password-toggle" onclick="togglePassword()">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <div class="invalid-feedback">
+                            Please enter a password (minimum 6 characters)
+                        </div>
+                        
+                        <!-- Password Strength Meter -->
+                        <div class="password-strength">
+                            <div class="strength-meter">
+                                <div class="strength-meter-fill" id="passwordStrengthMeter"></div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Terms and Conditions -->
+                <div class="mb-4 terms-section">
+                    <div class="form-check">
+                        {{ form_widget(registrationForm.agreeTerms, {
+                            'attr': {
+                                'class': 'form-check-input' ~ (registrationForm.agreeTerms.vars.valid ? '' : ' is-invalid'),
+                                'required': 'required'
+                            }
+                        }) }}
+                        {{ form_label(registrationForm.agreeTerms, 'I agree to the terms and conditions', {
+                            'label_attr': {'class': 'form-check-label'}
+                        }) }}
+                        <div class="invalid-feedback">
+                            You must agree to the terms and conditions
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Submit Button -->
+                <div class="d-grid mb-4">
+                    <button type="submit" class="btn btn-register btn-lg">
+                        <i class="fas fa-user-plus me-2"></i> Create Account
+                    </button>
+                </div>
+                
+                {{ form_end(registrationForm) }}
+                
+                <!-- Divider -->
+                <div class="divider">
+                    <span>OR</span>
+                </div>
+                
+                <!-- Login Link -->
+                <div class="text-center alrea-section">
+                    <p class="mb-2 text-muted">Already have an account?</p>
+                    <a href="{{ path('app_login') }}" class="login-link">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>Sign In to Your Account</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Password visibility toggle
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.querySelector('.password-toggle i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+        
+        // Password strength checker
+        function checkPasswordStrength() {
+            const password = document.getElementById('password').value;
+            const meter = document.getElementById('passwordStrengthMeter');
+            const levelText = document.getElementById('strengthLevel');
+            
+            let strength = 0;
+            let color = '#ef4444'; // Red
+            let level = 'Weak';
+            
+            // Length check
+            if (password.length >= 8) strength += 25;
+            if (password.length >= 12) strength += 10;
+            
+            // Character variety checks
+            if (/[a-z]/.test(password)) strength += 10;
+            if (/[A-Z]/.test(password)) strength += 15;
+            if (/[0-9]/.test(password)) strength += 20;
+            if (/[^A-Za-z0-9]/.test(password)) strength += 20;
+            
+            // Determine level and color
+            if (strength >= 80) {
+                level = 'Strong';
+                color = '#10b981'; // Green
+            } else if (strength >= 60) {
+                level = 'Good';
+                color = '#3b82f6'; // Blue
+            } else if (strength >= 40) {
+                level = 'Fair';
+                color = '#f59e0b'; // Orange
+            }
+            
+            // Update UI
+            meter.style.width = Math.min(strength, 100) + '%';
+            meter.style.backgroundColor = color;
+            levelText.textContent = level;
+            levelText.style.color = color;
+        }
+        
+        // Form validation
+        (function () {
+            'use strict'
+            
+            // Fetch all forms that need validation
+            const forms = document.querySelectorAll('.needs-validation')
+            
+            // Loop over them and prevent submission
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+        
+        // Real-time validation
+        document.querySelectorAll('.form-control').forEach(input => {
+            input.addEventListener('blur', function() {
+                if (this.value.trim() === '' && this.hasAttribute('required')) {
+                    this.classList.add('is-invalid');
+                } else {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                }
+            });
+            
+            input.addEventListener('input', function() {
+                if (this.value.trim() !== '') {
+                    this.classList.remove('is-invalid');
+                }
+            });
+        });
+        
+        // Auto-format phone number
+       const phoneInput = document.querySelector('input[name$="[phone]"]');
+    if (phoneInput) {
+    phoneInput.addEventListener('input', function(e) {
+        let value = e.target.value;
+        
+        // Check if already starts with +63
+        if (value.startsWith('+63')) {
+            // Remove +63 and spaces, keep only digits
+            value = value.substring(3).replace(/\D/g, '');
+        } else {
+            // Remove all non-digits
+            value = value.replace(/\D/g, '');
+        }
+        
+        if (value.length > 0) {
+            // Format: +63 XXX XXX XXXX
+            let formatted = '+63';
+            
+            if (value.length > 0) formatted += ' ' + value.substring(0, 3);
+            if (value.length > 3) formatted += ' ' + value.substring(3, 6);
+            if (value.length > 6) formatted += ' ' + value.substring(6, 10);
+            
+            e.target.value = formatted;
+        } else {
+            e.target.value = '';
+        }
+    });
+}
+        // Initialize password strength on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkPasswordStrength();
+        });
+    </script>
+{% endblock %}

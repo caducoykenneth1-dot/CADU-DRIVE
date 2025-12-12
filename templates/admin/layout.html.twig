@@ -10,42 +10,74 @@
 {% block body %}
     <div class="flex min-h-screen bg-gray-900 text-gray-200">
         <div id="admin-drawer-overlay" class="fixed inset-0 hidden bg-black/50 backdrop-blur-sm lg:hidden"></div>
-
+       
+        {%if is_granted('ROLE_ADMIN') %}
         <aside id="admin-drawer" class="admin-drawer admin-drawer-closed fixed inset-y-0 left-0 z-40 flex w-64 flex-col overflow-y-auto border-r border-gray-800 bg-gray-900 py-10 shadow-lg lg:static lg:z-10 lg:h-auto lg:py-8 lg:shadow-none">
             <div class="px-6 pb-4">
                 <h2 class="text-lg font-semibold uppercase tracking-wide text-gray-400">Admin Menu</h2>
             </div>
-            <nav class="flex-1 space-y-1 px-4 pb-6">
-               
-               <a href="{{ path('app_admin_dashboard') }}" 
-                data-section="dashboard" 
-                class="admin-nav-link {{ 'app_admin_dashboard' == app.request.attributes.get('_route') ? 'is-active' : '' }}">
-                 <span class="bi bi-speedometer2 text-base"></span> Dashboard </a>
-                
-                {# 2. Customers #}
-                 <a href="{{ path('app_admin_customer') }}" 
-                   data-section="customers" 
-                    class="admin-nav-link {{ 'app_customer_index' == app.request.attributes.get('_route') ? 'is-active' : '' }}">
-                       <span class="bi bi-people text-base"></span> Customers </a>
-                
-                <a href="{{ path('app_admin_cars') }}" 
-                   data-section="cars" 
-                   class="admin-nav-link {{ 'app_admin_cars' == app.request.attributes.get('_route') ? 'is-active' : '' }}">
-                    <span class="bi bi-car-front text-base"></span>
-                    Cars
+            {% else %}
+            <aside id="admin-drawer" class="admin-drawer admin-drawer-closed fixed inset-y-0 left-0 z-40 flex w-64 flex-col overflow-y-auto border-r border-gray-800 bg-gray-900 py-10 shadow-lg lg:static lg:z-10 lg:h-auto lg:py-8 lg:shadow-none">
+            <div class="px-6 pb-4">
+                <h2 class="text-lg font-semibold uppercase tracking-wide text-gray-400">Staff Menu</h2>
+            </div>
+        {% endif %}
+
+           <nav class="flex-1 space-y-1 px-4 pb-6">
+    {# Dashboard visible to both Admin and Staff #}
+       {% if is_granted('ROLE_ADMIN') %}
+    <a href="{{ path('app_admin_dashboard') }}" data-section="dashboard"
+    class="admin-nav-link"  > <span class="bi bi-people text-base"></span>
+    Admin Dashboard</a>
+{% elseif is_granted('ROLE_STAFF') %}
+    <a href="{{ path('app_staff_dashboard') }}" data-section="dashboard" 
+    class="admin-nav-link">  <span class="bi bi-people text-base"></span>Staff Dashboard</a>
+{% endif %}
+
+    {# Only Admin can see Customers #}
+    {% if is_granted('ROLE_ADMIN')or is_granted('ROLE_STAFF') %}
+        <a href="{{ path('app_admin_customer') }}" 
+           data-section="customers" 
+           class="admin-nav-link {{ 'app_customer_index' == app.request.attributes.get('_route') ? 'is-active' : '' }}">
+           <span class="bi bi-people text-base"></span> Customers
+        </a>
+    {% endif %}
+
+   {# NEW: Manage Staff - ADMIN ONLY #}
+   {% if is_granted('ROLE_ADMIN') %}
+<a href="{{ path('app_staff_overview') }}" 
+   data-section="staff"
+   class="admin-nav-link {{ 'staff_crud' in app.request.attributes.get('_route') ? 'is-active' : '' }}">
+    <span class="bi bi-person-gear text-base"></span>
+    Manage Staff
+</a>
+    {% endif %}
+
+
+    {# Cars: Admin and Staff can see #}
+    {% if is_granted('ROLE_ADMIN' )  %}
+        <a href="{{ path('app_admin_cars') }}" 
+           data-section="cars" 
+           class="admin-nav-link {{ 'app_admin_cars' == app.request.attributes.get('_route') ? 'is-active' : '' }}">
+           <span class="bi bi-car-front text-base"></span> Cars
+        </a>
+    {% endif %}
+
+                {# Rental Requests - For Staff to manage customer requests #}
+            {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
+                <a href="{{ path('app_staff_rental_requests') }}" 
+                data-section="rental-requests" 
+                class="admin-nav-link {{ 'app_staff_rental_requests' in app.request.attributes.get('_route') ? 'is-active' : '' }}">
+                <span class="bi bi-clipboard-check text-base"></span> Rental Requests
                 </a>
-                <a href="{{ path('app_admin_rentals') }}" 
-                   data-section="rentals" 
-                   class="admin-nav-link {{ 'app_admin_rentals' == app.request.attributes.get('_route') ? 'is-active' : '' }}">
-                    <span class="bi bi-calendar-check text-base"></span>
-                    Rentals
-                </a>
-                <a href="{{ path('app_admin_settings') }}" 
-                   data-section="settings" 
-                   class="admin-nav-link {{ 'app_admin_settings' == app.request.attributes.get('_route') ? 'is-active' : '' }}">
-                    <span class="bi bi-gear text-base"></span>
-                    Settings
-                </a>
+            {% endif %}
+
+            <form action="{{ path('app_logout') }}" method="post" class="pt-4 border-t border-gray-800 mt-4">
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+    <button type="submit" class="admin-nav-link w-full text-left hover:text-red-400 transition-colors">
+        <span class="bi bi-box-arrow-right text-base"></span> Logout 
+    </button>
+</form>
 
 
                 <a href="{{ path('app_home') }}" class="admin-nav-link"> Back to Home</a>

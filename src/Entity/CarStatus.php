@@ -11,6 +11,11 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: CarStatusRepository::class)]
 class CarStatus
 {
+    // ➤ ADD CONSTANTS HERE
+    public const AVAILABLE = 'available';
+    public const RENTED = 'rented';
+    public const MAINTENANCE = 'maintenance';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

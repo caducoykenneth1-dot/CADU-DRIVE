@@ -1,0 +1,45 @@
+[22:26:38] Logout listener started
+[22:26:38] User: staff@gmail.com
+[22:26:38] SUCCESS: Logout activity saved
+[22:26:38] Logout listener finished
+
+[22:34:47] Logout listener started
+[22:34:47] User: staff@gmail.com
+[22:34:47] SUCCESS: Logout activity saved
+[22:34:47] Logout listener finished
+
+[03:37:36] Logout listener started
+[03:37:36] User: staff@gmail.com
+[03:37:36] SUCCESS: Logout activity saved
+[03:37:36] Logout listener finished
+
+[03:38:43] Logout listener started
+[03:38:43] User: staff@gmail.com
+[03:38:43] SUCCESS: Logout activity saved
+[03:38:43] Logout listener finished
+
+[03:39:46] Logout listener started
+[03:39:46] User: staff@gmail.com
+[03:39:46] SUCCESS: Logout activity saved
+[03:39:46] Logout listener finished
+
+[03:41:23] Logout listener started
+[03:41:23] User: staff@gmail.com
+[03:41:23] SUCCESS: Logout activity saved
+[03:41:23] Logout listener finished
+
+[03:42:29] Logout listener started
+[03:42:29] User: staff@gmail.com
+[03:42:29] SUCCESS: Logout activity saved
+[03:42:29] Logout listener finished
+
+[03:43:27] Logout listener started
+[03:43:27] User: staff@gmail.com
+[03:43:27] SUCCESS: Logout activity saved
+[03:43:27] Logout listener finished
+
+[03:45:32] Logout listener started
+[03:45:32] User: staff@gmail.com
+[03:45:32] SUCCESS: Logout activity saved
+[03:45:32] Logout listener finished
+

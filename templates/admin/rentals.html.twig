@@ -1,59 +1,70 @@
 {% extends 'admin/layout.html.twig' %}
 
-{% block admin_title %}Rentals{% endblock %}
+{% block admin_title %}Rental Requests{% endblock %}
 
 {% block admin_content %}
-    <section id="rentals" class="dashboard-section" data-dashboard-section>
+    <section id="rental-requests" class="dashboard-section" data-dashboard-section>
         <div class="section-header">
             <div>
-                <h2>Rental Timeline</h2>
-                <p>Latest bookings with quick visibility into status and key dates.</p>
+                <h2>Rental Requests Timeline</h2>
+                <p>Latest customer rental requests with status visibility.</p>
             </div>
             <div class="section-actions">
-                <a href="{{ path('app_rental_index') }}" class="section-link">
-                    <span class="bi bi-calendar-event"></span>
-                    View All Rentals
+                <a href="{{ path('app_staff_rental_requests') }}" class="section-link">
+                    <span class="bi bi-clipboard-check"></span>
+                    Manage All Requests
                 </a>
             </div>
         </div>
 
-        {% if rentals is defined and rentals is not empty %}
+        {% if rentalRequests is defined and rentalRequests is not empty %}
             <div class="timeline">
                 {% set nowDate = date() %}
-                {% for rental in rentals %}
-                    {% set isActive = rental.startDate <= nowDate and rental.endDate >= nowDate %}
-                    {% set isUpcoming = rental.startDate > nowDate %}
+                {% for request in rentalRequests %}
+                    {% set isPending = request.status == 'pending' %}
+                    {% set isApproved = request.status == 'approved' %}
+                    {% set isRejected = request.status == 'rejected' %}
+                    
                     <div class="timeline-item">
-                        <span class="timeline-dot"></span>
+                        <span class="timeline-dot 
+                            {% if isPending %}timeline-dot-warning{% endif %}
+                            {% if isApproved %}timeline-dot-success{% endif %}
+                            {% if isRejected %}timeline-dot-danger{% endif %}
+                        "></span>
                         <div class="timeline-content">
-                            <h4>{{ rental.car ? rental.car.make ~ ' ' ~ rental.car.model : 'Vehicle' }}</h4>
+                            <h4>{{ request.car ? request.car.make ~ ' ' ~ request.car.model : 'Vehicle' }}</h4>
                             <p>
                                 <span class="bi bi-person"></span>
-                                {{ rental.customer ? rental.customer.displayName : 'Customer' }}
+                                {{ request.customer ? request.customer.displayName : 'Customer' }}
                             </p>
                             <div class="meta">
                                 <span>
-                                    <span class="bi bi-clock"></span>
-                                    {{ rental.startDate|date('M d, Y') }} to {{ rental.endDate|date('M d, Y') }}
+                                    <span class="bi bi-calendar"></span>
+                                    {{ request.startDate|date('M d, Y') }} to {{ request.endDate|date('M d, Y') }}
                                 </span>
                                 <span>
-                                    {% if isActive %}
-                                        <span class="status-badge is-green">Active</span>
-                                    {% elseif isUpcoming %}
-                                        <span class="status-badge is-amber">Upcoming</span>
-                                    {% else %}
-                                        <span class="status-badge is-slate">Completed</span>
+                                    {% if isPending %}
+                                        <span class="status-badge is-amber">Pending</span>
+                                    {% elseif isApproved %}
+                                        <span class="status-badge is-green">Approved</span>
+                                    {% elseif isRejected %}
+                                        <span class="status-badge is-red">Rejected</span>
                                     {% endif %}
                                 </span>
                             </div>
+                            {% if request.notes %}
+                            <div class="notes">
+                                <small><span class="bi bi-chat-left"></span> {{ request.notes|slice(0, 50) }}{% if request.notes|length > 50 %}...{% endif %}</small>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 {% endfor %}
             </div>
         {% else %}
             <div class="empty-placeholder">
-                <strong>No rentals recorded</strong>
-                Once bookings are created they will appear on the timeline.
+                <strong>No rental requests yet</strong>
+                Customer rental requests will appear here once submitted.
             </div>
         {% endif %}
     </section>

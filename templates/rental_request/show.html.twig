@@ -1,0 +1,513 @@
+{# templates/rental_request/show.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Rental Request #{{ rentalRequest.id }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .request-detail-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            color: #1a1a1a;
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #6b7280;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            transition: color 0.15s ease;
+        }
+        
+        .back-link:hover {
+            color: #1a1a1a;
+        }
+        
+        .back-link i {
+            font-size: 1rem;
+        }
+        
+        .page-header {
+            margin-bottom: 2rem;
+        }
+        
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0 0 0.5rem 0;
+            letter-spacing: -0.02em;
+        }
+        
+        .request-status-header {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8125rem;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-approved {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .detail-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-section {
+            padding: 1.5rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .card-section:last-child {
+            border-bottom: none;
+        }
+        
+        .section-title {
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 0 0 1rem 0;
+        }
+        
+        .info-grid {
+            display: grid;
+            gap: 1.25rem;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .info-label {
+            font-size: 0.8125rem;
+            color: #6b7280;
+            font-weight: 400;
+        }
+        
+        .info-value {
+            font-size: 0.9375rem;
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+        
+        .info-value-large {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+        
+        .customer-info, .vehicle-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+        
+        .info-icon {
+            width: 48px;
+            height: 48px;
+            background: #f9fafb;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+        
+        .info-content {
+            flex: 1;
+        }
+        
+        .primary-text {
+            font-size: 0.9375rem;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 0.25rem;
+        }
+        
+        .secondary-text {
+            font-size: 0.8125rem;
+            color: #6b7280;
+        }
+        
+        .date-range-display {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: #fafafa;
+            border-radius: 6px;
+        }
+        
+        .date-box {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .date-label {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-bottom: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .date-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+        
+        .date-separator {
+            color: #d1d5db;
+            font-size: 1.25rem;
+        }
+        
+        .duration-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.375rem 0.75rem;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: #374151;
+            gap: 0.375rem;
+        }
+        
+        .price-display {
+            text-align: center;
+            padding: 1.5rem;
+            background: #f0fdf4;
+            border-radius: 6px;
+        }
+        
+        .price-label {
+            font-size: 0.8125rem;
+            color: #065f46;
+            margin-bottom: 0.5rem;
+        }
+        
+        .price-amount {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #059669;
+            margin-bottom: 0.25rem;
+        }
+        
+        .price-breakdown {
+            font-size: 0.8125rem;
+            color: #6b7280;
+        }
+        
+        .notes-content {
+            padding: 1rem;
+            background: #fafafa;
+            border-radius: 6px;
+            color: #374151;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-decoration: none;
+            border: 1px solid;
+            transition: all 0.15s ease;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #374151;
+            border-color: #d1d5db;
+        }
+        
+        .btn-secondary:hover {
+            background: #f9fafb;
+            border-color: #9ca3af;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+        
+        .btn-success:hover {
+            background: #059669;
+            border-color: #059669;
+            transform: translateY(-1px);
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+            border-color: #dc2626;
+            transform: translateY(-1px);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #9ca3af;
+            font-size: 0.875rem;
+            font-style: italic;
+        }
+        
+        @media (max-width: 768px) {
+            .request-detail-container {
+                padding: 1.5rem 1rem;
+            }
+            
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .date-range-display {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .date-separator {
+                transform: rotate(90deg);
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="request-detail-container">
+    <a href="{{ path('app_staff_rental_requests') }}" class="back-link">
+        <i class="bi bi-arrow-left"></i>
+        Back to Rental Requests
+    </a>
+    
+    <header class="page-header">
+        <h1 style="color: white !important">Rental Request #{{ rentalRequest.id }}</h1>
+        <span class="request-status-header status-{{ rentalRequest.status }}">
+            {{ rentalRequest.status|title }}
+        </span>
+    </header>
+    
+    <!-- Customer Information -->
+    <div class="detail-card">
+        <div class="card-section">
+            <h2 class="section-title">Customer Information</h2>
+            {% if rentalRequest.customer %}
+                <div class="customer-info">
+                    <div class="info-icon">
+                        <i class="bi bi-person"></i>
+                    </div>
+                    <div class="info-content">
+                        <div class="primary-text">
+                            {{ rentalRequest.customer.firstName ~ ' ' ~ rentalRequest.customer.lastName | trim ?: rentalRequest.customer.email }}
+                        </div>
+                        <div class="secondary-text">{{ rentalRequest.customer.email }}</div>
+                        {% if rentalRequest.customer.phone %}
+                            <div class="secondary-text">{{ rentalRequest.customer.phone }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="empty-state">No customer information available</div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Vehicle Information -->
+    <div class="detail-card">
+        <div class="card-section">
+            <h2 class="section-title">Vehicle Information</h2>
+            {% if rentalRequest.car %}
+                <div class="vehicle-info">
+                    <div class="info-icon">
+                        <i class="bi bi-car-front"></i>
+                    </div>
+                    <div class="info-content">
+                        <div class="primary-text">
+                            {{ rentalRequest.car.make }} {{ rentalRequest.car.model }}
+                        </div>
+                        {% if rentalRequest.car.year %}
+                            <div class="secondary-text">{{ rentalRequest.car.year }} Model</div>
+                        {% endif %}
+                        {% if rentalRequest.car.dailyRate %}
+                            <div class="secondary-text">₱{{ rentalRequest.car.dailyRate|number_format(2) }} per day</div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="empty-state">No vehicle information available</div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Rental Details -->
+    <div class="detail-card">
+        <div class="card-section">
+            <h2 class="section-title">Rental Period</h2>
+            <div class="date-range-display">
+                <div class="date-box">
+                    <div class="date-label">Start Date</div>
+                    <div class="date-value">{{ rentalRequest.startDate|date('M d, Y') }}</div>
+                </div>
+                <div class="date-separator">→</div>
+                <div class="date-box">
+                    <div class="date-label">End Date</div>
+                    <div class="date-value">{{ rentalRequest.endDate|date('M d, Y') }}</div>
+                </div>
+            </div>
+            {% set daysDifference = date(rentalRequest.endDate).diff(date(rentalRequest.startDate)).days %}
+            {% set totalDays = daysDifference + 1 %}
+            <div style="margin-top: 1rem; text-align: center;">
+                <span class="duration-badge">
+                    <i class="bi bi-calendar-range"></i>
+                    {{ totalDays }} day{% if totalDays != 1 %}s{% endif %}
+                </span>
+            </div>
+        </div>
+        
+        {% if rentalRequest.car and rentalRequest.car.dailyRate %}
+            <div class="card-section">
+                <div class="price-display">
+                    <div class="price-label">Total Rental Cost</div>
+                    <div class="price-amount">
+                        {% set dailyRate = rentalRequest.car.dailyRate|default(0) %}
+                        {% set calculatedTotal = totalDays * dailyRate %}
+                        ₱{{ calculatedTotal|number_format(2) }}
+                    </div>
+                    <div class="price-breakdown">
+                        {{ totalDays }} day{% if totalDays != 1 %}s{% endif %} × ₱{{ dailyRate|number_format(2) }}/day
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Additional Information -->
+    {% if rentalRequest.notes or rentalRequest.approvedAt or rentalRequest.rejectedAt %}
+        <div class="detail-card">
+            {% if rentalRequest.notes %}
+                <div class="card-section">
+                    <h2 class="section-title">Notes</h2>
+                    <div class="notes-content">{{ rentalRequest.notes }}</div>
+                </div>
+            {% endif %}
+            
+            {% if rentalRequest.approvedAt %}
+                <div class="card-section">
+                    <div class="info-item">
+                        <span class="info-label">Approved On</span>
+                        <span class="info-value">{{ rentalRequest.approvedAt|date('M d, Y - h:i A') }}</span>
+                    </div>
+                </div>
+            {% endif %}
+            
+            {% if rentalRequest.rejectedAt %}
+                <div class="card-section">
+                    <div class="info-item">
+                        <span class="info-label">Rejected On</span>
+                        <span class="info-value">{{ rentalRequest.rejectedAt|date('M d, Y - h:i A') }}</span>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+    
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        {% if rentalRequest.status == 'pending' %}
+            <form action="{{ path('app_rental_request_approve', {'id': rentalRequest.id}) }}" method="post" style="display: inline;" onsubmit="return confirm('Approve this rental request?');">
+                <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ rentalRequest.id) }}">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle"></i>
+                    Approve Request
+                </button>
+            </form>
+            
+            <form action="{{ path('app_rental_request_reject', {'id': rentalRequest.id}) }}" method="post" style="display: inline;" onsubmit="return confirm('Reject this rental request?');">
+                <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ rentalRequest.id) }}">
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-x-circle"></i>
+                    Reject Request
+                </button>
+            </form>
+        {% endif %}
+        
+        <a href="{{ path('app_rental_request_edit', {'id': rentalRequest.id}) }}" class="btn btn-secondary" style="color: black !important">
+            <i class="bi bi-pencil" style="color: black !important"></i>
+            Edit Request
+        </a>
+    </div>
+</div>
+{% endblock %}

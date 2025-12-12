@@ -2,20 +2,34 @@
 
 namespace App\Controller;
 
-use App\Repository\RentalRepository;
+// CHANGE FROM:
+// use App\Entity\Rental;
+// use App\Repository\RentalRepository;
+
+// TO:
+use App\Entity\RentalRequest;
+use App\Repository\RentalRequestRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
-final class AdminRentalsController extends AbstractController
+class AdminRentalsController extends AbstractController
 {
     #[Route('/admin/rentals', name: 'app_admin_rentals')]
-    public function index(RentalRepository $rentalRepository): Response
+    public function index(RentalRequestRepository $rentalRequestRepository): Response
     {
-        $rentals = $rentalRepository->findAll();
-
+        // CHANGE FROM:
+        // $rentals = $rentalRepository->findAll();
+        
+        // TO:
+        $rentalRequests = $rentalRequestRepository->findAll();
+        
         return $this->render('admin/rentals.html.twig', [
-            'rentals' => $rentals,
+            // CHANGE FROM:
+            // 'rentals' => $rentals,
+            
+            // TO:
+            'rentalRequests' => $rentalRequests,
         ]);
     }
 }

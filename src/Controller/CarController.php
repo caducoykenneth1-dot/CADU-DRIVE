@@ -3,23 +3,19 @@
 namespace App\Controller;
 
 use App\Entity\Car;
-use App\Entity\Rental;
 use App\Form\CarType;
-use App\Form\RentalType;
 use App\Repository\CarRepository;
 use App\Repository\CarStatusRepository;
+use App\Service\ActivityLogger;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-/*HANDLE SA CRUD AND ROUTES FOR `/car` */   
-
 #[Route('/car')]
 final class CarController extends AbstractController
 {
-    /* Display the full fleet so users can browse every car*/
     #[Route('/', name: 'app_car_index', methods: ['GET'])]
     public function index(CarRepository $carRepository): Response
     {
@@ -28,10 +24,16 @@ final class CarController extends AbstractController
         ]);
     }
 
-    /*Create a new car record and optionally attach an uploaded image*/
     #[Route('/new', name: 'app_car_new', methods: ['GET','POST'])]
-    public function new(Request $request, EntityManagerInterface $em, CarStatusRepository $statusRepository): Response
+    public function new(
+        Request $request, 
+        EntityManagerInterface $em, 
+        CarStatusRepository $statusRepository,
+        ActivityLogger $activityLogger
+    ): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        
         $car = new Car();
         if (null !== ($defaultStatus = $statusRepository->findOneByCode('available'))) {
             $car->setStatus($defaultStatus);
@@ -51,6 +53,21 @@ final class CarController extends AbstractController
             $em->persist($car);
             $em->flush();
 
+            // ✅ LOG: Car created - USING getLabel() for display
+            $activityLogger->log(
+                'CAR_CREATED',
+                'Admin added new car to fleet',
+                sprintf('ID: %d | %s %s | Year: %d | $%s/day | Status: %s',
+                    $car->getId(),
+                    $car->getMake(),
+                    $car->getModel(),
+                    $car->getYear(),
+                    $car->getPrice(),
+                    $car->getStatus()->getLabel()  // ← CHANGED: getLabel() not getName()
+                )
+            );
+
+            $this->addFlash('success', 'Car added successfully!');
             return $this->redirectToRoute('app_car_index');
         }
 
@@ -58,8 +75,6 @@ final class CarController extends AbstractController
             'form' => $form,
         ]);
     }
-
-    /* Show the complete details for a single car*/
 
     #[Route('/{id}', name: 'app_car_show', methods: ['GET'])]
     public function show(Car $car): Response
@@ -69,10 +84,25 @@ final class CarController extends AbstractController
         ]);
     }
 
-    /* Update a car and replace the stored photo when a new file is provided*/
     #[Route('/{id}/edit', name: 'app_car_edit', methods: ['GET','POST'])]
-    public function edit(Request $request, Car $car, EntityManagerInterface $em): Response
+    public function edit(
+        Request $request, 
+        Car $car, 
+        EntityManagerInterface $em,
+        ActivityLogger $activityLogger
+    ): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        
+        // Store old values for comparison
+        $oldData = [
+            'make' => $car->getMake(),
+            'model' => $car->getModel(),
+            'year' => $car->getYear(),
+            'price' => $car->getPrice(),
+            'status' => $car->getStatus()->getLabel()  // ← CHANGED: getLabel()
+        ];
+        
         $form = $this->createForm(CarType::class, $car);
         $form->handleRequest($request);
 
@@ -91,7 +121,37 @@ final class CarController extends AbstractController
 
             $em->flush();
 
-            return $this->redirectToRoute('app_admin_dashboard');
+            // Get new values for comparison
+            $newData = [
+                'make' => $car->getMake(),
+                'model' => $car->getModel(),
+                'year' => $car->getYear(),
+                'price' => $car->getPrice(),
+                'status' => $car->getStatus()->getLabel()  // ← CHANGED: getLabel()
+            ];
+
+            // Detect changes
+            $changes = [];
+            foreach ($oldData as $key => $oldValue) {
+                if ($oldData[$key] != $newData[$key]) {
+                    $changes[] = sprintf('%s: "%s" → "%s"', 
+                        ucfirst($key), $oldValue, $newData[$key]
+                    );
+                }
+            }
+
+            // ✅ LOG: Car updated
+            $activityLogger->log(
+                'CAR_UPDATED',
+                'Admin updated car details',
+                sprintf('ID: %d | Changes: %s',
+                    $car->getId(),
+                    empty($changes) ? 'No changes detected' : implode(', ', $changes)
+                )
+            );
+
+            $this->addFlash('success', 'Car updated successfully!');
+            return $this->redirectToRoute('app_admin_cars');
         }
 
         return $this->render('car/edit.html.twig', [
@@ -99,46 +159,103 @@ final class CarController extends AbstractController
         ]);
     }
 
-    
-
-    /* Remove a car once the CSRF check passes*/
-
     #[Route('/{id}', name: 'app_car_delete', methods: ['POST'])]
-    public function delete(Request $request, Car $car, EntityManagerInterface $entityManager): Response
+    public function delete(
+        Request $request, 
+        Car $car, 
+        EntityManagerInterface $entityManager,
+        ActivityLogger $activityLogger
+    ): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        
         if ($this->isCsrfTokenValid('delete'.$car->getId(), $request->getPayload()->getString('_token'))) {
+            
+            // Store car info before deletion
+            $carInfo = sprintf('%s %s %d ($%s/day)', 
+                $car->getMake(),
+                $car->getModel(),
+                $car->getYear(),
+                $car->getPrice()
+            );
+            $carId = $car->getId();
+            
+            // Delete image file if exists
+            if ($car->getImage()) {
+                @unlink($this->getParameter('car_images_directory') . '/' . $car->getImage());
+            }
+            
             $entityManager->remove($car);
             $entityManager->flush();
+
+            // ✅ LOG: Car deleted
+            $activityLogger->log(
+                'CAR_DELETED',
+                'Admin removed car from fleet',
+                sprintf('ID: %d | Car: %s', $carId, $carInfo)
+            );
+
+            $this->addFlash('success', 'Car deleted successfully!');
         }
 
-        return $this->redirectToRoute('app_car_index');
+        return $this->redirectToRoute('app_admin_cars');
     }
 
-    /* Collect rental information, persist it, and flip the car status*/
-    #[Route('/{id}/rent', name: 'app_car_rent', methods: ['GET', 'POST'])]
-    public function rent(Request $request, Car $car, EntityManagerInterface $entityManager, CarStatusRepository $statusRepository): Response
+    #[Route('/{id}/toggle-status', name: 'app_car_toggle_status', methods: ['POST'])]
+    public function toggleStatus(
+        Request $request,
+        Car $car,
+        EntityManagerInterface $entityManager,
+        CarStatusRepository $statusRepository,
+        ActivityLogger $activityLogger
+    ): Response
     {
-        $rental = new Rental();
-        $form = $this->createForm(RentalType::class, $rental);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $rental->setCar($car);
-            if (null === ($rentedStatus = $statusRepository->findOneByCode('rented'))) {
-                $this->addFlash('warning', 'Car status "rented" is not configured. Please update status definitions.');
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        
+        if ($this->isCsrfTokenValid('toggle-status'.$car->getId(), $request->request->get('_token'))) {
+            $oldStatus = $car->getStatus() ? $car->getStatus()->getLabel() : 'Unknown';
+            $oldStatusCode = $car->getStatus() ? $car->getStatus()->getCode() : null;
+            
+            // Toggle between available and disabled
+            if ($oldStatusCode === 'available') {
+                $newStatus = $statusRepository->findOneByCode('disabled');
+                $action = 'CAR_DISABLED';
+                $message = 'Car disabled';
             } else {
-                $car->setStatus($rentedStatus);
+                $newStatus = $statusRepository->findOneByCode('available');
+                $action = 'CAR_ENABLED';
+                $message = 'Car enabled';
             }
-
-            $entityManager->persist($rental);
+            
+            // Check if new status was found
+            if (!$newStatus) {
+                $this->addFlash('error', 'Could not find the target status in the database. Please check CarStatus table.');
+                return $this->redirectToRoute('app_admin_cars');
+            }
+            
+            $car->setStatus($newStatus);
+            $car->setUpdatedAt(new \DateTime());
             $entityManager->flush();
-
-            return $this->redirectToRoute('app_car_index');
+            
+            // LOG: Car status changed
+            $activityLogger->log(
+                $this->getUser()->getEmail(),
+                $action,
+                sprintf('Changed status for car: %s %s', $car->getMake(), $car->getModel()),
+                [
+                    'car_id' => $car->getId(),
+                    'make' => $car->getMake(),
+                    'model' => $car->getModel(),
+                    'year' => $car->getYear(),
+                    'old_status' => $oldStatus,
+                    'new_status' => $car->getStatus()->getLabel()
+                ],
+                'ADMIN'
+            );
+            
+            $this->addFlash('success', $message);
         }
-
-        return $this->render('car/rent.html.twig', [
-            'car' => $car,
-            'form' => $form,
-        ]);
+        
+        return $this->redirectToRoute('app_admin_cars');
     }
 }

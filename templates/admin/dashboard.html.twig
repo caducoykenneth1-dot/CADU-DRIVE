@@ -1,38 +1,357 @@
 {% extends 'admin/layout.html.twig' %}
 
-{% block admin_title %}Admin Dashboard{% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        /* Add profile card styles from the profile template */
+        .profile-header-card {
+            background: linear-gradient(135deg, #ffffff 0%, #fef3c7 100%);
+            border: 2px solid #f59e0b;
+            border-radius: 12px;
+        }
+        
+        .profile-name {
+            color: #92400e;
+            font-weight: 700;
+        }
+        
+        .profile-email {
+            color: #4b5563;
+            font-weight: 500;
+        }
+        
+        .badge-admin {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .badge-active {
+            background: #dcfce7;
+            color: #166534;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        /* Activity Logs Table Styles */
+        .activity-logs-table {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .activity-logs-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+        
+        .activity-logs-table thead th {
+            background: #fafafa;
+            text-align: left;
+            padding: 0.875rem 1rem;
+            font-weight: 500;
+            font-size: 0.8125rem;
+            color: #6b7280;
+            border-bottom: 1px solid #e5e7eb;
+            white-space: nowrap;
+        }
+        
+        .activity-logs-table tbody td {
+            padding: 1rem;
+            border-bottom: 1px solid #f3f4f6;
+            vertical-align: middle;
+        }
+        
+        .activity-logs-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .activity-logs-table tbody tr:hover {
+            background: #fafafa;
+        }
+        
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .user-icon {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .user-icon.admin {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+        
+        .user-icon.staff {
+            background: #fffbeb;
+            color: #d97706;
+        }
+        
+        .user-icon.user {
+            background: #ecfdf5;
+            color: #059669;
+        }
+        
+        .user-icon.guest {
+            background: #f9fafb;
+            color: #6b7280;
+        }
+        
+        .user-info {
+            min-width: 0;
+        }
+        
+        .user-type {
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: #1a1a1a;
+            margin-bottom: 0.125rem;
+        }
+        
+        .username {
+            font-size: 0.8125rem;
+            color: #6b7280;
+        }
+        
+        .action-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .action-icon {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .action-icon.login {
+            background: #ecfdf5;
+            color: #059669;
+        }
+        
+        .action-icon.logout {
+            background: #f9fafb;
+            color: #6b7280;
+        }
+        
+        .action-icon.create {
+            background: #eff6ff;
+            color: #3b82f6;
+        }
+        
+        .action-icon.update {
+            background: #fffbeb;
+            color: #d97706;
+        }
+        
+        .action-icon.delete {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+        
+        .action-icon.default {
+            background: #faf5ff;
+            color: #9333ea;
+        }
+        
+        .action-name {
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: #1a1a1a;
+        }
+        
+        .details-cell {
+            max-width: 300px;
+        }
+        
+        .details-text {
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: #374151;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        
+        .timestamp-cell {
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: 0.8125rem;
+            white-space: nowrap;
+        }
+        
+        .timestamp-date {
+            display: block;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 0.25rem;
+        }
+        
+        .timestamp-time {
+            display: block;
+            color: #6b7280;
+        }
+        
+        .empty-logs {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #9ca3af;
+        }
+        
+        .empty-logs-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+            opacity: 0.3;
+        }
+        
+        .empty-logs p {
+            font-size: 0.875rem;
+            margin: 0;
+        }
+    </style>
+{% endblock %}
 
 {% block admin_content %}
     {% set stats = stats|default({}) %}
-    {% set nowDate = date() %}
+    {% set recentStaff = recentStaff|default([]) %}
+    {% set recentLogs = recentLogs|default([]) %}
 
     <div class="admin-dashboard">
         {% for message in app.flashes('success') %}
             <div class="alert-success">{{ message }}</div>
         {% endfor %}
+        
+        <!-- ENHANCED ADMIN USER PROFILE SECTION (from profile template) -->
+        {% if app.user and is_granted('ROLE_ADMIN') %}
+        <section id="profile" class="dashboard-section" data-dashboard-section style="margin-bottom: 2rem;">
+            <!-- Enhanced Profile Card from profile template -->
+            <div class="card profile-header-card mb-4 shadow">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-warning text-white d-flex align-items-center justify-content-center me-4" 
+                             style="width: 80px; height: 80px; font-size: 2rem; font-weight: bold;">
+                            {{ app.user.firstName|first|upper }}{{ app.user.lastName|first|upper }}
+                        </div>
+                        <div>
+                            <h2 class="profile-name mb-2">{{ app.user.firstName }} {{ app.user.lastName }}</h2>
+                            <p class="profile-email mb-3">{{ app.user.email }}</p>
+                            <div class="d-flex gap-2">
+                                <span class="badge-admin">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+                                    </svg>
+                                    ADMINISTRATOR
+                                </span>
+                                <span class="badge-active">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <path d="m9 12 2 2 4-4"/>
+                                    </svg>
+                                    ACTIVE
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Profile Action Buttons -->
+                    <div class="d-flex gap-3 mt-4">
+                        <a href="{{ path('app_admin_profile') }}" 
+                           class="btn btn-warning d-flex align-items-center gap-2">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+                            </svg>
+                            View Full Profile
+                        </a>
+                        
+                        <a href="{{ path('app_admin_edit_profile') ?: '#' }}" 
+                           class="btn btn-outline-warning d-flex align-items-center gap-2">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                            </svg>
+                            Edit Profile
+                        </a>
+                        
+                        <a href="{{ path('app_admin_change_password') ?: '#' }}" 
+                           class="btn btn-outline-primary d-flex align-items-center gap-2">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                            </svg>
+                            Change Password
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+        
+        <!-- ADMIN DASHBOARD OVERVIEW -->
         <section id="overview" class="dashboard-section" data-dashboard-section>
             <div class="dashboard-hero">
                 <div>
-                    <p class="dashboard-eyebrow">Control Center</p>
-                    <h1 class="dashboard-heading">Operations Dashboard</h1>
+                    <p class="dashboard-eyebrow">Administration Center</p>
+                    <h1 class="dashboard-heading">Administrator Dashboard</h1>
                     <p class="dashboard-subheading">
-                        Monitor customers, fleet health, and rental activity without leaving this page.
-                        Use the quick actions to jump straight into the work that matters today.
+                        Manage the entire rental system, staff, and business operations.
                     </p>
                 </div>
+
                 <div class="dashboard-hero-actions">
-                    <a href="{{ path('app_car_new') }}" class="dashboard-action">
-                        <span class="bi bi-car-front-fill"></span>
-                        Add Vehicle
-                    </a>
-                    <a href="{{ path('app_rental_index') }}" class="dashboard-action">
-                        <span class="bi bi-calendar2-week"></span>
-                        Manage Rentals
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a href="{{ path('app_car_new') }}" class="dashboard-action">
+                            <span class="bi bi-car-front-fill"></span>
+                            Add Vehicle
+                        </a>
+                        <a href="{{ path('app_staff_overview') }}" class="dashboard-action">
+                            <span class="bi bi-people-fill"></span>
+                            Manage Staff
+                        </a>
+                        <a href="{{ path('app_admin_customer') }}" class="dashboard-action">
+                            <span class="bi bi-person-plus"></span>
+                            Manage Customers
+                        </a>
+                    {% endif %}
+                    <a href="{{ path('app_staff_rental_requests') }}" class="dashboard-action">
+                        <span class="bi bi-clipboard-check"></span>
+                        Rental Requests
                     </a>
                 </div>
             </div>
 
-            <div class="dashboard-stat-grid">
+            <!-- ADMIN STATISTICS -->
+            <div class="dashboard-stat-grid">   
                 <article class="dashboard-stat-card">
                     <p>Total Customers</p>
                     <h3>{{ stats.totalCustomers ?? 0 }}</h3>
@@ -58,7 +377,7 @@
                         <span>
                             {{ nextReturnCar ? nextReturnCar.make ~ ' ' ~ nextReturnCar.model : 'Vehicle' }}
                             &middot;
-                            {{ nextReturnCustomer ? nextReturnCustomer.displayName : 'Customer' }}
+                            {{ nextReturnCustomer ? nextReturnCustomer.firstName ~ ' ' ~ nextReturnCustomer.lastName : 'Customer' }}
                         </span>
                     {% else %}
                         <h3>--</h3>
@@ -68,120 +387,225 @@
             </div>
         </section>
 
-{#         
-        <section id="fleet" class="dashboard-section" data-dashboard-section>
-            <div class="section-header">
-                <div>
-                    <h2>Fleet Snapshot</h2>
-                    <p>Recently updated vehicles and their current availability.</p>
+        <!-- ADMIN-ONLY MANAGEMENT SECTIONS -->
+        {% if is_granted('ROLE_ADMIN') %}
+                       <!-- Staff Management Quick View -->
+            {% if recentStaff is defined and recentStaff|length > 0 %}
+            <section id="staff-management" class="dashboard-section" data-dashboard-section>
+                <div class="section-header">
+                    <div>
+                        <h2>Recent Staff Activity</h2>
+                        <p>Latest staff members and their status</p>
+                    </div>
+                    <div class="section-actions">
+                        <a href="{{ path('app_staff_overview') }}" class="section-link">
+                            <span class="bi bi-people"></span>
+                            View All Staff
+                        </a>
+                    </div>
                 </div>
-            </div>
-
-            {% if fleetSnapshot is not empty %}
-                <div class="fleet-grid">
-                    {% for car in fleetSnapshot %}
-                        {% set status = car.status ?? null %}
-                        {% set statusCode = status ? status.code|default('')|lower : '' %}
-                        {% set badgeClass = statusCode == 'available' ? 'is-green' : (statusCode in ['maintenance', 'service'] ? 'is-amber' : 'is-slate') %}
-                        <article class="fleet-card">
-                            <div class="fleet-card-header">
-                                <h3>{{ car.make }} {{ car.model }}</h3>
-                                <span class="status-badge {{ badgeClass }}">
-                                    {{ status ? status.label : 'Unassigned' }}
-                                </span>
-                            </div>
-                            <div class="fleet-card-meta">
-                                <span><span class="bi bi-calendar3"></span> {{ car.year }}</span>
-                                <span><span class="bi bi-cash-stack"></span> &#8369;{{ car.price|number_format(2, '.', ',') }}/day</span>
-                                <span><span class="bi bi-diagram-3"></span> {{ car.rentals|length }} rentals</span>
-                            </div>
-                            {% set lastRental = car.rentals|last %}
-                            <div class="fleet-card-footer">
-                                <span>Car ID #{{ car.id }}</span>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-gray-400">
-                                        Last booking {{ lastRental ? lastRental.endDate|date('M d, Y') : 'N/A' }}
-                                    </span>
-                                    <a href="{{ path('app_car_edit', { id: car.id }) }}" class="section-link">
-                                        <span class="bi bi-pencil-square"></span>
-                                        Edit
-                                    </a>
-                                    <form method="post" action="{{ path('app_car_delete', { id: car.id }) }}" class="inline-delete-form">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ car.id) }}">
-                                        <button type="button"
-                                                class="section-link section-link-danger confirm-delete-btn"
-                                                data-confirm-title="Delete this vehicle?"
-                                                data-confirm-text="This vehicle and its related rentals will be removed. This action cannot be undone."
-                                                data-confirm-button="Yes, Delete It">
-                                            <span class="bi bi-trash"></span>
-                                            Delete
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </article>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="empty-placeholder">
-                    <strong>No vehicles recorded</strong>
-                    Add your first car to start building out the fleet roster.
-                </div>
-            {% endif %}
-        </section>
-
-        <section id="rentals" class="dashboard-section" data-dashboard-section>
-            <div class="section-header">
-                <div>
-                    <h2>Rental Timeline</h2>
-                    <p>Latest bookings with quick visibility into status and key dates.</p>
-                </div>
-                <div class="section-actions">
-                    <a href="{{ path('app_rental_index') }}" class="section-link">
-                        <span class="bi bi-calendar-event"></span>
-                        View All Rentals
-                    </a>
-                </div>
-            </div>
-
-            {% if recentRentals is not empty %}
-                <div class="timeline">
-                    {% for rental in recentRentals %}
-                        {% set isActive = rental.startDate <= nowDate and rental.endDate >= nowDate %}
-                        {% set isUpcoming = rental.startDate > nowDate %}
-                        <div class="timeline-item">
-                            <span class="timeline-dot"></span>
-                            <div class="timeline-content">
-                                <h4>{{ rental.car.make }} {{ rental.car.model }}</h4>
-                                <p>
-                                    <span class="bi bi-person"></span>
-                                    {{ rental.customer.displayName }}
-                                </p>
-                                <div class="meta">
-                                    <span>
-                                        <span class="bi bi-clock"></span>
-                                        {{ rental.startDate|date('M d, Y') }} to {{ rental.endDate|date('M d, Y') }}
-                                    </span>
-                                    <span>
-                                        {% if isActive %}
-                                            <span class="status-badge is-green">Active</span>
-                                        {% elseif isUpcoming %}
-                                            <span class="status-badge is-amber">Upcoming</span>
+                
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Staff Member</th>
+                                <th>Department</th>
+                                <th>Email</th>
+                                <th>Last Login</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for staff in recentStaff %}
+                                <tr>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <div style="width: 32px; height: 32px; background: #e0f2fe; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 600; color: #0369a1;">
+                                                {{ staff.firstName|first|upper }}{{ staff.lastName|first|upper }}
+                                            </div>
+                                            <div>
+                                                <div style="font-weight: 500;" style="color: black !important">{{ staff.firstName }} {{ staff.lastName }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ staff.department|default('General') }}</td>
+                                    <td>{{ staff.user.email }}</td>
+                                    <td>{{ staff.user.lastLogin ? staff.user.lastLogin|date('M d, h:i A') : 'Never' }}</td>
+                                    <td>
+                                        {% if staff.isActive %}
+                                            <span style="background: #dcfce7; color: #166534; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.75rem; font-weight: 500;">
+                                                Active
+                                            </span>
                                         {% else %}
-                                            <span class="status-badge is-slate">Completed</span>
+                                            <span style="background: #fee2e2; color: #991b1b; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.75rem; font-weight: 500;">
+                                                Inactive
+                                            </span>
                                         {% endif %}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ path('app_staff_crud_edit', {'id': staff.id}) }}" 
+                                           class="btn btn-sm btn-primary">
+                                            Manage
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-            {% else %}
-                <div class="empty-placeholder">
-                    <strong>No rentals recorded</strong>
-                    Once bookings are created they will appear on the timeline.
-                </div>
+            </section>
             {% endif %}
-        </section>
-    </div> #}
+            
+            <!-- Recent Activity Logs -->
+            <section id="activity-logs" class="dashboard-section" data-dashboard-section>
+                <div class="section-header">
+                    <div>
+                        <h2>Recent Activity</h2>
+                        <p>Latest system activities and events</p>
+                    </div>
+                    <div class="section-actions">
+                        <a href="{{ path('admin_activity_logs_index') }}" class="section-link">
+                            <span class="bi bi-clock-history"></span>
+                            View All Logs
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="activity-logs-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Action</th>
+                                <th>Details</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if recentLogs|length > 0 %}
+                                {% for log in recentLogs|slice(0, 10) %}
+                                    <tr>
+                                        <!-- User -->
+                                        <td>
+                                            <div class="user-cell">
+                                                {% if log.userType %}
+                                                    {% set userType = log.userType %}
+                                                {% elseif log.user %}
+                                                    {% if 'ROLE_ADMIN' in log.user.roles %}
+                                                        {% set userType = 'ADMIN' %}
+                                                    {% elseif 'ROLE_STAFF' in log.user.roles %}
+                                                        {% set userType = 'STAFF' %}
+                                                    {% else %}
+                                                        {% set userType = 'USER' %}
+                                                    {% endif %}
+                                                {% else %}
+                                                    {% set userType = 'GUEST' %}
+                                                {% endif %}
+                                                
+                                                {% if userType == 'ADMIN' %}
+                                                    <div class="user-icon admin">
+                                                        <i class="bi bi-shield-fill"></i>
+                                                    </div>
+                                                {% elseif userType == 'STAFF' %}
+                                                    <div class="user-icon staff">
+                                                        <i class="bi bi-person-badge"></i>
+                                                    </div>
+                                                {% elseif userType == 'USER' %}
+                                                    <div class="user-icon user">
+                                                        <i class="bi bi-person-fill"></i>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="user-icon guest">
+                                                        <i class="bi bi-person"></i>
+                                                    </div>
+                                                {% endif %}
+                                                
+                                                <div class="user-info">
+                                                    <div class="user-type">{{ userType }}</div>
+                                                    {% if log.user and log.user.email %}
+                                                        <div class="username">{{ log.user.email|split('@')|first }}</div>
+                                                    {% elseif log.username %}
+                                                        <div class="username">{{ log.username|split('@')|first }}</div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <!-- Action -->
+                                        <td>
+                                            <div class="action-cell">
+                                                {% set actionLower = log.action|lower %}
+                                                {% if 'login' in actionLower %}
+                                                    <div class="action-icon login">
+                                                        <i class="bi bi-box-arrow-in-right"></i>
+                                                    </div>
+                                                {% elseif 'logout' in actionLower %}
+                                                    <div class="action-icon logout">
+                                                        <i class="bi bi-box-arrow-right"></i>
+                                                    </div>
+                                                {% elseif 'create' in actionLower %}
+                                                    <div class="action-icon create">
+                                                        <i class="bi bi-plus-circle"></i>
+                                                    </div>
+                                                {% elseif 'update' in actionLower %}
+                                                    <div class="action-icon update">
+                                                        <i class="bi bi-pencil-square"></i>
+                                                    </div>
+                                                {% elseif 'delete' in actionLower %}
+                                                    <div class="action-icon delete">
+                                                        <i class="bi bi-trash"></i>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="action-icon default">
+                                                        <i class="bi bi-activity"></i>
+                                                    </div>
+                                                {% endif %}
+                                                <div class="action-name">
+                                                    {{ log.action|replace({'_': ' '})|title }}
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <!-- Details -->
+                                        <td>
+                                            <div class="details-cell">
+                                                <div class="details-text" title="{{ log.targetData }}">
+                                                    {% if log.targetData %}
+                                                        {{ log.targetData }}
+                                                    {% else %}
+                                                        <span style="color: #9ca3af; font-style: italic;">No details</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <!-- Timestamp -->
+                                        <td>
+                                            <div class="timestamp-cell">
+                                                <span class="timestamp-date">{{ log.createdAt|date('Y-m-d') }}</span>
+                                                <span class="timestamp-time">{{ log.createdAt|date('H:i:s') }}</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="4">
+                                        <div class="empty-logs">
+                                            <div class="empty-logs-icon">
+                                                <i class="bi bi-clock-history"></i>
+                                            </div>
+                                            <p>No recent activity logs</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        {% endif %}
+    </div>
 {% endblock %}

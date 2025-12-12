@@ -2,60 +2,73 @@
 
 namespace App\Entity;
 
-use Doctrine\DBAL\Types\Types;
+use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
-/**
- * Represents an authenticated user account created via the registration form.
- */
-#[ORM\Entity]
-#[ORM\Table(name: 'app_user')]
-#[UniqueEntity(fields: ['email'], message: 'A user already exists with this email.')]
-class User
+#[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 180, unique: true)]
+    #[ORM\Column(length: 180)]
     private ?string $email = null;
 
-    #[ORM\Column(type: Types::JSON)]
+    /**
+     * @var list<string> The user roles
+     */
+    #[ORM\Column]
     private array $roles = [];
 
-
-    #[ORM\Column(length: 100)]
-    private ?string $firstName = null;
-
-    #[ORM\Column(length: 100)]
-    private ?string $lastName = null;
-
-    #[ORM\Column(length: 30, nullable: true)]
-    private ?string $phone = null;
-
-    #[ORM\Column(options: ['default' => true])]
-    private bool $isActive = true;
-
-    #[ORM\Column(length: 64, nullable: true)]
-    private ?string $verificationToken = null;
-
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    private ?\DateTimeImmutable $createdAt = null;
-
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
-    private ?\DateTimeImmutable $updatedAt = null;
+    /**
+     * @var string The hashed password
+     */
+    #[ORM\Column]
+    private ?string $password = null;
 
     #[ORM\OneToOne(mappedBy: 'user', targetEntity: Customer::class, cascade: ['persist'])]
     private ?Customer $customer = null;
 
+    #[ORM\OneToOne(mappedBy: 'user', targetEntity: Admin::class, cascade: ['persist'])]
+    private ?Admin $admin = null;
+
+    #[ORM\OneToOne(mappedBy: 'user', targetEntity: Staff::class, cascade: ['persist'])]
+    private ?Staff $staff = null;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $firstName = null;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $lastName = null;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $lastLogin = null;
+
+    /**
+     * @var Collection<int, RentalRequest>
+     */
+    #[ORM\OneToMany(mappedBy: 'customer', targetEntity: RentalRequest::class)]
+    private Collection $rentalRequests;
+
+    /**
+     * @var Collection<int, ActivityLog>
+     */
+    #[ORM\OneToMany(targetEntity: ActivityLog::class, mappedBy: 'user')]
+    private Collection $activityLogs;
+
     public function __construct()
     {
-        $now = new \DateTimeImmutable();
-        $this->roles = ['ROLE_USER'];
-        $this->createdAt = $now;
-        $this->updatedAt = $now;
+        $this->rentalRequests = new ArrayCollection();
+        $this->action = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -74,9 +87,16 @@ class User
         return $this;
     }
 
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
     public function getRoles(): array
     {
-        return array_values(array_unique($this->roles));
+        $roles = $this->roles;
+        $roles[] = 'ROLE_USER';
+        return array_unique($roles);
     }
 
     public function setRoles(array $roles): static
@@ -85,15 +105,71 @@ class User
         return $this;
     }
 
-    public function addRole(string $role): static
+    public function getPassword(): ?string
     {
-        if (!in_array($role, $this->roles, true)) {
-            $this->roles[] = $role;
-        }
+        return $this->password;
+    }
 
+    public function setPassword(string $password): static
+    {
+        $this->password = $password;
         return $this;
     }
 
+    public function __serialize(): array
+    {
+        $data = (array) $this;
+        $data["\0".self::class."\0password"] = hash('crc32c', $this->password);
+        return $data;
+    }
+
+    #[\Deprecated]
+    public function eraseCredentials(): void
+    {
+        // To be removed in Symfony 8
+    }
+
+    public function getCustomer(): ?Customer
+    {
+        return $this->customer;
+    }
+
+    public function setCustomer(?Customer $customer): static
+    {
+        $this->customer = $customer;
+        if ($customer !== null && $customer->getUser() !== $this) {
+            $customer->setUser($this);
+        }
+        return $this;
+    }
+
+    public function getAdmin(): ?Admin
+    {
+        return $this->admin;
+    }
+
+    public function setAdmin(?Admin $admin): static
+    {
+        $this->admin = $admin;
+        if ($admin !== null && $admin->getUser() !== $this) {
+            $admin->setUser($this);
+        }
+        return $this;
+    }
+
+    public function getStaff(): ?Staff
+    {
+        return $this->staff;
+    }
+
+    public function setStaff(?Staff $staff): static
+    {
+        $this->staff = $staff;
+        if ($staff !== null && $staff->getUser() !== $this) {
+            $staff->setUser($this);
+        }
+        return $this;
+    }
 
     public function getFirstName(): ?string
     {
@@ -117,78 +193,108 @@ class User
         return $this;
     }
 
-    public function getPhone(): ?string
+    public function getLastLogin(): ?\DateTimeInterface
     {
-        return $this->phone;
+        return $this->lastLogin;
     }
 
-    public function setPhone(?string $phone): static
+    public function setLastLogin(?\DateTimeInterface $lastLogin): static
     {
-        $this->phone = $phone;
+        $this->lastLogin = $lastLogin;
         return $this;
     }
 
-    public function isActive(): bool
+    /**
+     * @return Collection<int, RentalRequest>
+     */
+    public function getRentalRequests(): Collection
     {
-        return $this->isActive;
+        return $this->rentalRequests;
     }
 
-    public function setIsActive(bool $isActive): static
+    public function addRentalRequest(RentalRequest $rentalRequest): static
     {
-        $this->isActive = $isActive;
+        if (!$this->rentalRequests->contains($rentalRequest)) {
+            $this->rentalRequests->add($rentalRequest);
+            $rentalRequest->setCustomer($this);
+        }
         return $this;
     }
 
-    public function getVerificationToken(): ?string
+    public function removeRentalRequest(RentalRequest $rentalRequest): static
     {
-        return $this->verificationToken;
-    }
-
-    public function setVerificationToken(?string $verificationToken): static
-    {
-        $this->verificationToken = $verificationToken;
+        if ($this->rentalRequests->removeElement($rentalRequest)) {
+            if ($rentalRequest->getCustomer() === $this) {
+                $rentalRequest->setCustomer(null);
+            }
+        }
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getPrimaryRole(): string
     {
-        return $this->createdAt;
+        if ($this->admin !== null) {
+            return 'ROLE_ADMIN';
+        }
+        if ($this->staff !== null) {
+            return 'ROLE_STAFF';
+        }
+        if ($this->customer !== null) {
+            return 'ROLE_CUSTOMER';
+        }
+        return 'ROLE_USER';
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function getAssociatedEntity(): Admin|Staff|Customer|null
     {
-        $this->createdAt = $createdAt;
-        return $this;
+        return $this->admin ?? $this->staff ?? $this->customer;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    /**
+     * @return Collection<int, ActivityLog>
+     */
+    public function getAction(): Collection
     {
-        return $this->updatedAt;
+        return $this->action;
     }
 
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    public function addAction(ActivityLog $action): static
     {
-        $this->updatedAt = $updatedAt;
-        return $this;
-    }
-
-    public function getCustomer(): ?Customer
-    {
-        return $this->customer;
-    }
-
-    public function setCustomer(?Customer $customer): static
-    {
-        if ($customer === null && $this->customer !== null) {
-            $this->customer->setUser(null);
+        if (!$this->action->contains($action)) {
+            $this->action->add($action);
+            $action->setUser($this);
         }
 
-        if ($customer !== null && $customer->getUser() !== $this) {
-            $customer->setUser($this);
-        }
-
-        $this->customer = $customer;
-
         return $this;
     }
+
+   /**
+ * @return Collection<int, ActivityLog>
+ */
+public function getActivityLogs(): Collection
+{
+    return $this->activityLogs;
+}
+
+public function addActivityLog(ActivityLog $activityLog): static
+{
+    if (!$this->activityLogs->contains($activityLog)) {
+        $this->activityLogs->add($activityLog);
+        $activityLog->setUser($this);
+    }
+
+    return $this;
+}
+
+public function removeActivityLog(ActivityLog $activityLog): static
+{
+    if ($this->activityLogs->removeElement($activityLog)) {
+        // set the owning side to null (unless already changed)
+        if ($activityLog->getUser() === $this) {
+            $activityLog->setUser(null);
+        }
+    }
+
+    return $this;
+}
 }

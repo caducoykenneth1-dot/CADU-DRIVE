@@ -1,0 +1,579 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block admin_title %}Activity Logs{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="https://cdn.datatables.net/2.0.7/css/dataTables.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<style>
+    .activity-logs-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2.5rem 1.5rem;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        color: #1a1a1a;
+        background: #fafafa;
+        min-height: 100vh;
+    }
+    
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #6b7280;
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+        transition: color 0.15s ease;
+    }
+    
+    .back-link:hover {
+        color: #1a1a1a;
+    }
+    
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 0;
+        letter-spacing: -0.02em;
+    }
+    
+    .page-subtitle {
+        color: #6b7280;
+        font-size: 0.9375rem;
+        margin-top: 0.25rem;
+    }
+    
+    .total-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+    }
+    
+    .table-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    /* DataTables Wrapper */
+    .dataTables_wrapper {
+        padding: 1.25rem;
+    }
+    
+    .dataTables_filter {
+        float: right;
+        margin-bottom: 1rem;
+    }
+    
+    .dataTables_filter label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .dataTables_filter input {
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        color: #1a1a1a;
+        background: white;
+        transition: all 0.15s ease;
+        margin-left: 0;
+    }
+    
+    .dataTables_filter input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .dataTables_length {
+        float: left;
+        margin-bottom: 1rem;
+    }
+    
+    .dataTables_length label {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .dataTables_length select {
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        color: #1a1a1a;
+        background: white;
+        margin: 0;
+    }
+    
+    .dataTables_info {
+        color: #6b7280;
+        font-size: 0.875rem;
+        padding-top: 1rem;
+    }
+    
+    .dataTables_paginate {
+        padding-top: 1rem;
+    }
+    
+    .paginate_button {
+        border: 1px solid #e5e7eb;
+        color: #374151;
+        background: white;
+        margin: 0 0.25rem;
+        border-radius: 6px;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        transition: all 0.15s ease;
+    }
+    
+    .paginate_button.current {
+        background: #1a1a1a;
+        color: white;
+        border-color: #1a1a1a;
+    }
+    
+    .paginate_button:hover:not(.disabled) {
+        background: #f9fafb;
+        border-color: #d1d5db;
+        color: #1a1a1a;
+    }
+    
+    .paginate_button.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    
+    /* Table Styles */
+    .logs-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+    }
+    
+    .logs-table thead th {
+        background: #fafafa;
+        text-align: left;
+        padding: 0.875rem 1rem;
+        font-weight: 500;
+        font-size: 0.8125rem;
+        color: #6b7280;
+        border-bottom: 1px solid #e5e7eb;
+        white-space: nowrap;
+    }
+    
+    .logs-table tbody td {
+        padding: 1rem;
+        border-bottom: 1px solid #f3f4f6;
+        vertical-align: middle;
+    }
+    
+    .logs-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .logs-table tbody tr:hover {
+        background: #fafafa;
+    }
+    
+    /* User Cell */
+    .user-cell {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .user-icon {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+    
+    .user-icon.admin {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+    
+    .user-icon.staff {
+        background: #fffbeb;
+        color: #d97706;
+    }
+    
+    .user-icon.user {
+        background: #ecfdf5;
+        color: #059669;
+    }
+    
+    .user-icon.guest {
+        background: #f9fafb;
+        color: #6b7280;
+    }
+    
+    .user-info {
+        min-width: 0;
+    }
+    
+    .user-type {
+        font-weight: 500;
+        font-size: 0.875rem;
+        color: #1a1a1a;
+        margin-bottom: 0.125rem;
+    }
+    
+    .username {
+        font-size: 0.8125rem;
+        color: #6b7280;
+    }
+    
+    /* Action Cell */
+    .action-cell {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .action-icon {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+    
+    .action-icon.login {
+        background: #ecfdf5;
+        color: #059669;
+    }
+    
+    .action-icon.logout {
+        background: #f9fafb;
+        color: #6b7280;
+    }
+    
+    .action-icon.create {
+        background: #eff6ff;
+        color: #3b82f6;
+    }
+    
+    .action-icon.update {
+        background: #fffbeb;
+        color: #d97706;
+    }
+    
+    .action-icon.delete {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+    
+    .action-icon.default {
+        background: #faf5ff;
+        color: #9333ea;
+    }
+    
+    .action-name {
+        font-weight: 500;
+        font-size: 0.875rem;
+        color: #1a1a1a;
+    }
+    
+    /* Details Cell */
+    .details-cell {
+        max-width: 300px;
+    }
+    
+    .details-text {
+        font-size: 0.875rem;
+        line-height: 1.5;
+        color: #374151;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+    
+    /* Timestamp Cell */
+    .timestamp-cell {
+        font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+        font-size: 0.8125rem;
+        white-space: nowrap;
+    }
+    
+    .date {
+        display: block;
+        font-weight: 500;
+        color: #1a1a1a;
+        margin-bottom: 0.25rem;
+    }
+    
+    .time {
+        display: block;
+        color: #6b7280;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #9ca3af;
+    }
+    
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.3;
+    }
+    
+    .empty-state h4 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-state p {
+        font-size: 0.875rem;
+        color: #9ca3af;
+    }
+    
+    @media (max-width: 768px) {
+        .activity-logs-container {
+            padding: 1.5rem 1rem;
+        }
+        
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .page-header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .dataTables_wrapper {
+            padding: 1rem;
+        }
+        
+        .dataTables_filter,
+        .dataTables_length {
+            float: none;
+            margin-bottom: 1rem;
+        }
+        
+        .table-card {
+            overflow-x: auto;
+        }
+        
+        .logs-table {
+            min-width: 800px;
+        }
+        
+        .details-cell {
+            max-width: 200px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="activity-logs-container">
+    <a href="{{ path('app_admin_profile') }}" class="back-link">
+        <i class="bi bi-arrow-left"></i>
+        Back to Profile
+    </a>
+    
+    <header class="page-header">
+        <div>
+            <h1>Activity Logs</h1>
+            <p class="page-subtitle">Monitor all system activities in real-time</p>
+        </div>
+        <div class="total-badge">
+            <strong>{{ logs|length }}</strong>&nbsp;Total Entries
+        </div>
+    </header>
+    
+    <div class="table-card">
+        <table class="table logs-table" id="activityLogsTable">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Details</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <!-- User -->
+                    <td>
+                        <div class="user-cell">
+                            {% if log.userType == 'ADMIN' %}
+                                <div class="user-icon admin">
+                                    <i class="bi bi-shield-fill"></i>
+                                </div>
+                            {% elseif log.userType == 'STAFF' %}
+                                <div class="user-icon staff">
+                                    <i class="bi bi-person-badge"></i>
+                                </div>
+                            {% elseif log.userType == 'USER' %}
+                                <div class="user-icon user">
+                                    <i class="bi bi-person-fill"></i>
+                                </div>
+                            {% else %}
+                                <div class="user-icon guest">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            {% endif %}
+                            <div class="user-info">
+                                <div class="user-type">{{ log.userType|default('GUEST') }}</div>
+                                {% if log.username %}
+                                    <div class="username">{{ log.username|split('@')|first }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+
+                    <!-- Action -->
+                    <td>
+                        <div class="action-cell">
+                            {% set actionLower = log.action|lower %}
+                            {% if 'login' in actionLower %}
+                                <div class="action-icon login">
+                                    <i class="bi bi-box-arrow-in-right"></i>
+                                </div>
+                            {% elseif 'logout' in actionLower %}
+                                <div class="action-icon logout">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                </div>
+                            {% elseif 'create' in actionLower %}
+                                <div class="action-icon create">
+                                    <i class="bi bi-plus-circle"></i>
+                                </div>
+                            {% elseif 'update' in actionLower %}
+                                <div class="action-icon update">
+                                    <i class="bi bi-pencil-square"></i>
+                                </div>
+                            {% elseif 'delete' in actionLower %}
+                                <div class="action-icon delete">
+                                    <i class="bi bi-trash"></i>
+                                </div>
+                            {% else %}
+                                <div class="action-icon default">
+                                    <i class="bi bi-activity"></i>
+                                </div>
+                            {% endif %}
+                            <div class="action-name">
+                                {{ log.action|replace({'_': ' '})|title }}
+                            </div>
+                        </div>
+                    </td>
+
+                    <!-- Details -->
+                    <td>
+                        <div class="details-cell">
+                            <div class="details-text" title="{{ log.targetData }}">
+                                {% if log.targetData %}
+                                    {{ log.targetData }}
+                                {% else %}
+                                    <span style="color: #9ca3af; font-style: italic;">No details available</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+
+                    <!-- Timestamp -->
+                    <td>
+                        <div class="timestamp-cell">
+                            <span class="date">{{ log.createdAt|date('Y-m-d') }}</span>
+                            <span class="time">{{ log.createdAt|date('H:i:s') }}</span>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4">
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="bi bi-clock-history"></i>
+                            </div>
+                            <h4>No Activity Logs Found</h4>
+                            <p>System activities will appear here as they occur</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/2.0.7/js/dataTables.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    $('#activityLogsTable').DataTable({
+        pageLength: 25,
+        lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+        order: [[3, 'desc']],
+        language: {
+            search: "Search:",
+            lengthMenu: "Show _MENU_ entries",
+            info: "Showing _START_ to _END_ of _TOTAL_ entries",
+            infoEmpty: "No entries to show",
+            infoFiltered: "(filtered from _MAX_ total)",
+            paginate: {
+                first: "First",
+                last: "Last",
+                next: "Next",
+                previous: "Prev"
+            }
+        },
+        responsive: true,
+        dom: '<"row"<"col-sm-6"l><"col-sm-6"f>>rt<"row"<"col-sm-6"i><"col-sm-6"p>>'
+    });
+});
+</script>
+{% endblock %}

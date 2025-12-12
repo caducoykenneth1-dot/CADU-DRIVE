@@ -1,0 +1,445 @@
+{# templates/rental_request/edit.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Rental Request #{{ rentalRequest.id }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .rental-edit-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            color: #1a1a1a;
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #6b7280;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            transition: color 0.15s ease;
+        }
+        
+        .back-link:hover {
+            color: #1a1a1a;
+        }
+        
+        .page-header {
+            margin-bottom: 2rem;
+        }
+        
+        .page-header h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0 0 0.25rem 0;
+            letter-spacing: -0.02em;
+        }
+        
+        .page-subtitle {
+            color: #6b7280;
+            font-size: 0.9375rem;
+            margin: 0;
+        }
+        
+        .form-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-section {
+            padding: 2rem;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .form-group label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.9375rem;
+            color: #1a1a1a;
+            transition: all 0.15s ease;
+            background: white;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .form-control option {
+            padding: 0.5rem;
+        }
+        
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background: #fafafa;
+            border-top: 1px solid #e5e7eb;
+            gap: 0.75rem;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-decoration: none;
+            border: 1px solid;
+            transition: all 0.15s ease;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+            border-color: #2563eb;
+            transform: translateY(-1px);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #374151;
+            border-color: #d1d5db;
+        }
+        
+        .btn-secondary:hover {
+            background: #f9fafb;
+            border-color: #9ca3af;
+        }
+        
+        /* Info Card */
+        .info-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .info-card-header {
+            background: #fafafa;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .info-card-header h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0;
+        }
+        
+        .info-card-body {
+            padding: 1.5rem;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        .info-section h3 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            margin: 0 0 0.75rem 0;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .info-label {
+            font-size: 0.8125rem;
+            color: #6b7280;
+            font-weight: 400;
+        }
+        
+        .info-value {
+            font-size: 0.9375rem;
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.625rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .status-badge.available {
+            background: #ecfdf5;
+            color: #059669;
+        }
+        
+        .status-badge.unavailable {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        @media (max-width: 768px) {
+            .rental-edit-container {
+                padding: 1.5rem 1rem;
+            }
+            
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 1.25rem;
+            }
+            
+            .form-section {
+                padding: 1.5rem;
+            }
+            
+            .form-actions {
+                flex-direction: column-reverse;
+                padding: 1.25rem 1.5rem;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="rental-edit-container">
+    <a href="{{ path('app_rental_request_index') }}" class="back-link">
+        <i class="bi bi-arrow-left"></i>
+        Back to Rental Requests
+    </a>
+    
+    <header class="page-header">
+        <h1 style="color: white;">Edit Rental Request #{{ rentalRequest.id }}</h1>
+        <p class="page-subtitle">Update rental request details and status</p>
+    </header>
+    
+    {# USE SYMFONY FORM #}
+    {{ form_start(form) }}
+        <div class="form-card">
+            <div class="form-section">
+                <div class="form-group">
+                    {{ form_label(form.customer) }}
+                    {{ form_widget(form.customer, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.customer) }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form_label(form.car) }}
+                    {{ form_widget(form.car, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.car) }}
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        {{ form_label(form.startDate) }}
+                        {{ form_widget(form.startDate, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.startDate) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_label(form.endDate) }}
+                        {{ form_widget(form.endDate, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.endDate) }}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    {{ form_label(form.status) }}
+                    {{ form_widget(form.status, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.status) }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form_label(form.notes) }}
+                    {{ form_widget(form.notes, {'attr': {'class': 'form-control', 'rows': 3}}) }}
+                    {{ form_errors(form.notes) }}
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <a href="{{ path('app_rental_request_index') }}" class="btn btn-secondary" style="color: black !important;">
+                    <i class="bi bi-x-lg"></i>
+                    Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-lg"></i>
+                    Update Request
+                </button>
+            </div>
+        </div>
+    {{ form_end(form) }}
+            
+        
+    <div class="info-card">
+        <div class="info-card-header">
+            <h2>Current Request Details</h2>
+        </div>
+        <div class="info-card-body">
+            <div class="info-grid">
+                <div class="info-section">
+                    <h3>Customer Information</h3>
+                    <div class="info-item">
+                        <span class="info-label">Name</span>
+                        <span class="info-value">{{ rentalRequest.customer.firstName }} {{ rentalRequest.customer.lastName }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email</span>
+                        <span class="info-value">{{ rentalRequest.customer.email }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Phone</span>
+                        <span class="info-value">{{ rentalRequest.customer.phone ?? 'Not provided' }}</span>
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <h3>Vehicle Information</h3>
+                    <div class="info-item">
+                        <span class="info-label">Vehicle</span>
+                        <span class="info-value">{{ rentalRequest.car.make }} {{ rentalRequest.car.model }} {{ rentalRequest.car.year }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Daily Rate</span>
+                        <span class="info-value">₱{{ rentalRequest.car.price|number_format(2) }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Status</span>
+                        <span class="status-badge {{ rentalRequest.car.status.code == 'available' ? 'available' : 'unavailable' }}">
+                            {{ rentalRequest.car.status.name|default('Unknown') }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const startDate = document.getElementById('startDate');
+            const endDate = document.getElementById('endDate');
+            
+            if (startDate && endDate && startDate.value && endDate.value) {
+                const start = new Date(startDate.value);
+                const end = new Date(endDate.value);
+                
+                if (start > end) {
+                    alert('Start date cannot be after end date');
+                    e.preventDefault();
+                    return false;
+                }
+                
+                // Check if dates are in the past
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                if (start < today) {
+                    if (!confirm('Start date is in the past. Continue anyway?')) {
+                        e.preventDefault();
+                        return false;
+                    }
+                }
+            }
+        });
+        
+        // Add visual feedback for date validation
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        
+        function validateDates() {
+            if (startDateInput.value && endDateInput.value) {
+                const start = new Date(startDateInput.value);
+                const end = new Date(endDateInput.value);
+                
+                if (start > end) {
+                    endDateInput.style.borderColor = '#ef4444';
+                } else {
+                    endDateInput.style.borderColor = '#d1d5db';
+                }
+            }
+        }
+        
+        if (startDateInput && endDateInput) {
+            startDateInput.addEventListener('change', validateDates);
+            endDateInput.addEventListener('change', validateDates);
+        }
+    }
+});
+</script>
+{% endblock %}

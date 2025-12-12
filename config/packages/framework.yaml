@@ -1,15 +1,15 @@
-# see https://symfony.com/doc/current/reference/configuration/framework.html
+# config/packages/framework.yaml
 framework:
     secret: '%env(APP_SECRET)%'
-
-    # Note that the session will be started ONLY if you read or write from it.
     session: true
+    
+    # CRITICAL: Add this for ALL environments, not just test
 
-    #esi: true
-    #fragments: true
+    
+    # ... rest of your config
 
 when@test:
     framework:
-        test: true
+        # This can stay, but http_method_override should be above
         session:
             storage_factory_id: session.storage.factory.mock_file

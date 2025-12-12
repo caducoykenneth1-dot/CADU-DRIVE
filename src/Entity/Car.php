@@ -8,175 +8,119 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/* Represents a vehicle offered in the rental fleet.
- Stores basic descriptive information together with operational status
- and an optional image filename for display in the UI*/
 #[ORM\Entity(repositoryClass: CarRepository::class)]
 class Car
 {
-    public function __construct()
-    {
-        $this->rentals = new ArrayCollection();
-    }
-
-    /* Surrogate primary key.*/
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    /* Manufacturer or brand (e.g. Toyota, BMW) */
     #[ORM\Column(length: 128)]
     private ?string $make = null;
 
-    /**
-     * Specific model name supplied by the manufacturer.
-     */
     #[ORM\Column(length: 128)]
     private ?string $model = null;
 
-    /**
-     * Optional marketing copy or vehicle highlights.
-     */
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
-    /**
-     * Production year of the vehicle.
-     */
     #[ORM\Column]
     private ?int $year = null;
 
-    /**
-     * Daily rental price expressed in the smallest currency unit.
-     */
     #[ORM\Column]
     private ?int $price = null;
 
-    /**
-     * Current availability marker (available, rented, maintenance, etc.).
-     */
-    #[ORM\ManyToOne(targetEntity: CarStatus::class)]
+    #[ORM\ManyToOne(targetEntity: CarStatus::class, inversedBy: 'cars')]
     #[ORM\JoinColumn(nullable: false)]
     private ?CarStatus $status = null;
 
-    /**
-     * Rentals that use this car.
-     */
-    #[ORM\OneToMany(mappedBy: 'car', targetEntity: Rental::class)]
-    private Collection $rentals;
-
-    /**
-     * Filename of the uploaded image stored under `public/images`.
-     */
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $image = null; // �o. KEEP JUST THIS ONE
+    private ?string $image = null;
 
-    /**
-     * Unique identifier accessor.
-     */
+    #[ORM\OneToMany(mappedBy: 'car', targetEntity: RentalRequest::class)]
+    private Collection $rentalRequests;
+    
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $updatedAt = null;
+
+    public function __construct()
+    {
+        $this->rentalRequests = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * Return the car manufacturer.
-     */
     public function getMake(): ?string
     {
         return $this->make;
     }
 
-    /**
-     * Define the car manufacturer label.
-     */
     public function setMake(string $make): static
     {
         $this->make = $make;
         return $this;
     }
 
-    /**
-     * Return the car model name.
-     */
     public function getModel(): ?string
     {
         return $this->model;
     }
 
-    /**
-     * Persist the model name.
-     */
     public function setModel(string $model): static
     {
         $this->model = $model;
         return $this;
     }
 
-    /**
-     * Fetch the optional description text.
-     */
     public function getDescription(): ?string
     {
         return $this->description;
     }
 
-    /**
-     * Update the descriptive text shown in listings.
-     */
     public function setDescription(?string $description): static
     {
         $this->description = $description;
         return $this;
     }
 
-    /**
-     * Retrieve the production year.
-     */
     public function getYear(): ?int
     {
         return $this->year;
     }
 
-    /**
-     * Store the production year.
-     */
     public function setYear(int $year): static
     {
         $this->year = $year;
         return $this;
     }
 
-    /**
-     * Retrieve the daily rental price.
-     */
     public function getPrice(): ?int
     {
         return $this->price;
     }
 
-    /**
-     * Persist the daily rental price.
-     */
     public function setPrice(int $price): static
     {
         $this->price = $price;
         return $this;
     }
 
-    /**
-     * Return the current availability status.
-     */
     public function getStatus(): ?CarStatus
     {
         return $this->status;
     }
 
-    /**
-     * Change the availability status record.
-     */
-    public function setStatus(CarStatus $status): static
+    public function getDailyRate(): ?int
+    {
+        // Return the price as daily rate
+        return $this->price;
+    }
+
+    public function setStatus(?CarStatus $status): static
     {
         if ($this->status === $status) {
             return $this;
@@ -195,17 +139,11 @@ class Car
         return $this;
     }
 
-    /**
-     * Retrieve the stored image filename.
-     */
     public function getImage(): ?string
     {
         return $this->image;
     }
 
-    /**
-     * Store the filename for the uploaded image.
-     */
     public function setImage(?string $image): static
     {
         $this->image = $image;
@@ -213,31 +151,154 @@ class Car
     }
 
     /**
-     * @return Collection<int, Rental>
+     * @return Collection<int, RentalRequest>
+     */
+    public function getRentalRequests(): Collection
+    {
+        return $this->rentalRequests;
+    }
+    
+    /**
+     * Alias for template compatibility - returns the same as getRentalRequests()
+     * @return Collection<int, RentalRequest>
      */
     public function getRentals(): Collection
     {
-        return $this->rentals;
+        return $this->rentalRequests;
     }
 
-    public function addRental(Rental $rental): static
+    public function addRentalRequest(RentalRequest $rentalRequest): static
     {
-        if (!$this->rentals->contains($rental)) {
-            $this->rentals->add($rental);
-            if ($rental->getCar() !== $this) {
-                $rental->setCar($this);
+        if (!$this->rentalRequests->contains($rentalRequest)) {
+            $this->rentalRequests->add($rentalRequest);
+            $rentalRequest->setCar($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRentalRequest(RentalRequest $rentalRequest): static
+    {
+        if ($this->rentalRequests->removeElement($rentalRequest)) {
+            if ($rentalRequest->getCar() === $this) {
+                $rentalRequest->setCar(null);
             }
         }
 
         return $this;
     }
 
-    public function removeRental(Rental $rental): static
+    public function getUpdatedAt(): ?\DateTimeInterface
     {
-        if ($this->rentals->removeElement($rental) && $rental->getCar() === $this) {
-            // Let doctrine handle the owning side when the rental is removed or reassigned.
-        }
+        return $this->updatedAt;
+    }
 
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
         return $this;
+    }
+
+    // ============================================================
+    // HELPER METHODS FOR BUSINESS LOGIC
+    // ============================================================
+
+    /**
+     * Check if the car is currently rented
+     */
+    public function isCurrentlyRented(): bool
+    {
+        $status = $this->getStatus();
+        return $status && $status->getCode() === 'rented';
+    }
+
+    /**
+     * Check if the car has any rental history (approved requests)
+     */
+    public function hasRentalHistory(): bool
+    {
+        foreach ($this->rentalRequests as $request) {
+            if ($request->getStatus() === 'approved') {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check if the car can be deleted
+     * A car can only be deleted if:
+     * - It has no rental history
+     * - It's not currently rented
+     * - It's not disabled
+     */
+    public function canBeDeleted(): bool
+    {
+        $statusCode = $this->getStatusCode();
+        return !$this->hasRentalHistory() && 
+               !$this->isCurrentlyRented() && 
+               $statusCode !== 'disabled';
+    }
+
+    /**
+     * Check if the car can be disabled
+     * A car can be disabled if:
+     * - It's not already disabled
+     * - It's not currently rented
+     */
+    public function canBeDisabled(): bool
+    {
+        $statusCode = $this->getStatusCode();
+        return $statusCode !== 'disabled' && 
+               !$this->isCurrentlyRented();
+    }
+
+    /**
+     * Check if the car can be enabled
+     * A car can be enabled if it's currently disabled
+     */
+    public function canBeEnabled(): bool
+    {
+        return $this->getStatusCode() === 'disabled';
+    }
+
+    /**
+     * Get the status code (e.g., 'available', 'rented', 'disabled')
+     */
+    public function getStatusCode(): string
+    {
+        $status = $this->getStatus();
+        return $status ? $status->getCode() : 'unknown';
+    }
+
+    /**
+     * Get the status label for display (e.g., 'Available', 'Rented', 'Disabled')
+     */
+    public function getStatusLabel(): string
+    {
+        $status = $this->getStatus();
+        return $status ? $status->getLabel() : 'Unknown';
+    }
+
+    /**
+     * Get count of rental requests
+     */
+    public function getRentalCount(): int
+    {
+        return $this->rentalRequests->count();
+    }
+
+    /**
+     * Get count of approved rental requests only
+     */
+    public function getApprovedRentalCount(): int
+    {
+        $count = 0;
+        foreach ($this->rentalRequests as $request) {
+            if ($request->getStatus() === 'approved') {
+                $count++;
+            }
+        }
+        return $count;
     }
 }

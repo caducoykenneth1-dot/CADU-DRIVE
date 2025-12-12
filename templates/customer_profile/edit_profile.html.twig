@@ -1,0 +1,248 @@
+{# templates/customer/edit.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Customer - {{ customer.firstName }} {{ customer.lastName }}{% endblock %}
+
+{% block body %}
+<style>
+    .container {
+        max-width: 600px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+        color: #222;
+    }
+    h4 {
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: #111;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .customer-info {
+        background: #f7f8fa;
+        border-left: 4px solid #007bff;
+        border-radius: 6px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+        color: #444;
+        font-size: 0.95rem;
+    }
+    .customer-info h5 {
+        margin: 0 0 0.25rem;
+        font-weight: 700;
+        color: #0a2342;
+    }
+    .customer-info p {
+        margin: 0.15rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        color: #555;
+        font-size: 0.9rem;
+    }
+    .customer-info .text-muted {
+        color: #777 !important;
+        font-size: 0.85rem;
+    }
+    form {
+        background: #fff;
+        border-radius: 8px;
+        padding: 1.5rem 1.75rem 2rem;
+        box-shadow: 0 2px 5px rgb(0 0 0 / 0.07);
+    }
+    label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.25rem;
+        display: block;
+        font-size: 0.9rem;
+    }
+    input.form-control {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        font-size: 1rem;
+        border: 1.5px solid #ccc;
+        border-radius: 4px;
+        transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    input.form-control:focus {
+        border-color: #007bff;
+        outline: none;
+        box-shadow: 0 0 6px rgba(0,123,255,0.4);
+    }
+    .form-error {
+        color: #d9534f;
+        font-size: 0.85rem;
+        margin-top: 0.2rem;
+    }
+    .btn-primary, .btn-outline-danger {
+        font-weight: 600;
+        font-size: 0.95rem;
+        padding: 0.5rem 1.2rem;
+        border-radius: 5px;
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: background-color 0.25s ease, border-color 0.25s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        text-decoration: none;
+        user-select: none;
+    }
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+        color: white;
+    }
+    .btn-outline-danger {
+        background-color: transparent;
+        color: #dc3545;
+        border-color: #dc3545;
+    }
+    .btn-outline-danger:hover {
+        background-color: #dc3545;
+        color: white;
+    }
+    .btn + .btn {
+        margin-left: 0.75rem;
+    }
+    .alert {
+        border-radius: 6px;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    .alert-success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    .alert-danger {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+    button.btn-close {
+        margin-left: auto;
+        background: transparent;
+        border: none;
+        font-size: 1rem;
+        cursor: pointer;
+        color: inherit;
+        opacity: 0.6;
+        transition: opacity 0.3s ease;
+    }
+    button.btn-close:hover {
+        opacity: 1;
+    }
+    .row {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    .col-md-6 {
+        flex: 1 1 calc(50% - 1rem);
+        min-width: 220px;
+    }
+    @media (max-width: 480px) {
+        .col-md-6 {
+            flex: 1 1 100%;
+        }
+    }
+</style>
+
+<div class="container">
+    <h4 style="color: #1a73e8;"><i class="bi bi-person-gear"></i> Edit Customer Profile</h4>
+
+    <div class="customer-info" style="color: black !important;">
+        <div>
+            <h5>{{ customer.firstName }} {{ customer.lastName }}</h5>
+            <p><i class="bi bi-envelope"></i> {{ customer.email }}</p>
+
+            {% if customer.phone %}
+                <p><i class="bi bi-telephone"></i> {{ customer.phone }}</p>
+            {% endif %}
+
+            {% if customer.licenseNumber %}
+                <p><i class="bi bi-card-text"></i> License: {{ customer.licenseNumber }}</p>
+            {% endif %}
+        </div>
+        <div style="margin-top: 0.6rem; font-size: 0.85rem; color: #666;">
+            <p>Created: {{ customer.createdAt ? customer.createdAt|date('Y-m-d') : 'N/A' }}</p>
+            {% if customer.updatedAt %}
+                <p>Last Updated: {{ customer.updatedAt|date('Y-m-d H:i') }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Flash Messages #}
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success" role="alert">
+            <i class="bi bi-check-circle"></i> {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+    <div class="row">
+        <div class="col-md-6">
+            {{ form_label(form.firstName) }}
+            {{ form_widget(form.firstName, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.firstName, {'attr': {'class': 'form-error'}}) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_label(form.lastName) }}
+            {{ form_widget(form.lastName, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.lastName, {'attr': {'class': 'form-error'}}) }}
+        </div>
+    </div>
+
+    <div class="row" style="margin-top: 0.8rem;">
+        <div class="col-md-6">
+            {{ form_label(form.email) }}
+            {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.email, {'attr': {'class': 'form-error'}}) }}
+        </div>
+        <div class="col-md-6">
+            {{ form_label(form.phone) }}
+            {{ form_widget(form.phone, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.phone, {'attr': {'class': 'form-error'}}) }}
+        </div>
+    </div>
+
+    <div style="margin-top: 0.8rem;">
+        {{ form_label(form.licenseNumber) }}
+        {{ form_widget(form.licenseNumber, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.licenseNumber, {'attr': {'class': 'form-error'}}) }}
+    </div>
+
+    <div style="margin-top: 1.25rem;">
+        <button type="submit" class="btn-primary">
+            <i class="bi bi-save"></i> Save Changes
+        </button>
+        <a href="{{ path('app_customer_my_profile') }}" class="btn-outline-danger">
+            <i class="bi bi-x-circle"></i> Cancel
+        </a>
+    </div>
+
+    {{ form_end(form) }}
+</div>
+{% endblock %}

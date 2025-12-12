@@ -1,0 +1,640 @@
+{% extends 'admin/layout.html.twig' %}
+{% block admin_title %}Rental Requests - Staff{% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .rental-requests-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            color: #1a1a1a;
+            background: #fafafa;
+        }
+        
+        .page-header {
+            margin-bottom: 2.5rem;
+        }
+        
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0 0 0.25rem 0;
+            letter-spacing: -0.02em;
+        }
+        
+        .page-subtitle {
+            color: #6b7280;
+            font-size: 0.9375rem;
+            font-weight: 400;
+            margin: 0;
+        }
+        
+        .requests-section {
+            margin-bottom: 3rem;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        .section-header h2 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0;
+            letter-spacing: -0.01em;
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.125rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            min-width: 24px;
+            height: 24px;
+        }
+        
+        .badge {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+        
+        .badge-approved {
+            background: #ecfdf5;
+            color: #059669;
+        }
+        
+        .badge-rejected {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+        
+        .requests-table {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+            min-width: 900px;
+        }
+        
+        thead th {
+            background: #fafafa;
+            text-align: left;
+            padding: 0.875rem 1rem;
+            font-weight: 500;
+            font-size: 0.8125rem;
+            color: #6b7280;
+            border-bottom: 1px solid #e5e7eb;
+            white-space: nowrap;
+        }
+        
+        tbody td {
+            padding: 1rem;
+            border-bottom: 1px solid #f3f4f6;
+            vertical-align: middle;
+        }
+        
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tbody tr:hover {
+            background: #fafafa;
+        }
+        
+        .request-id {
+            font-weight: 500;
+            color: #3b82f6;
+            font-size: 0.875rem;
+        }
+        
+        .customer-name, .vehicle-name {
+            font-weight: 500;
+            color: black !important;
+            margin-bottom: 0.125rem;
+        }
+        
+        .customer-email, .vehicle-year, .date-days, .approved-date, .submitted-date, .submitted-time {
+            font-size: 0.8125rem;
+            color: #9ca3af;
+            display: block;
+            margin-top: 0.125rem;
+        }
+        
+        .date-range {
+            font-weight: 400;
+            color: #1a1a1a;
+            margin-bottom: 0.125rem;
+        }
+        
+        .text-muted {
+            color: #9ca3af;
+        }
+        
+        .price-total {
+            color: #059669;
+            font-weight: 600;
+            font-size: 0.9375rem;
+            margin-bottom: 0.125rem;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            gap: 0.375rem;
+        }
+        
+        .status-pending {
+            background: #fef3c7;
+            color: black !important;
+        }
+        
+        .status-approved {
+            background: #d1fae5;
+            color: green !important;
+        }
+        
+        .status-rejected {
+            background: #fee2e2;
+            color: red !important;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.375rem;
+            justify-content: flex-end;
+        }
+        
+        .action-buttons form {
+            margin: 0;
+        }
+        
+        .action-buttons a, .action-buttons button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 0.9375rem;
+            background: white;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-decoration: none;
+        }
+        
+        .action-buttons button {
+            padding: 0;
+        }
+        
+        .action-buttons a:hover, .action-buttons button:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+            transform: translateY(-1px);
+        }
+        
+        .btn-edit:hover {
+            color: #d97706;
+            border-color: #fbbf24;
+        }
+        
+        .btn-view:hover {
+            color: #2563eb;
+            border-color: #3b82f6;
+        }
+        
+        .btn-approve:hover {
+            color: #059669;
+            border-color: #10b981;
+        }
+        
+        .btn-reject:hover {
+            color: #dc2626;
+            border-color: #ef4444;
+        }
+        
+        .btn-delete:hover {
+            color: #1f2937;
+            border-color: #9ca3af;
+        }
+        
+        .alert {
+            border-radius: 8px;
+            padding: 0.875rem 1rem;
+            margin-bottom: 1.5rem;
+            font-weight: 400;
+            font-size: 0.875rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid;
+        }
+        
+        .alert-success {
+            background: #ecfdf5;
+            color: #065f46;
+            border-color: #a7f3d0;
+        }
+        
+        .alert-error {
+            background: #fef2f2;
+            color: #991b1b;
+            border-color: #fecaca;
+        }
+        
+        .btn-close {
+            background: transparent;
+            border: none;
+            font-size: 1.125rem;
+            color: inherit;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.15s ease;
+            padding: 0;
+            line-height: 1;
+        }
+        
+        .btn-close:hover {
+            opacity: 1;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 4rem 1rem;
+            color: #9ca3af;
+        }
+        
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 0.75rem;
+            opacity: 0.3;
+        }
+        
+        .empty-state p {
+            font-size: 0.9375rem;
+            margin: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .rental-requests-container {
+                padding: 1.5rem 1rem;
+            }
+            
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .requests-table {
+                overflow-x: auto;
+            }
+            
+            .action-buttons {
+                gap: 0.25rem;
+            }
+            
+            .action-buttons a, .action-buttons button {
+                width: 28px;
+                height: 28px;
+                font-size: 0.875rem;
+            }
+            
+            thead th, tbody td {
+                padding: 0.75rem 0.625rem;
+                font-size: 0.8125rem;
+            }
+        }
+    </style>
+{% endblock %}
+{% block admin_content %}
+<div class="rental-requests-container" role="main" aria-label="Rental Requests Management">
+    <header class="page-header">
+        <h1>Rental Requests</h1>
+        <p class="page-subtitle">Manage customer rental submissions</p>
+    </header>
+    
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert" aria-live="polite">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">×</button>
+        </div>
+    {% endfor %}
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-error alert-dismissible fade show" role="alert" aria-live="assertive">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">×</button>
+        </div>
+    {% endfor %}
+    
+    <section class="requests-section" aria-labelledby="pending-requests-header">
+        <div class="section-header">
+            <h2 id="pending-requests-header" style="color: black">Pending Review</h2>
+            <span class="badge" aria-label="{{ pendingRequests|length }} pending requests">{{ pendingRequests|length }}</span>
+        </div>
+        {% if pendingRequests|length > 0 %}
+            <div class="requests-table">
+                <table>
+                    <thead>
+                    <tr>
+                        <th scope="col">Request</th>
+                        <th scope="col">Customer</th>
+                        <th scope="col">Vehicle</th>
+                        <th scope="col">Dates</th>
+                        <th scope="col">Total</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for request in pendingRequests %}
+                        <tr>
+                            <td class="request-id">#{{ request.id }}</td>
+                            <td>
+                                {% if request.customer %}
+                                    <div class="customer-name">{{ request.customer.firstName ~ ' ' ~ request.customer.lastName | trim ?: request.customer.email }}</div>
+                                    <small class="customer-email">{{ request.customer.email }}</small>
+                                {% else %}
+                                    <span class="text-muted">No customer</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if request.car %}
+                                    <div class="vehicle-name">{{ request.car.make }} {{ request.car.model }}</div>
+                                    {% if request.car.year %}
+                                        <small class="vehicle-year">{{ request.car.year }}</small>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">No vehicle</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="date-range">{{ request.startDate|date('M d, Y') }} – {{ request.endDate|date('M d, Y') }}</div>
+                                {% set daysDifference = date(request.endDate).diff(date(request.startDate)).days %}
+                                <small class="date-days">{{ daysDifference }} day{% if daysDifference != 1 %}s{% endif %}</small>
+                            </td>
+                            <td>
+                                {% if request.car and request.startDate and request.endDate %}
+                                    {% set totalDays = daysDifference + 1 %}
+                                    {% set dailyRate = request.car.dailyRate|default(0) %}
+                                    {% set calculatedTotal = totalDays * dailyRate %}
+                                    <div class="price-total">₱{{ calculatedTotal|number_format(2) }}</div>
+                                    <small class="text-muted">{{ totalDays }} day{% if totalDays != 1 %}s{% endif %} × ₱{{ dailyRate|number_format(2) }}/day</small>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="status-badge status-pending">Pending</span>
+                            </td>
+                            <td>
+                                <div class="action-buttons" role="group" aria-label="Actions for rental request #{{ request.id }}">
+                                    <a href="{{ path('app_staff_rental_request_show', {'id': request.id}) }}" class="btn-view" title="View Details">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ path('app_rental_request_edit', {'id': request.id}) }}" class="btn-edit" title="Edit Request">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form action="{{ path('app_rental_request_approve', {'id': request.id}) }}" method="post" class="inline-form" onsubmit="return confirm('Approve rental request #{{ request.id }}?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ request.id) }}">
+                                        <button type="submit" class="btn-approve" title="Approve Request">
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
+                                    </form>
+                                    <form action="{{ path('app_rental_request_reject', {'id': request.id}) }}" method="post" class="inline-form" onsubmit="return confirm('Reject rental request #{{ request.id }}?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ request.id) }}">
+                                        <button type="submit" class="btn-reject" title="Reject Request">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                    </form>
+                                    <form action="{{ path('app_staff_rental_request_delete', {'id': request.id}) }}" method="post" class="inline-form" onsubmit="return confirm('Delete rental request #{{ request.id }}?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ request.id) }}">
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <button type="submit" class="btn-delete" title="Delete Request">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                <p>No pending rental requests</p>
+            </div>
+        {% endif %}
+    </section>
+    
+    <section class="requests-section" aria-labelledby="approved-requests-header">
+        <div class="section-header">
+            <h2 id="approved-requests-header" style="color: black">Approved</h2>
+            <span class="badge badge-approved">{{ approvedRequests|length }}</span>
+        </div>
+        {% if approvedRequests|length > 0 %}
+            <div class="requests-table">
+                <table>
+                    <thead>
+                    <tr>
+                        <th scope="col">Request</th>
+                        <th scope="col">Customer</th>
+                        <th scope="col">Vehicle</th>
+                        <th scope="col">Dates</th>
+                        <th scope="col">Total</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for request in approvedRequests %}
+                        <tr>
+                            <td class="request-id">#{{ request.id }}</td>
+                            <td>
+                                {% if request.customer %}
+                                    <div class="customer-name">{{ request.customer.firstName ~ ' ' ~ request.customer.lastName | trim ?: request.customer.email }}</div>
+                                    <small class="customer-email">{{ request.customer.email }}</small>
+                                {% else %}
+                                    <span class="text-muted">No customer</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if request.car %}
+                                    <div class="vehicle-name">{{ request.car.make }} {{ request.car.model }}</div>
+                                    {% if request.car.year %}
+                                        <small class="vehicle-year">{{ request.car.year }}</small>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">No vehicle</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="date-range">{{ request.startDate|date('M d, Y') }} – {{ request.endDate|date('M d, Y') }}</div>
+                                {% set daysDifference = date(request.endDate).diff(date(request.startDate)).days %}
+                                <small class="date-days">{{ daysDifference }} day{% if daysDifference != 1 %}s{% endif %}</small>
+                            </td>
+                            <td>
+                                {% if request.car and request.startDate and request.endDate %}
+                                    {% set totalDays = daysDifference + 1 %}
+                                    {% set dailyRate = request.car.dailyRate|default(0) %}
+                                    {% set calculatedTotal = totalDays * dailyRate %}
+                                    <div class="price-total">₱{{ calculatedTotal|number_format(2) }}</div>
+                                    <small class="text-muted">{{ totalDays }} day{% if totalDays != 1 %}s{% endif %} × ₱{{ dailyRate|number_format(2) }}/day</small>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="status-badge status-approved">Approved</span>
+                                <small class="approved-date">{{ request.approvedAt|date('M d, Y') }}</small>
+                            </td>
+                            <td>
+                                <div class="action-buttons" role="group">
+                                    <a href="{{ path('app_staff_rental_request_show', {'id': request.id}) }}" class="btn-view" title="View Details">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ path('app_rental_request_edit', {'id': request.id}) }}" class="btn-edit" title="Edit Request">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form action="{{ path('app_staff_rental_request_delete', {'id': request.id}) }}" method="post" class="inline-form" onsubmit="return confirm('Delete rental request #{{ request.id }}?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ request.id) }}">
+                                        <button type="submit" class="btn-delete" title="Delete Request">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">✅</div>
+                <p>No approved requests</p>
+            </div>
+        {% endif %}
+    </section>
+    
+    <section class="requests-section" aria-labelledby="rejected-requests-header">
+        <div class="section-header">
+            <h2 id="rejected-requests-header" style="color: black">Rejected</h2>
+            <span class="badge badge-rejected">{{ rejectedRequests|length }}</span>
+        </div>
+        {% if rejectedRequests|length > 0 %}
+            <div class="requests-table">
+                <table>
+                    <thead>
+                    <tr>
+                        <th scope="col">Request</th>
+                        <th scope="col">Customer</th>
+                        <th scope="col">Vehicle</th>
+                        <th scope="col">Dates</th>
+                        <th scope="col">Total</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Rejected On</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for request in rejectedRequests %}
+                        <tr>
+                            <td class="request-id">#{{ request.id }}</td>
+                            <td>
+                                {% if request.customer %}
+                                    <div class="customer-name">{{ request.customer.firstName ~ ' ' ~ request.customer.lastName | trim ?: request.customer.email }}</div>
+                                    <small class="customer-email">{{ request.customer.email }}</small>
+                                {% else %}
+                                    <span class="text-muted">No customer</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if request.car %}
+                                    <div class="vehicle-name">{{ request.car.make }} {{ request.car.model }}</div>
+                                    {% if request.car.year %}
+                                        <small class="vehicle-year">{{ request.car.year }}</small>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-muted">No vehicle</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="date-range">{{ request.startDate|date('M d, Y') }} – {{ request.endDate|date('M d, Y') }}</div>
+                                {% set daysDifference = date(request.endDate).diff(date(request.startDate)).days %}
+                                <small class="date-days">{{ daysDifference }} day{% if daysDifference != 1 %}s{% endif %}</small>
+                            </td>
+                            <td>
+                                {% if request.car and request.startDate and request.endDate %}
+                                    {% set totalDays = daysDifference + 1 %}
+                                    {% set dailyRate = request.car.dailyRate|default(0) %}
+                                    {% set calculatedTotal = totalDays * dailyRate %}
+                                    <div class="price-total">₱{{ calculatedTotal|number_format(2) }}</div>
+                                    <small class="text-muted">{{ totalDays }} day{% if totalDays != 1 %}s{% endif %} × ₱{{ dailyRate|number_format(2) }}/day</small>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="status-badge status-rejected">Rejected</span>
+                            </td>
+                            <td>
+                                {% if request.rejectedAt %}
+                                    <div class="submitted-date">{{ request.rejectedAt|date('M d, Y') }}</div>
+                                    <small class="submitted-time">{{ request.rejectedAt|date('h:i A') }}</small>
+                                {% else %}
+                                    <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="action-buttons" role="group">
+                                    <a href="{{ path('app_staff_rental_request_show', {'id': request.id}) }}" class="btn-view" title="View Details">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ path('app_rental_request_edit', {'id': request.id}) }}" class="btn-edit" title="Edit Request">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form action="{{ path('app_staff_rental_request_delete', {'id': request.id}) }}" method="post" class="inline-form" onsubmit="return confirm('Delete rental request #{{ request.id }}?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ request.id) }}">
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <button type="submit" class="btn-delete" title="Delete Request">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">❌</div>
+                <p>No rejected requests</p>
+            </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Staff Overview{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/staff.css') }}">
+{% endblock %}
+
+{% block admin_content %}
+<h1>Staff Overview</h1>
+
+<p>Total staff: {{ staffList|length }}</p>
+
+<div class="table-container">
+    <table class="table-modern">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Date Created</th>
+                {# <th>Department</th> #}
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for staff in staffList %}
+            <tr>
+                <td>{{ staff.id }}</td>
+                <td>{{ staff.getFullName() }}</td>
+                <td>{{ staff.getEmail() }}</td>
+                <td>
+                    {% if staff.user %}
+                        {{ staff.user.roles|join(', ') }}
+                    {% else %}
+                        No user account
+                    {% endif %}
+                </td>
+                <td>{{ staff.createdAt|date('M j, Y') }}</td>
+                <td>
+                    {# FIXED: Use the isActive() method #}
+                    <span class="status-badge {{ staff.active ? 'active' : 'inactive' }}">
+                        {{ staff.active ? 'Active' : 'Inactive' }}
+                    </span>
+                </td>
+            </tr>
+            {% else %}
+            <tr class="no-results"><td colspan="7">No staff found</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<a href="{{ path('app_staff_crud_index') }}" class="btn-primary">Go to Staff Management</a>
+{% endblock %}

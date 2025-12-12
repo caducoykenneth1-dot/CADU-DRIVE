@@ -1,14 +1,10 @@
 {% extends 'admin/layout.html.twig' %}
 
-{# ❌ DELETE the first incorrect block override: {% block body %} Manage Customer {% endblock %} #}
 
-{# ✅ Use the correct block name for the main admin content area #}
 {% block admin_content %}
 
-    {# ------------------------------------- #}
-    {# Set the title for the browser tab. This is usually defined in admin/layout.html.twig #}
+    {# FOR CUSTOME PAGE #}
     {% block admin_title %}Manage Customer{% endblock %}
-    {# ------------------------------------- #}
 
     <section id="customers" class="dashboard-section" data-dashboard-section>
         <div class="section-header">
@@ -52,7 +48,7 @@
                                 </td>
                                 <td>{{ customer.phone|default('N/A') }}</td>
                                 <td>{{ customer.createdAt ? customer.createdAt|date('M d, Y') : 'N/A' }}</td>
-                                <td>{{ customer.rentals|length }}</td>
+                                <td>{{ customer.rentalRequests|length }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>

@@ -1,0 +1,400 @@
+{% block stylesheets %}
+    <style>
+        /* Minimal, clean, professional design */
+
+        .profile-edit-page {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 180px);
+            padding: 2rem 1rem;
+            background: #f9fafb;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #1f2937;
+        }
+
+        .center-form-card {
+            width: 100%;
+            max-width: 480px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-header {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: #ffffff;
+            padding: 1.75rem 2rem;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            letter-spacing: 0.04em;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .form-header i {
+            font-size: 1.7rem;
+        }
+
+        .form-body {
+            padding: 2rem;
+            flex-grow: 1;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-label {
+            display: block;
+            color: #6b7280;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #f3f4f6;
+            user-select: none;
+        }
+
+        .form-group {
+            margin-bottom: 1.4rem;
+        }
+
+        .form-label {
+            display: block;
+            color: #374151;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            user-select: none;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border: 1.5px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 1rem;
+            color: #111827;
+            background: #fff;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 5px rgba(37, 99, 235, 0.5);
+            background: #ffffff;
+        }
+
+        .form-input.readonly {
+            background: #f9fafb;
+            color: #6b7280;
+            cursor: not-allowed;
+            border-color: #e5e7eb;
+        }
+
+        .form-help {
+            display: block;
+            color: #9ca3af;
+            font-size: 0.825rem;
+            margin-top: 0.35rem;
+            user-select: none;
+        }
+
+        .info-box {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 10px;
+            padding: 1.25rem 1.5rem;
+            margin: 1.5rem 0;
+            color: #3b82f6;
+            font-weight: 600;
+            font-size: 0.95rem;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-box i {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .info-box-content {
+            color: #374151;
+            font-weight: 400;
+            font-size: 0.95rem;
+        }
+
+        .status-badges {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            user-select: none;
+            box-shadow: 0 1px 3px rgb(0 0 0 / 0.06);
+        }
+
+        .badge-staff {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-inactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-joined {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .btn {
+            padding: 0.75rem 1.75rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            user-select: none;
+            border: 2px solid transparent;
+            cursor: pointer;
+            min-width: 120px;
+            justify-content: center;
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border-color: #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: #ffffff;
+            border-color: transparent;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+            box-shadow: 0 6px 18px rgba(30, 64, 175, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .error-message {
+            color: #dc2626;
+            font-size: 0.875rem;
+            margin-top: 0.4rem;
+            user-select: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .profile-edit-page {
+                padding: 1rem 1rem;
+            }
+            .form-body {
+                padding: 1.5rem 1.5rem;
+            }
+            .form-actions {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="profile-edit-page" role="main" aria-label="Edit Staff Profile">
+    <div class="center-form-card" tabindex="-1">
+        <!-- Form Header -->
+        <div class="form-header" aria-live="polite">
+            <i class="bi bi-person-badge" aria-hidden="true"></i> Edit My Profile
+        </div>
+
+        <!-- Form Body -->
+        <div class="form-body">
+            {{ form_start(form, {'attr': {'class': 'profile-form', 'novalidate': 'novalidate'}}) }}
+
+            <div class="form-section" aria-labelledby="personal-info-label">
+                <span id="personal-info-label" class="section-label">Personal Information</span>
+
+                <div class="form-group">
+                    {{ form_label(form.firstName, 'First Name', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.firstName, {'attr': {
+                        'class': 'form-input',
+                        'placeholder': 'Enter your first name',
+                        'aria-describedby': form.firstName.vars.errors ? 'firstName-error' : null,
+                        'aria-invalid': form.firstName.vars.errors ? 'true' : 'false'
+                    }}) }}
+                    {% if form.firstName.vars.errors %}
+                        <div id="firstName-error" class="error-message" role="alert">
+                            {{ form_errors(form.firstName) }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.lastName, 'Last Name', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.lastName, {'attr': {
+                        'class': 'form-input',
+                        'placeholder': 'Enter your last name',
+                        'aria-describedby': form.lastName.vars.errors ? 'lastName-error' : null,
+                        'aria-invalid': form.lastName.vars.errors ? 'true' : 'false'
+                    }}) }}
+                    {% if form.lastName.vars.errors %}
+                        <div id="lastName-error" class="error-message" role="alert">
+                            {{ form_errors(form.lastName) }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="email-readonly">Email Address</label>
+                    <input id="email-readonly" type="email" class="form-input readonly" value="{{ app.user.email }}" readonly aria-readonly="true">
+                    <span class="form-help">Contact administrator to change email</span>
+                </div>
+
+                {% if form.phoneNumber is defined %}
+                <div class="form-group">
+                    {{ form_label(form.phoneNumber, 'Phone Number', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.phoneNumber, {'attr': {
+                        'class': 'form-input',
+                        'placeholder': 'Enter your phone number',
+                        'aria-describedby': form.phoneNumber.vars.errors ? 'phoneNumber-error' : null,
+                        'aria-invalid': form.phoneNumber.vars.errors ? 'true' : 'false'
+                    }}) }}
+                    {% if form.phoneNumber.vars.errors %}
+                        <div id="phoneNumber-error" class="error-message" role="alert">
+                            {{ form_errors(form.phoneNumber) }}
+                        </div>
+                    {% endif %}
+                    <span class="form-help">For contact purposes</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-section" aria-labelledby="professional-info-label">
+                <span id="professional-info-label" class="section-label">Professional Information</span>
+
+                <div class="info-box" role="region" aria-live="polite" aria-label="Administrator managed info">
+                    <i class="bi bi-shield-lock" aria-hidden="true"></i>
+                    <div class="info-box-content">
+                        The following info can only be modified by an administrator. Contact your administrator to update.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="department-readonly">Department</label>
+                    <input id="department-readonly" type="text" class="form-input readonly" value="{{ staff.department|default('Not assigned') }}" readonly aria-readonly="true">
+                    <span class="form-help">Contact administrator to change department</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="position-readonly">Position</label>
+                    <input id="position-readonly" type="text" class="form-input readonly" value="{{ staff.position|default('Staff Member') }}" readonly aria-readonly="true">
+                    <span class="form-help">Your current role in the organization</span>
+                </div>
+
+                {% if staff.hireDate %}
+                <div class="form-group">
+                    <label class="form-label" for="hiredate-readonly">Hire Date</label>
+                    <input id="hiredate-readonly" type="text" class="form-input readonly" value="{{ staff.hireDate|date('F d, Y') }}" readonly aria-readonly="true">
+                    <span class="form-help">Date you joined the organization</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-section" aria-labelledby="account-status-label">
+                <span id="account-status-label" class="section-label">Account Status</span>
+
+                <div class="status-badges" role="list">
+                    <span class="status-badge badge-staff" role="listitem">
+                        <i class="bi bi-person-badge" aria-hidden="true"></i> Staff Member
+                    </span>
+
+                    {% if staff.isActive %}
+                        <span class="status-badge badge-active" role="listitem">
+                            <i class="bi bi-check-circle" aria-hidden="true"></i> Active Account
+                        </span>
+                    {% else %}
+                        <span class="status-badge badge-inactive" role="listitem">
+                            <i class="bi bi-x-circle" aria-hidden="true"></i> Inactive
+                        </span>
+                    {% endif %}
+
+                    <span class="status-badge badge-joined" role="listitem">
+                        <i class="bi bi-calendar" aria-hidden="true"></i> Joined {{ staff.createdAt ? staff.createdAt|date('M Y') : '' }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="{{ path('app_staff_profile') }}" class="btn btn-secondary" role="button" aria-label="Back to profile">
+                    <i class="bi bi-arrow-left" aria-hidden="true"></i> Back to Profile
+                </a>
+                <button type="submit" class="btn btn-primary" aria-label="Save changes">
+                    <i class="bi bi-save" aria-hidden="true"></i> Save Changes
+                </button>
+            </div>
+
+            {{ form_end(form) }}
+
+            <div class="text-center mt-5" style="font-size:0.9rem;">
+                <a href="{{ path('app_staff_change_password') }}" class="text-blue-600 hover:text-blue-800" aria-label="Change password">
+                    <i class="bi bi-key me-1"></i> Need to change your password?
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

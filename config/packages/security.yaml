@@ -1,39 +1,101 @@
 security:
-    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
-    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+    
     providers:
-        users_in_memory: { memory: null }
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+
+    # ✅ ADD THIS
+    role_hierarchy:
+        ROLE_ADMIN: [ROLE_STAFF, ROLE_USER]
+        ROLE_STAFF: ROLE_USER
+
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
             lazy: true
-            provider: users_in_memory
+            provider: app_user_provider
+            form_login:
+                login_path: login
+                check_path: login
+            logout:
+                path: app_logout
+            custom_authenticator: App\Security\UserAuthenticator
+            entry_point: App\Security\UserAuthenticator
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800
+                path: /
 
-            # activate different ways to authenticate
-            # https://symfony.com/doc/current/security.html#the-firewall
+            access_denied_handler: App\Service\AccessDeniedHandler
 
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
 
-    # Easy way to control access for large sections of your site
-    # Note: Only the *first* access control that matches will be used
+    # ✅ REORDERED access_control (MOST IMPORTANT!)
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        # Public routes
+        - { path: ^/login$, roles: PUBLIC_ACCESS }
+        - { path: ^/unauthorized, roles: PUBLIC_ACCESS }
+        - { path: ^/$, roles: PUBLIC_ACCESS }
+        - { path: ^/register, roles: PUBLIC_ACCESS }
+        
+        # General areas FIRST
+        - { path: ^/staff/dashboard, roles: [ROLE_ADMIN, ROLE_STAFF] }
+        
+        # Specific staff routes
+        - { path: ^/staff/dashboard, roles: [ROLE_ADMIN, ROLE_STAFF] }
+        - { path: ^/staff/profile, roles: [ROLE_ADMIN, ROLE_STAFF] }
+        - { path: ^/staff/rental-requests, roles: [ROLE_ADMIN, ROLE_STAFF] }
+        - { path: ^/staff/rental-request, roles: [ROLE_ADMIN, ROLE_STAFF] }
+        - { path: ^/staff/rental-requests/\d+/delete$, roles: [ROLE_ADMIN, ROLE_STAFF] }
+        - { path: ^/staff/crud/, roles: ROLE_ADMIN }
+        - { path: ^/staff/crud/\d+$, roles: ROLE_ADMIN }
+        - { path: ^/admin/cars, roles: ROLE_ADMIN }
+        
+        # Customer routes
+        - { path: ^/customer, roles: [ROLE_ADMIN, ROLE_STAFF] }
+        - { path: ^/admin/customer, roles: [ROLE_ADMIN, ROLE_STAFF] }
+        
+        # Car routes
+        
+        
+        # User home
+        - { path: ^/app_home, roles: ROLE_USER }
+        
+        # ADMIN-ONLY routes LAST
+        - { path: ^/admin/staff/overview, roles: ROLE_ADMIN }
+        - { path: ^/car/new$, roles: ROLE_ADMIN }
+        - { path: ^/car/\d+/edit$, roles: ROLE_ADMIN }
+        - { path: ^/car/\d+/delete$, roles: ROLE_ADMIN }
+        - { path: ^/staff/crud/new$, roles: ROLE_ADMIN }
+        - { path: ^/staff/crud/\d+/edit$, roles: ROLE_ADMIN }
+        - { path: ^/staff/crud/\d+/delete$, roles: ROLE_ADMIN }
+        - { path: ^/staff/crud/\d+/disable$, roles: ROLE_ADMIN }
+        - { path: ^/staff/crud/\d+/enable$, roles: ROLE_ADMIN }
+        - { path: ^/staff/crud/\d+/archive$, roles: ROLE_ADMIN }
+        - { path: ^/admin/profile, roles: ROLE_ADMIN }
+        
+        - { path: ^/admin/change-password, roles: ROLE_ADMIN }
+        - { path: ^/admin/, roles: ROLE_ADMIN }
+        
+        # Staff routes - for ROLE_STAFF and ROLE_ADMIN
+        - { path: ^/staff/change-password, roles: ROLE_STAFF }
+        - { path: ^/staff/, roles: ROLE_STAFF }
+        
+        # Customer routes - for ROLE_USER
+        - { path: ^/my-profile, roles: ROLE_USER }
+        - { path: ^/profile/change-password, roles: ROLE_USER }
+        
 
 when@test:
     security:
         password_hashers:
-            # By default, password hashers are resource intensive and take time. This is
-            # important to generate secure password hashes. In tests however, secure hashes
-            # are not important, waste resources and increase test times. The following
-            # reduces the work factor to the lowest possible values.
             Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
                 algorithm: auto
-                cost: 4 # Lowest possible value for bcrypt
-                time_cost: 3 # Lowest possible value for argon
-                memory_cost: 10 # Lowest possible value for argon
+                cost: 4
+                time_cost: 3
+                memory_cost: 10

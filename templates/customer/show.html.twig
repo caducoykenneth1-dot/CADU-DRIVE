@@ -1,0 +1,629 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ customer.displayName }} - Customer Profile{% endblock %}
+
+{% block body %}
+    <section class="customer-section space-y-8">
+        <!-- Header -->
+        <div class="customer-toolbar">
+            <div class="text-center mb-8">
+                <p class="eyebrow">CUSTOMER PROFILE</p>
+                <h1 class="page-title mb-2">{{ customer.displayName|default(customer.firstName ~ ' ' ~ customer.lastName) }}</h1>
+                <p class="text-gray-400 text-lg">Customer ID: #{{ customer.id }}</p>
+            </div>
+            <div class="flex justify-center gap-4 flex-wrap">
+                {#x` <a href="{{ path('app_customer_edit', {'id': customer.id}) }}" class="btn btn-warning text-lg px-6 py-3">Edit Profile</a> #}
+                <a href="{{ path('app_customer_index') }}" class="btn text-lg px-6 py-3">Back to Customers</a>
+            </div>
+        </div>
+
+        {% if app.flashes('success') %}
+            {% for message in app.flashes('success') %}
+                <div class="alert-success max-w-2xl mx-auto text-lg">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Main Content -->
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {# Main Info Card #}
+                <div class="lg:col-span-2">
+                    <div class="customer-card">
+                        <h2 class="section-title mb-6">📋 PERSONAL INFORMATION</h2>
+                        
+                        <div class="space-y-8">
+                            <!-- Name Section -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div>
+                                    <div class="field-label">FIRST NAME</div>
+                                    <div class="field-divider"></div>
+                                    <p class="field-value">{{ customer.firstName }}</p>
+                                </div>
+                                <div>
+                                    <div class="field-label">LAST NAME</div>
+                                    <div class="field-divider"></div>
+                                    <p class="field-value">{{ customer.lastName }}</p>
+                                </div>
+                            </div>
+
+                            <!-- Contact Section -->
+                            <div>
+                                <div class="field-label">EMAIL ADDRESS</div>
+                                <div class="field-divider"></div>
+                                <a href="mailto:{{ customer.email }}" class="field-value-link">{{ customer.email }}</a>
+                            </div>
+
+                            <div>
+                                <div class="field-label">PHONE NUMBER</div>
+                                <div class="field-divider"></div>
+                                <p class="field-value">{{ customer.phone|default('Not provided') }}</p>
+                            </div>
+
+                            {% if customer.licenseNumber %}
+                                <div>
+                                    <div class="field-label">DRIVER'S LICENSE NUMBER</div>
+                                    <div class="field-divider"></div>
+                                    <p class="field-value font-mono bg-gray-800 px-4 py-3 rounded-lg">{{ customer.licenseNumber }}</p>
+                                </div>
+                            {% endif %}
+
+                            {% if customer.notes %}
+                                <div>
+                                    <div class="field-label">ADDITIONAL NOTES</div>
+                                    <div class="field-divider"></div>
+                                    <div class="notes-box">{{ customer.notes }}</div>
+                                </div>
+                            {% endif %}
+
+                            <!-- Dates Section -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8 border-t border-gray-700">
+                                <div>
+                                    <div class="field-label">JOINED DATE</div>
+                                    <div class="field-divider"></div>
+                                    <p class="field-value">{{ customer.createdAt|date('F j, Y') }}</p>
+                                </div>
+                                <div>
+                                    <div class="field-label">LAST UPDATED</div>
+                                    <div class="field-divider"></div>
+                                    <p class="field-value">{{ customer.updatedAt ? customer.updatedAt|date('F j, Y • g:i A') : 'Never updated' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {# Stats Sidebar #}
+                <div>
+                    <div class="customer-card">
+                        <h2 class="section-title mb-6">📊 ACTIVITY SUMMARY</h2>
+                        
+                        <div class="space-y-6">
+                            <!-- Stats Cards -->
+                            <div class="stat-card">
+                                <div class="stat-label">TOTAL RENTALS</div>
+                                <div class="stat-divider"></div>
+                                <div class="stat-value text-blue-400">{{ customer.rentalRequests.count }}</div>
+                            </div>
+
+                            {% if customer.rentalRequests.count > 0 %}
+                                <div class="stat-card">
+                                    <div class="stat-label">ACTIVE RENTALS</div>
+                                    <div class="stat-divider"></div>
+                                    {% set activeCount = 0 %}
+                                    {% for rental in customer.rentalRequests %}
+                                        {% if rental.status == 'active' %}
+                                            {% set activeCount = activeCount + 1 %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    <div class="stat-value text-green-400">{{ activeCount }}</div>
+                                </div>
+                            {% endif %}
+
+                            <!-- Quick Actions -->
+                           
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Rental History #}
+            <div class="mt-10">
+                <div class="customer-card">
+                    <h2 class="section-title mb-6">🚗 RENTAL HISTORY</h2>
+                    
+                    {% if customer.rentalRequests.count > 0 %}
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-base">
+                                <thead>
+                                    <tr>
+                                        <th class="table-header">VEHICLE</th>
+                                        <th class="table-header">RENTAL PERIOD</th>
+                                        <th class="table-header">STATUS</th>
+                                        <th class="table-header text-right">ACTION</th>
+                                    </tr>
+                                    <tr><td colspan="4"><div class="table-divider"></div></td></tr>
+                                </thead>
+                                <tbody>
+                                    {% for rental in customer.rentalRequests|reverse %}
+                                        <tr class="table-row">
+                                            <td class="table-cell">
+                                                {% if rental.car %}
+                                                    <div class="font-semibold text-gray-100 text-lg">{{ rental.car.make }} {{ rental.car.model }}</div>
+                                                    <div class="text-gray-400">{{ rental.car.year }} • {{ rental.car.plateNumber|default('No plate') }}</div>
+                                                {% else %}
+                                                    <div class="font-semibold text-gray-100 text-lg">Vehicle not specified</div>
+                                                {% endif %}
+                                            </td>
+                                            <td class="table-cell">
+                                                <div class="font-semibold text-gray-100">{{ rental.startDate|date('M d, Y') }} → {{ rental.endDate|date('M d, Y') }}</div>
+                                                <div class="text-gray-400">{{ rental.startDate ? rental.startDate.diff(rental.endDate).days + 1 : 0 }} </div>
+                                            </td>
+                                            <td class="table-cell">
+                                                {% if rental.status == 'completed' %}
+                                                    <span class="status-badge status-completed">COMPLETED</span>
+                                                {% elseif rental.status == 'active' %}
+                                                    <span class="status-badge status-active">ACTIVE</span>
+                                                {% elseif rental.status == 'cancelled' %}
+                                                    <span class="status-badge status-cancelled">CANCELLED</span>
+                                                {% elseif rental.status == 'pending' %}
+                                                    <span class="status-badge status-pending">PENDING</span>
+                                                {% else %}
+                                                    <span class="status-badge">{{ rental.status|upper }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="table-cell text-right">
+                                                {% if rental.id %}
+                                                    <a href="{{ path('app_rental_show', {'id': rental.id}) }}" class="action-link">VIEW DETAILS →</a>
+                                                {% else %}
+                                                    <span class="text-gray-500">N/A</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% if not loop.last %}
+                                            <tr><td colspan="4"><div class="row-divider"></div></td></tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <div class="empty-icon">🚗</div>
+                            <p class="empty-text">No rental history recorded yet.</p>
+                            <p class="empty-subtext">This customer has not made any rental requests.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# Action Buttons #}
+            {# <div class="action-bar mt-10"> 
+                <a href="{{ path('app_customer_edit', {'id': customer.id}) }}" class="action-btn action-btn-warning">
+                    <i class="bi bi-pencil-square mr-3"></i> EDIT PROFILE
+                 </a> #}
+                 <a href="{{ path('app_customer_index') }}" class="action-btn action-btn-secondary"> 
+                    <i class="bi bi-arrow-left mr-3"></i> BACK TO LIST
+                 </a>   
+                {# <form action="{{ path('app_customer_delete', {'id': customer.id}) }}" method="post" onsubmit="return confirm('Are you sure you want to delete this customer profile? This action cannot be undone.');"> 
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ customer.id) }}">
+                    <button type="submit" class="action-btn action-btn-danger">
+                         <i class="bi bi-trash mr-3"></i> DELETE PROFILE #}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+/* ===== CUSTOMER PROFILE STYLES ===== */
+.customer-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+/* Typography */
+.eyebrow {
+    color: #9ca3af;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #f9fafb;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #f9fafb;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #374151;
+}
+
+/* Cards */
+.customer-card {
+    background: #1f2937;
+    border: 1px solid #374151;
+    border-radius: 1rem;
+    padding: 2rem;
+}
+
+/* Form Fields */
+.field-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.field-divider {
+    height: 2px;
+    background: linear-gradient(90deg, #374151 0%, #4b5563 50%, #374151 100%);
+    margin-bottom: 0.75rem;
+    width: 100%;
+}
+
+.field-value {
+    font-size: 1.125rem;
+    color: #f9fafb;
+    font-weight: 500;
+    padding: 0.5rem 0;
+    min-height: 2.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.field-value-link {
+    font-size: 1.125rem;
+    color: #60a5fa;
+    font-weight: 500;
+    padding: 0.5rem 0;
+    text-decoration: none;
+    display: inline-block;
+    min-height: 2.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.field-value-link:hover {
+    color: #3b82f6;
+    text-decoration: underline;
+}
+
+/* Notes Box */
+.notes-box {
+    background: #111827;
+    border: 1px solid #374151;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    color: #d1d5db;
+    font-size: 1rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    margin-top: 0.5rem;
+}
+
+/* Stats Cards */
+.stat-card {
+    background: #111827;
+    border: 1px solid #374151;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.stat-divider {
+    height: 1px;
+    background: #374151;
+    margin-bottom: 0.75rem;
+    width: 100%;
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+/* Table Styling */
+.table-header {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1rem 1.5rem;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.table-divider {
+    height: 2px;
+    background: linear-gradient(90deg, #374151 0%, #4b5563 50%, #374151 100%);
+    margin: 0.5rem 1.5rem;
+}
+
+.row-divider {
+    height: 1px;
+    background: #374151;
+    margin: 0.25rem 1.5rem;
+}
+
+.table-row {
+    transition: background-color 0.2s ease;
+}
+
+.table-row:hover {
+    background-color: rgba(55, 65, 81, 0.3);
+}
+
+.table-cell {
+    padding: 1.25rem 1.5rem;
+    vertical-align: top;
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: 1px solid;
+}
+
+.status-completed {
+    background-color: rgba(34, 197, 94, 0.1);
+    color: #4ade80;
+    border-color: #22c55e;
+}
+
+.status-active {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #60a5fa;
+    border-color: #3b82f6;
+}
+
+.status-pending {
+    background-color: rgba(234, 179, 8, 0.1);
+    color: #fbbf24;
+    border-color: #eab308;
+}
+
+.status-cancelled {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+    border-color: #ef4444;
+}
+
+/* Action Links */
+.action-link {
+    color: #60a5fa;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 0.875rem;
+}
+
+.action-link:hover {
+    color: #3b82f6;
+    text-decoration: underline;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.5;
+}
+
+.empty-text {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #f9fafb;
+    margin-bottom: 0.5rem;
+}
+
+.empty-subtext {
+    color: #9ca3af;
+    font-size: 1rem;
+}
+
+/* Action Bar */
+.action-bar {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 2rem 0;
+    border-top: 1px solid #374151;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.875rem 1.75rem;
+    border-radius: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.action-btn-warning {
+    background-color: #f59e0b;
+    color: white;
+    border-color: #f59e0b;
+}
+
+.action-btn-warning:hover {
+    background-color: #d97706;
+    border-color: #d97706;
+}
+
+.action-btn-secondary {
+    background-color: #374151;
+    color: #e5e7eb;
+    border-color: #4b5563;
+}
+
+.action-btn-secondary:hover {
+    background-color: #4b5563;
+    border-color: #6b7280;
+}
+
+.action-btn-danger {
+    background-color: #ef4444;
+    color: white;
+    border-color: #ef4444;
+}
+
+.action-btn-danger:hover {
+    background-color: #dc2626;
+    border-color: #dc2626;
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    text-decoration: none;
+    border: 2px solid transparent;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn-warning {
+    background-color: #f59e0b;
+    color: white;
+    border-color: #f59e0b;
+}
+
+.btn-warning:hover {
+    background-color: #d97706;
+    border-color: #d97706;
+}
+
+.btn-danger {
+    background-color: #ef4444;
+    color: white;
+    border-color: #ef4444;
+}
+
+.btn-danger:hover {
+    background-color: #dc2626;
+    border-color: #dc2626;
+}
+
+.btn {
+    background-color: #374151;
+    color: #e5e7eb;
+    border-color: #4b5563;
+}
+
+.btn:hover {
+    background-color: #4b5563;
+    border-color: #6b7280;
+}
+
+/* Alert */
+.alert-success {
+    background-color: rgba(34, 197, 94, 0.1);
+    border: 2px solid #22c55e;
+    color: #4ade80;
+    padding: 1rem 1.5rem;
+    border-radius: 0.75rem;
+    margin-bottom: 2rem;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .customer-section {
+        padding: 1rem;
+    }
+    
+    .page-title {
+        font-size: 2rem;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+    }
+    
+    .customer-card {
+        padding: 1.5rem;
+    }
+    
+    .field-value {
+        font-size: 1rem;
+    }
+    
+    .table-cell {
+        padding: 1rem;
+    }
+    
+    .action-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .action-btn {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    .grid.grid-cols-1.md\:grid-cols-2.gap-8 {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+</style>
+{% endblock %}

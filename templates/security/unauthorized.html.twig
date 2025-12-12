@@ -1,0 +1,318 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Access Restricted | {{ app_name|default('System') }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .unauthorized-container {
+            min-height: 70vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+        
+        .access-card {
+            max-width: 500px;
+            width: 100%;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-radius: 15px;
+            overflow: hidden;
+            background-color: #ffffff;
+        }
+        
+        .access-header {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+            padding: 2.5rem 2rem;
+            text-align: center;
+        }
+        
+        .access-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+        
+        .access-header h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+        
+        .access-header p {
+            font-size: 1rem;
+            opacity: 0.9;
+            color: #f8f9fa;
+        }
+        
+        .role-badge {
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        
+        .card-body {
+            padding: 2rem !important;
+            color: #212529;
+        }
+        
+        .alert-warning {
+            background-color: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .alert-warning strong {
+            color: #856404;
+            font-weight: 600;
+        }
+        
+        .permission-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 0.75rem;
+            padding: 1.25rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            border: 1px solid #e9ecef;
+        }
+        
+        .permission-item {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #dee2e6;
+            color: #343a40;
+            font-weight: 500;
+        }
+        
+        .permission-item:last-child {
+            border-bottom: none;
+        }
+        
+        h5 {
+            color: #343a40;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .list-group-item {
+            border-color: #e9ecef;
+            color: #495057;
+            padding: 0.75rem 1rem;
+            background-color: transparent;
+            font-size: 0.95rem;
+        }
+        
+        .list-group-item span {
+            font-weight: 500;
+        }
+        
+        .btn {
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            padding: 0.625rem 1.25rem;
+        }
+        
+        .btn-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        
+        .btn-outline-secondary {
+            color: #6c757d;
+            border-color: #6c757d;
+        }
+        
+        .btn-outline-secondary:hover {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .text-muted {
+            color: #6c757d !important;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        
+        /* Ensure good contrast for all text */
+        .badge.bg-secondary {
+            background-color: #6c757d !important;
+            color: white !important;
+        }
+        
+        .badge.bg-dark {
+            background-color: #343a40 !important;
+            color: white !important;
+        }
+        
+        .text-success {
+            color: #198754 !important;
+        }
+        
+        /* Make sure all text is clearly visible */
+        body {
+            color: #212529;
+            background-color: #f8f9fa;
+        }
+        
+        /* Improve contrast for alert icon */
+        .bi-exclamation-triangle-fill {
+            color: #856404;
+        }
+        
+        /* Button spacing improvements */
+        .d-grid.gap-2 {
+            gap: 0.75rem !important;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 576px) {
+            .access-header {
+                padding: 1.5rem 1rem;
+            }
+            
+            .access-icon {
+                font-size: 3rem;
+            }
+            
+            .access-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .card-body {
+                padding: 1.5rem !important;
+            }
+            
+            .d-md-flex {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container unauthorized-container py-5">
+    <div class="access-card">
+        <div class="access-header">
+            <div class="access-icon">
+                <i class="bi bi-shield-lock"></i>
+            </div>
+            <h1 class="mb-2">Access Restricted</h1>
+            <p class="mb-0">Administrator privileges required</p>
+        </div>
+        
+        <div class="card-body p-4">
+            {% if section is defined %}
+                <div class="alert alert-warning">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-exclamation-triangle-fill me-3" style="font-size: 1.5rem;"></i>
+                        <div>
+                            <strong>The "{{ section }}" section is restricted to Administrators only.</strong>
+                            <p class="mb-0 mt-1">Staff members do not have permission to access this area.</p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <div class="permission-grid">
+                <div class="permission-item"><strong>Your Current Role:</strong></div>
+                <div>
+                    <span class="badge bg-secondary role-badge">
+                        {% if userRole == 'Administrator' %}
+                            <i class="bi bi-star-fill me-1"></i>
+                        {% elseif userRole == 'Staff Member' %}
+                            <i class="bi bi-person-badge me-1"></i>
+                        {% else %}
+                            <i class="bi bi-person me-1"></i>
+                        {% endif %}
+                        {{ userRole }}
+                    </span>
+                </div>
+                
+                <div class="permission-item"><strong>Required Role:</strong></div>
+                <div>
+                    <span class="badge bg-dark role-badge">
+                        <i class="bi bi-shield-check me-1"></i>
+                        Administrator
+                    </span>
+                </div>
+                
+                {% if section is defined %}
+                    <div class="permission-item"><strong>Restricted Section:</strong></div>
+                    <div><strong>{{ section }}</strong></div>
+                {% endif %}
+            </div>
+            
+            <h5 class="mb-3">What can you do?</h5>
+            
+            {% if userRole == 'Staff Member' %}
+                <div class="mb-4">
+                    <p>As a <strong>Staff Member</strong>, you have access to:</p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <span>Staff Dashboard</span>
+                        </li>
+                        <li class="list-group-item d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <span>Manage assigned tasks</span>
+                        </li>
+                        <li class="list-group-item d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <span>View customer information</span>
+                        </li>
+                        <li class="list-group-item d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <span>Update your profile</span>
+                        </li>
+                    </ul>
+                </div>
+            {% endif %}
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-between mt-4">
+                {% if is_granted('ROLE_STAFF') %}
+                    <a href="{{ path('app_staff_dashboard') }}" class="btn btn-primary">
+                        <i class="bi bi-speedometer2 me-2"></i>
+                        Go to Staff Dashboard
+                    </a>
+                {% elseif is_granted('ROLE_ADMIN') %}
+                    <a href="{{ path('app_admin_dashboard') }}" class="btn btn-primary">
+                        <i class="bi bi-speedometer2 me-2"></i>
+                        Go to Admin Dashboard
+                    </a>
+                {% endif %}
+                
+                <a href="{{ path('app_home') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-house me-2"></i>
+                    Return Home
+                </a>
+                
+                <button onclick="history.back()" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>
+                    Go Back
+                </button>
+            </div>
+            
+            <div class="mt-4 pt-3 border-top text-center">
+                <small class="text-muted">
+                    <i class="bi bi-info-circle me-1"></i>
+                    If you believe you should have access to this section, please contact your system administrator.
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

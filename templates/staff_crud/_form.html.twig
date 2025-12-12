@@ -1,0 +1,82 @@
+{{ form_start(form) }}
+    {{ form_errors(form) }}
+    
+    <!-- Display admin-only warning for staff users -->
+    {% if not is_admin|default(false) %}
+    <div class="alert alert-info">
+        <strong>Note:</strong> You are editing your own profile. Some fields are restricted.
+    </div>
+    {% endif %}
+    
+    <div class="form-group">
+        {{ form_label(form.firstName) }}
+        {{ form_widget(form.firstName, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.firstName) }}
+    </div>
+    
+    <div class="form-group">
+        {{ form_label(form.lastName) }}
+        {{ form_widget(form.lastName, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.lastName) }}
+    </div>
+    
+    <div class="form-group">
+        {{ form_label(form.department) }}
+        {{ form_widget(form.department, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.department) }}
+    </div>
+    
+    <div class="form-group">
+        {{ form_label(form.hireDate) }}
+        {{ form_widget(form.hireDate, {'attr': {'class': 'form-control'}}) }}
+        {{ form_errors(form.hireDate) }}
+    </div>
+    
+    {# Admin-only fields #}
+    {% if is_admin|default(false) %}
+        <div class="form-group">
+            {{ form_label(form.user_email) }}
+            {{ form_widget(form.user_email, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.user_email) }}
+        </div>
+        
+        <div class="form-group">
+            {{ form_label(form.user_roles) }}
+            <div class="form-check">
+                {{ form_widget(form.user_roles, {'attr': {'class': 'form-check-input'}}) }}
+            </div>
+            {{ form_errors(form.user_roles) }}
+        </div>
+        
+        <div class="form-group">
+            {{ form_label(form.user_password) }}
+            {{ form_widget(form.user_password, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.user_password) }}
+            <small class="form-text text-muted">Leave blank to keep current password</small>
+        </div>
+        
+        <div class="form-group">
+            {{ form_label(form.status) }}
+            {{ form_widget(form.status, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.status) }}
+        </div>
+        
+        <div class="form-group">
+            <div class="form-check">
+                {{ form_widget(form.isActive, {'attr': {'class': 'form-check-input'}}) }}
+                {{ form_label(form.isActive) }}
+            </div>
+            {{ form_errors(form.isActive) }}
+        </div>
+    {% endif %}
+    
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">
+            {{ is_admin|default(false) ? 'Update Staff' : 'Update My Profile' }}
+        </button>
+        <a href="{{ is_admin|default(false) ? path('app_staff_crud_index') : path('app_staff_crud_show', {'id': staff.id}) }}" 
+           class="btn btn-secondary">
+            Cancel
+        </a>
+    </div>
+{{ form_end(form) }}

@@ -1,0 +1,148 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block admin_title %}Rental Details{% endblock %}
+
+{% block admin_content %}
+    <section class="px-4 py-6">
+        <div class="max-w-4xl mx-auto">
+            <div class="flex items-center gap-4 mb-6">
+                <a href="{{ path('app_rental_index') }}" class="text-indigo-400 hover:text-indigo-300">
+                    <span class="bi bi-arrow-left"></span> Rentals
+                </a>
+                <span class="text-gray-500">/</span>
+                <h1 class="text-2xl font-bold text-gray-100">Rental #{{ rental.id }}</h1>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                {# Vehicle Information #}
+                <div class="customer-card">
+                    <h2 class="text-lg font-semibold text-gray-100 mb-4 pb-3 border-b border-gray-600">🚗 Vehicle</h2>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Model</label>
+                            <p class="text-gray-100 font-medium">{{ rental.car.make }} {{ rental.car.model }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Year</label>
+                            <p class="text-gray-100">{{ rental.car.year }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Daily Rate</label>
+                            <p class="text-gray-100">{{ rental.car.price is defined ? '$ ' ~ (rental.car.price / 100) : 'N/A' }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                {# Customer Information #}
+                <div class="customer-card">
+                    <h2 class="text-lg font-semibold text-gray-100 mb-4 pb-3 border-b border-gray-600">👤 Customer</h2>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Name</label>
+                            <a href="{{ path('app_customer_show', {'id': rental.customer.id}) }}" class="text-indigo-400 hover:text-indigo-300 font-medium">
+                                {{ rental.customer.displayName|default(rental.customer.firstName ~ ' ' ~ rental.customer.lastName) }}
+                            </a>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Email</label>
+                            <a href="mailto:{{ rental.customer.email }}" class="text-blue-300 hover:underline">{{ rental.customer.email }}</a>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-1">Phone</label>
+                            <p class="text-gray-100">{{ rental.customer.phone|default('N/A') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# Rental Timeline #}
+            <div class="customer-card mb-6">
+                <h2 class="text-lg font-semibold text-gray-100 mb-4 pb-3 border-b border-gray-600">📅 Rental Timeline</h2>
+                <div class="space-y-4">
+                    <div class="flex items-center gap-4">
+                        <div class="flex-shrink-0 w-12 h-12 bg-indigo-900/30 rounded-full flex items-center justify-center">
+                            <span class="bi bi-calendar-event text-indigo-300 text-lg"></span>
+                        </div>
+                        <div class="flex-grow">
+                            <p class="text-sm text-gray-400">Start Date & Time</p>
+                            <p class="text-lg font-medium text-gray-100">{{ rental.startDate|date('M d, Y') }} at {{ rental.startDate|date('H:i') }}</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        <div class="flex-shrink-0 w-12 h-12 bg-indigo-900/30 rounded-full flex items-center justify-center">
+                            <span class="bi bi-calendar-check text-indigo-300 text-lg"></span>
+                        </div>
+                        <div class="flex-grow">
+                            <p class="text-sm text-gray-400">Expected Return Date & Time</p>
+                            <p class="text-lg font-medium text-gray-100">{{ rental.endDate|date('M d, Y') }} at {{ rental.endDate|date('H:i') }}</p>
+                        </div>
+                    </div>
+
+                    {% set duration = (rental.endDate|date('U') - rental.startDate|date('U')) / 3600 %}
+                    <div class="flex items-center gap-4 bg-gray-700/30 p-4 rounded-lg border border-gray-600">
+                        <div class="flex-shrink-0 w-12 h-12 bg-green-900/30 rounded-full flex items-center justify-center">
+                            <span class="bi bi-hourglass-split text-green-300 text-lg"></span>
+                        </div>
+                        <div class="flex-grow">
+                            <p class="text-sm text-gray-400">Rental Duration</p>
+                            <p class="text-lg font-medium text-gray-100">{{ duration|round(1) }} hours ({{ (duration / 24)|round(1) }} days)</p>
+                        </div>
+                    </div>
+
+                    {% if rental.confirmedAt %}
+                        <div class="flex items-center gap-4 bg-green-900/20 p-4 rounded-lg border border-green-700">
+                            <div class="flex-shrink-0 w-12 h-12 bg-green-900/30 rounded-full flex items-center justify-center">
+                                <span class="bi bi-check-circle-fill text-green-300 text-lg"></span>
+                            </div>
+                            <div class="flex-grow">
+                                <p class="text-sm text-gray-400">Confirmed as Completed</p>
+                                <p class="text-lg font-medium text-green-300">{{ rental.confirmedAt|date('M d, Y') }} at {{ rental.confirmedAt|date('H:i') }}</p>
+                            </div>
+                        </div>
+                    {% else %}
+                        {% set now = 'now'|date('U') %}
+                        {% set endTime = rental.endDate|date('U') %}
+                        {% if now > endTime %}
+                            <form method="post" action="{{ path('app_rental_confirm', {'id': rental.id}) }}" style="display:inline;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('confirm' ~ rental.id) }}">
+                                <div class="flex items-center gap-4 bg-yellow-900/20 p-4 rounded-lg border border-yellow-700">
+                                    <div class="flex-shrink-0 w-12 h-12 bg-yellow-900/30 rounded-full flex items-center justify-center">
+                                        <span class="bi bi-exclamation-circle text-yellow-300 text-lg"></span>
+                                    </div>
+                                    <div class="flex-grow">
+                                        <p class="text-sm text-gray-400">Awaiting Completion Confirmation</p>
+                                        <p class="text-lg font-medium text-yellow-300">Ready to mark as completed</p>
+                                    </div>
+                                    <button type="submit" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition flex-shrink-0">
+                                        <span class="bi bi-check"></span> Confirm Now
+                                    </button>
+                                </div>
+                            </form>
+                        {% else %}
+                            <div class="flex items-center gap-4 bg-blue-900/20 p-4 rounded-lg border border-blue-700">
+                                <div class="flex-shrink-0 w-12 h-12 bg-blue-900/30 rounded-full flex items-center justify-center">
+                                    <span class="bi bi-hourglass-split text-blue-300 text-lg"></span>
+                                </div>
+                                <div class="flex-grow">
+                                    <p class="text-sm text-gray-400">Status</p>
+                                    <p class="text-lg font-medium text-blue-300">Rental is currently active</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+
+            {# Action Buttons #}
+            <div class="flex gap-3">
+                <a href="{{ path('app_rental_index') }}" class="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition">
+                    <span class="bi bi-arrow-left"></span> Back to Rentals
+                </a>
+                <a href="{{ path('app_customer_show', {'id': rental.customer.id}) }}" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition">
+                    <span class="bi bi-person-circle"></span> View Customer Profile
+                </a>
+            </div>
+        </div>
+    </section>
+{% endblock %}

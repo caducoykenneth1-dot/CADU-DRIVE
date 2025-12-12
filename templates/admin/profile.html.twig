@@ -1,0 +1,615 @@
+{# templates/admin/profile.html.twig #}
+{% extends 'admin/layout.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Variables */
+        :root {
+            --primary-blue: #3b82f6;
+            --primary-blue-dark: #1e40af;
+            --primary-blue-light: #eff6ff;
+            --success-green: #10b981;
+            --success-green-dark: #059669;
+            --warning-orange: #f59e0b;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-700: #374151;
+            --gray-900: #111827;
+        }
+        
+        /* Profile Container */
+        .profile-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        /* Profile Header Card */
+        .profile-header-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+            border: 2px solid var(--primary-blue);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .profile-header-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 8px;
+            height: 100%;
+            background: var(--primary-blue);
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+            color: white;
+            font-weight: 700;
+            font-size: 2.25rem;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        
+        .profile-name {
+            color: var(--primary-blue-dark);
+            font-weight: 700;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .profile-email {
+            color: var(--gray-700);
+            font-weight: 500;
+            font-size: 1.125rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* Badges */
+        .badge-admin,
+        .badge-staff,
+        .badge-active,
+        .badge-inactive {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.25rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        
+        .badge-admin {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+            color: white;
+            border: 1px solid #2563eb;
+        }
+        
+        .badge-staff {
+            background: linear-gradient(135deg, var(--success-green) 0%, var(--success-green-dark) 100%);
+            color: white;
+            border: 1px solid #059669;
+        }
+        
+        .badge-active {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: 1px solid #059669;
+        }
+        
+        .badge-inactive {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+            color: white;
+            border: 1px solid #4b5563;
+        }
+        
+        /* Quick Actions Rectangle */
+        .actions-rectangle {
+            background: white;
+            border: 2px solid var(--gray-200);
+            border-radius: 16px;
+            margin-bottom: 2.5rem;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .actions-header {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            font-weight: 700;
+            font-size: 1.125rem;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .actions-body {
+            padding: 1.5rem;
+        }
+        
+        /* Action Buttons */
+        .action-btn {
+            display: flex;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            border: 2px solid;
+            border-radius: 12px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.2s ease;
+            flex: 1;
+            min-width: 250px;
+        }
+
+        /* Activity Logs Styles */
+.activity-timeline {
+    position: relative;
+}
+
+.activity-timeline::before {
+    content: '';
+    position: absolute;
+    left: 30px; /* Adjust based on icon size */
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--primary-blue), var(--gray-200));
+    opacity: 0.3;
+}
+
+.activity-item {
+    position: relative;
+}
+
+.activity-item .activity-icon {
+    position: relative;
+    z-index: 1;
+    background: white;
+}
+
+.activity-content {
+    flex: 1;
+}
+        
+        .action-btn-primary {
+            border-color: var(--primary-blue);
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        }
+        
+        .action-btn-success {
+            border-color: var(--success-green);
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+        }
+        
+        .action-btn-secondary {
+            border-color: var(--gray-200);
+            background: var(--gray-100);
+            color: var(--gray-700);
+        }
+        
+        .action-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .action-btn-primary:hover:not(:disabled) {
+            border-color: var(--primary-blue-dark);
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        }
+        
+        .action-btn-success:hover:not(:disabled) {
+            border-color: var(--success-green-dark);
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        }
+        
+        .action-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .action-icon {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+        
+        .action-btn-primary .action-icon {
+            color: var(--primary-blue);
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .action-btn-success .action-icon {
+            color: var(--success-green);
+            background: rgba(16, 185, 129, 0.1);
+        }
+        
+        .action-btn-secondary .action-icon {
+            color: var(--gray-700);
+            background: rgba(107, 114, 128, 0.1);
+        }
+        
+        .action-text {
+            flex: 1;
+        }
+        
+        .action-title {
+            display: block;
+            font-weight: 700;
+            color: var(--gray-900);
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .action-desc {
+            display: block;
+            color: var(--gray-700);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        /* Profile Cards */
+        .card-clean {
+            background: white;
+            border: 2px solid var(--gray-200);
+            border-radius: 16px;
+            height: 100%;
+        }
+        
+        .card-clean .card-header {
+            background: linear-gradient(135deg, var(--gray-100) 0%, #f9fafb 100%);
+            border-bottom: 2px solid var(--gray-200);
+            color: var(--gray-900);
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+            padding: 1rem 1.5rem;
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-clean .card-body {
+            padding: 1.5rem;
+        }
+        
+        .table-profile {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        .table-profile tbody tr {
+            border-bottom: 1px solid var(--gray-100);
+        }
+        
+        .table-profile tbody tr:last-child {
+            border-bottom: none;
+        }
+        
+        .table-profile td {
+            padding: 1rem 0;
+            vertical-align: top;
+        }
+        
+        .table-profile td:first-child {
+            color: var(--gray-700);
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            width: 40%;
+        }
+        
+        .table-profile td:last-child {
+            color: var(--gray-900);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        /* Code elements */
+        code {
+            background: var(--primary-blue-dark);
+            color: white;
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+            font-size: 0.875rem;
+        }
+        
+        /* Buttons */
+        .btn-outline-secondary {
+            border: 2px solid var(--gray-300);
+            color: var(--gray-700);
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-outline-secondary:hover {
+            background: var(--gray-100);
+            border-color: var(--gray-400);
+            color: var(--gray-900);
+            transform: translateY(-1px);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .profile-container {
+                padding: 1rem;
+            }
+            
+            .profile-header-card {
+                padding: 1.5rem;
+            }
+            
+            .profile-avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 1.75rem;
+            }
+            
+            .profile-name {
+                font-size: 1.5rem;
+            }
+            
+            .action-btn {
+                min-width: 100%;
+                margin-bottom: 1rem;
+            }
+        }
+
+        /* Activity Logs Datatable Styles */
+.table-hover tbody tr:hover {
+    background-color: rgba(59, 130, 246, 0.05);
+}
+
+.table thead th {
+    border-top: none;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gray-700);
+    padding: 1rem 1.5rem;
+    background: var(--gray-100);
+}
+
+.table tbody td {
+    padding: 1rem 1.5rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Pagination Styles */
+.pagination {
+    --bs-pagination-padding-x: 0.75rem;
+    --bs-pagination-padding-y: 0.375rem;
+    --bs-pagination-font-size: 0.875rem;
+    --bs-pagination-color: var(--gray-700);
+    --bs-pagination-bg: white;
+    --bs-pagination-border-width: 2px;
+    --bs-pagination-border-color: var(--gray-200);
+    --bs-pagination-border-radius: 8px;
+    --bs-pagination-hover-color: var(--primary-blue);
+    --bs-pagination-hover-bg: var(--primary-blue-light);
+    --bs-pagination-hover-border-color: var(--primary-blue);
+    --bs-pagination-focus-color: var(--primary-blue);
+    --bs-pagination-focus-bg: var(--primary-blue-light);
+    --bs-pagination-focus-box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25);
+    --bs-pagination-active-color: white;
+    --bs-pagination-active-bg: var(--primary-blue);
+    --bs-pagination-active-border-color: var(--primary-blue);
+    --bs-pagination-disabled-color: var(--gray-400);
+    --bs-pagination-disabled-bg: var(--gray-100);
+    --bs-pagination-disabled-border-color: var(--gray-200);
+}
+
+.page-link {
+    margin: 0 0.25rem;
+    font-weight: 600;
+}
+
+.page-item.active .page-link {
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.header-section {
+    color: black !important;
+}
+
+.record-view{
+    color: black
+}
+    </style>
+{% endblock %}
+
+{% block admin_title %}My Profile{% endblock %}
+
+{% block admin_content %}
+<div class="profile-container">
+    <!-- Profile Header -->
+    <div class="profile-header-card">
+        <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-4">
+            <div class="profile-avatar">
+                {{ user.firstName|first|upper }}{{ user.lastName|first|upper }}
+            </div>
+            
+            <div class="flex-grow-1">
+                <h1 class="profile-name">{{ user.firstName }} {{ user.lastName }}</h1>
+                <p class="profile-email">{{ user.email }}</p>
+                
+                <div class="d-flex flex-wrap gap-2">
+                    {% for role in user.roles %}
+                        {% if role == 'ROLE_ADMIN' %}
+                            <span class="badge-admin">
+                                <i class="bi bi-shield-check"></i>
+                                ADMINISTRATOR
+                            </span>
+                        {% elseif role == 'ROLE_STAFF' %}
+                            <span class="badge-staff">
+                                <i class="bi bi-person-badge"></i>
+                                STAFF MEMBER
+                            </span>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <span class="badge-active">
+                        <i class="bi bi-check-circle"></i>
+                        ACTIVE
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions Rectangle -->
+    <div class="actions-rectangle">
+        <div class="actions-header">
+            <i class="bi bi-lightning-charge me-2"></i> QUICK ACTIONS
+        </div>
+        <div class="actions-body">
+            <div class="d-flex flex-wrap gap-3">
+                <a href="{{ path('app_admin_change_password') ?: '#' }}" 
+                   class="action-btn action-btn-primary">
+                    <i class="bi bi-shield-lock action-icon"></i>
+                    <div class="action-text">
+                        <span class="action-title">CHANGE PASSWORD</span>
+                        <span class="action-desc">Update account security</span>
+                    </div>
+                    <i class="bi bi-arrow-right ms-2"></i>
+                </a>
+                
+                {% if app.user.staff is defined and app.user.staff %}
+                    <a href="{{ path('app_admin_edit_profile', {'id': app.user.staff.id}) }}" 
+                       class="action-btn action-btn-success">
+                        <i class="bi bi-person-badge action-icon"></i>
+                        <div class="action-text">
+                            <span class="action-title">EDIT PROFILE</span>
+                            <span class="action-desc">Update personal information</span>
+                        </div>
+                        <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
+                {% else %}
+                    <a href="{{ path('app_admin_profile_edit') ?: '#' }}" 
+                       class="action-btn action-btn-success">
+                        <i class="bi bi-person-badge action-icon"></i>
+                        <div class="action-text">
+                            <span class="action-title">EDIT ADMIN PROFILE</span>
+                            <span class="action-desc">Update administrator information</span>
+                        </div>
+                        <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
+                {% endif %}
+                
+                <a href="{{ path('admin_activity_logs_index') }}" class="action-btn action-btn-secondary text-decoration-none">
+                    <i class="bi bi-graph-up action-icon"></i>
+                    <div class="action-text">
+                        <span class="action-title">ACTIVITY LOG</span>
+                        <span class="action-desc">View recent activity</span>
+                    </div>
+                    <i class="bi bi-clock ms-2"></i>
+                </a>
+    <!-- Profile Information -->
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card card-clean h-100">
+                <div class="card-header">
+                    <i class="bi bi-person-circle me-2"></i> PERSONAL INFORMATION
+                </div>
+                <div class="card-body">
+                    <table class="table-profile mb-0">
+                        <tbody>
+                            <tr>
+                                <td>FULL NAME</td>
+                                <td>{{ user.firstName }} {{ user.lastName }}</td>
+                            </tr>
+                            <tr>
+                                <td>EMAIL ADDRESS</td>
+                                <td>{{ user.email }}</td>
+                            </tr>
+                            <tr>
+                                <td>USER ID</td>
+                                <td><code>#{{ user.id }}</code></td>
+                            </tr>
+                            {% if app.user.staff is defined and app.user.staff %}
+                       
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6 mb-4">
+            <div class="card card-clean h-100">
+                <div class="card-header">
+                    <i class="bi bi-info-circle me-2"></i> ACCOUNT INFORMATION
+                </div>
+                <div class="card-body">
+                    <table class="table-profile mb-0">
+                        <tbody>
+                            <tr>
+                                <td>ACCOUNT CREATED</td>
+                                <td>{{ user.createdAt is defined and user.createdAt ? user.createdAt|date('F d, Y') : 'N/A' }}</td>
+                            </tr>
+                            <tr>
+                                <td>LAST LOGIN</td>
+                                <td>{{ user.lastLogin ? user.lastLogin|date('F d, Y h:i A') : 'Never logged in' }}</td>
+                            </tr>
+                            <tr>
+                                <td>STATUS</td>
+                                <td>
+                                    <span class="badge-active">
+                                        <i class="bi bi-check-circle"></i>
+                                        ACTIVE
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>PRIMARY ROLE</td>
+                                <td>
+                                    {% if 'ROLE_ADMIN' in user.roles %}
+                                        <span class="badge-admin">ADMINISTRATOR</span>
+                                    {% else %}
+                                        <span class="badge-staff">STAFF MEMBER</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Bottom Navigation -->
+<div class="d-flex justify-content-between mt-4 pt-3 border-top">
+    <a href="{{ path('app_admin_dashboard') }}" class="btn btn-outline-secondary btn-lg">
+        <i class="bi bi-arrow-left me-2"></i> BACK TO DASHBOARD
+    </a>
+</div>
+{% endblock %}

@@ -7,7 +7,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_USER')]
 /*Renders the pages such as home, contact, and about */
 class HomeController extends AbstractController
 {
@@ -54,7 +56,14 @@ class HomeController extends AbstractController
             'selectedType' => $selectedType,
             'selectedPriceRange' => $selectedPriceRangeKey,
         ]);
+    // Check if user is admin/staff and redirect to admin dashboard
+    if ($this->getUser()) {
+        if ($this->isGranted('ROLE_ADMIN') || $this->isGranted('ROLE_STAFF')) {
+            return $this->redirectToRoute('app_admin_dashboard');
+        }
     }
+    return $this->render('home/index.html.twig');
+}
 
     /* Render the contact form and process submissions with a flash message */
     #[Route('/contact', name: 'app_contact', methods: ['GET', 'POST'])]

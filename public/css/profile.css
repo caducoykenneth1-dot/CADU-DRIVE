@@ -1,0 +1,244 @@
+/* Profile Page - High Visibility Colors */
+.profile-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* Profile Header - Brighter */
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    font-size: 1.8rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+/* Quick Actions Rectangle - More Visible */
+.actions-rectangle {
+    border: 2px solid #dbeafe;
+    border-radius: 12px;
+    background: white;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 6px rgba(59, 130, 246, 0.1);
+}
+
+.actions-rectangle:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 6px 12px rgba(59, 130, 246, 0.15);
+}
+
+.actions-header {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border-bottom: 2px solid #3b82f6;
+    padding: 1rem 1.25rem;
+    font-weight: 700;
+    color: #1e40af;
+    font-size: 1.1rem;
+}
+
+.actions-body {
+    padding: 1.5rem;
+    background: #f8fafc;
+}
+
+/* Action Button Styles - High Contrast */
+.action-btn {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border: 2px solid;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    min-width: 220px;
+    background: white;
+}
+
+.action-btn:hover {
+    text-decoration: none;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.action-btn-primary {
+    border-color: #3b82f6;
+    color: #1e40af;
+    background: #eff6ff;
+}
+
+.action-btn-primary:hover {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+}
+
+.action-btn-success {
+    border-color: #10b981;
+    color: #047857;
+    background: #d1fae5;
+}
+
+.action-btn-success:hover {
+    background: #10b981;
+    color: white;
+    border-color: #10b981;
+}
+
+.action-btn-secondary {
+    border-color: #94a3b8;
+    color: #475569;
+    background: #f1f5f9;
+    cursor: not-allowed;
+}
+
+.action-btn .action-icon {
+    font-size: 1.5rem;
+    margin-right: 1rem;
+    width: 30px;
+    text-align: center;
+}
+
+.action-btn .action-text {
+    flex-grow: 1;
+}
+
+.action-btn .action-title {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+    font-size: 1rem;
+}
+
+.action-btn .action-desc {
+    font-size: 0.85rem;
+    display: block;
+}
+
+.action-btn-primary .action-desc {
+    color: #1e40af;
+}
+
+.action-btn-success .action-desc {
+    color: #047857;
+}
+
+.action-btn-secondary .action-desc {
+    color: #64748b;
+}
+
+.action-btn-primary:hover .action-desc,
+.action-btn-success:hover .action-desc {
+    color: white;
+}
+
+/* Card Improvements - More Visible */
+.card-clean {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.card-clean .card-header {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-bottom: 2px solid #e2e8f0;
+    padding: 1.25rem;
+    font-weight: 700;
+    color: #1e293b;
+    font-size: 1.1rem;
+}
+
+/* Table Styling - High Contrast */
+.table-profile {
+    width: 100%;
+}
+
+.table-profile tr {
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.table-profile tr:last-child {
+    border-bottom: none;
+}
+
+.table-profile td {
+    padding: 1rem 0.75rem;
+    vertical-align: middle;
+}
+
+.table-profile td:first-child {
+    width: 40%;
+    color: #475569;
+    font-weight: 600;
+    background: #f8fafc;
+    border-right: 2px solid #e2e8f0;
+}
+
+.table-profile td:last-child {
+    color: #0f172a;
+    font-weight: 600;
+    background: white;
+}
+
+/* Badges - More Vibrant */
+.badge-admin {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    color: #78350f;
+    padding: 0.5em 1em;
+    font-weight: 700;
+}
+
+.badge-staff {
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+    color: white;
+    padding: 0.5em 1em;
+    font-weight: 700;
+}
+
+.badge-active {
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+    color: white;
+    padding: 0.5em 1em;
+    font-weight: 700;
+}
+
+.badge-inactive {
+    background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+    color: white;
+    padding: 0.5em 1em;
+    font-weight: 700;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .action-btn {
+        min-width: auto;
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+    
+    .profile-avatar {
+        width: 70px;
+        height: 70px;
+        font-size: 1.5rem;
+    }
+    
+    .actions-body {
+        padding: 1rem;
+    }
+}
+
+/* Animation Effects */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.profile-container {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Hover Effects */
+.action-btn, .card-clean, .actions-rectangle {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}

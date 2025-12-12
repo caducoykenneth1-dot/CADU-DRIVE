@@ -1,0 +1,732 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Staff Management{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/staff.css') }}">
+    <style>
+        /* MODERN MINIMALIST BASE */
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --surface: #ffffff;
+            --background: #f8fafc;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --radius: 8px;
+        }
+        
+        body {
+            background: var(--background);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        /* HEADER */
+        .admin-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 2rem;
+            border-radius: var(--radius);
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .admin-header h1 {
+            color: white;
+            font-weight: 700;
+            font-size: 1.875rem;
+            letter-spacing: -0.025em;
+            margin: 0;
+        }
+        
+        /* BUTTON STYLES */
+        .btn-modern {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid white;
+        }
+        
+        .btn-primary:hover {
+            background: transparent;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-outline-white {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn-outline-white:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: white;
+            transform: translateY(-1px);
+        }
+        
+        /* FILTER SECTION */
+        .filter-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border);
+        }
+        
+        .search-wrapper {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            pointer-events: none;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 0.875rem 1rem 0.875rem 3rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            background: var(--surface);
+            color: var(--text);
+            transition: all 0.2s;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .select-modern {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--surface);
+            color: var(--text);
+            font-size: 0.875rem;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1.25em;
+        }
+        
+        .select-modern:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        /* ACTIVE FILTERS */
+        .active-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        .filter-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.375rem 0.75rem;
+            background: #e0f2fe;
+            color: var(--primary);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .filter-tag button {
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            padding: 0;
+            opacity: 0.7;
+        }
+        
+        .filter-tag button:hover {
+            opacity: 1;
+        }
+        
+        /* RESULTS COUNT */
+        .results-count {
+            color: var(--primary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-top: 1rem;
+            padding: 0.5rem 0.75rem;
+            background: #e0f2fe;
+            border-radius: var(--radius);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* TABLE STYLES */
+        .table-modern {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--surface);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+        
+        .table-modern thead {
+            background: #f1f5f9;
+        }
+        
+        .table-modern th {
+            padding: 1rem 1.25rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .table-modern td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.875rem;
+        }
+        
+        .table-modern tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .table-modern tbody tr:hover {
+            background: #f8fafc;
+        }
+        
+        /* ROLE BADGES */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.025em;
+        }
+        
+        .badge-admin {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .badge-staff {
+            background: #dbeafe;
+            color: var(--primary);
+        }
+        
+        .badge-user {
+            background: #dcfce7;
+            color: var(--success);
+        }
+        
+        .badge-success {
+            background: #dcfce7;
+            color: var(--success);
+        }
+        
+        .badge-warning {
+            background: #fef3c7;
+            color: var(--warning);
+        }
+        
+        .badge-secondary {
+            background: #f1f5f9;
+            color: var(--text-light);
+        }
+        
+        .badge-danger {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+        
+        .badge-info {
+            background: #e0f2fe;
+            color: #0ea5e9;
+        }
+        
+        /* STATUS INDICATORS */
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 0.375rem;
+        }
+        
+        .status-online {
+            background: var(--success);
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+        }
+        
+        .status-active {
+            background: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+        
+        .status-idle {
+            background: var(--warning);
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+        }
+        
+        .status-inactive {
+            background: var(--danger);
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+        }
+        
+        /* ACTION BUTTONS */
+        .action-group {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+        }
+        
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-light);
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        .btn-icon:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+            color: var(--text);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* TOOLTIP ENHANCEMENTS */
+        [data-tooltip] {
+            position: relative;
+        }
+        
+        [data-tooltip]:hover::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.95);
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            white-space: nowrap;
+            z-index: 1000;
+            margin-bottom: 0.5rem;
+            backdrop-filter: blur(4px);
+        }
+        
+        [data-tooltip]:hover::after {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 4px solid transparent;
+            border-top-color: rgba(15, 23, 42, 0.95);
+            margin-bottom: -4px;
+            z-index: 1000;
+        }
+        
+        /* EMPTY STATE */
+        .empty-state {
+            padding: 3rem 1rem;
+            text-align: center;
+        }
+        
+        .empty-state-icon {
+            font-size: 3rem;
+            color: var(--border);
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-state-description {
+            color: var(--text-light);
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .admin-header {
+                padding: 1.5rem;
+            }
+            
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .table-modern {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .action-group {
+                flex-wrap: wrap;
+            }
+            
+            .btn-modern {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="admin-header">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h1>Staff Management</h1>
+        {% if is_granted('ROLE_ADMIN') %}
+            <div style="display: flex; gap: 1rem;">
+                <a href="{{ path('app_staff_crud_new') }}" class="btn-modern btn-primary" data-tooltip="Add new staff member">
+                    <i class="bi bi-plus-lg"></i> New Staff
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Search & Filter Section -->
+<div class="filter-card">
+    <form method="get" action="{{ path('app_staff_crud_index') }}">
+        <div class="search-wrapper">
+            <i class="bi bi-search search-icon"></i>
+            <input type="text" 
+                   name="search" 
+                   value="{{ search }}" 
+                   placeholder="Search by name or email..." 
+                   class="search-input">
+        </div>
+        
+        <div class="filters-grid">
+            <select name="role" class="select-modern">
+                <option value="">All Roles</option>
+                <option value="ROLE_ADMIN" {{ roleFilter == 'ROLE_ADMIN' ? 'selected' : '' }}>Administrator</option>
+                <option value="ROLE_STAFF" {{ roleFilter == 'ROLE_STAFF' ? 'selected' : '' }}>Staff Member</option>
+                <option value="ROLE_USER" {{ roleFilter == 'ROLE_USER' ? 'selected' : '' }}>User</option>
+            </select>
+            
+            <select name="accountStatus" class="select-modern">
+                <option value="">All Status</option>
+                <option value="active" {{ accountStatusFilter == 'active' ? 'selected' : '' }}>Active</option>
+                <option value="disabled" {{ accountStatusFilter == 'disabled' ? 'selected' : '' }}>Disabled</option>
+                <option value="archived" {{ accountStatusFilter == 'archived' ? 'selected' : '' }}>Archived</option>
+            </select>
+            
+            <select name="status" class="select-modern">
+                <option value="">Login Activity</option>
+                <option value="online" {{ statusFilter == 'online' ? 'selected' : '' }}>Online</option>
+                <option value="active" {{ statusFilter == 'active' ? 'selected' : '' }}>Active Today</option>
+                <option value="recent" {{ statusFilter == 'recent' ? 'selected' : '' }}>Recent (7 days)</option>
+                <option value="idle" {{ statusFilter == 'idle' ? 'selected' : '' }}>Idle (30 days)</option>
+                <option value="inactive" {{ statusFilter == 'inactive' ? 'selected' : '' }}>Inactive</option>
+            </select>
+            
+            <button type="submit" class="select-modern" style="background: var(--primary); color: white; border-color: var(--primary); font-weight: 600;">
+                Apply Filters
+            </button>
+        </div>
+        
+        {% if search or roleFilter or statusFilter or accountStatusFilter %}
+            <div class="active-filters">
+                {% if search %}
+                    <span class="filter-tag">
+                        Search: "{{ search }}"
+                        <a href="?{{ app.request.query.all|filter((v, k) => k != 'search')|url_encode }}">
+                            <i class="bi bi-x"></i>
+                        </a>
+                    </span>
+                {% endif %}
+                
+                {% if roleFilter %}
+                    <span class="filter-tag">
+                        Role: {{ roleFilter|replace({'ROLE_': ''})|title }}
+                        <a href="?{{ app.request.query.all|filter((v, k) => k != 'role')|url_encode }}">
+                            <i class="bi bi-x"></i>
+                        </a>
+                    </span>
+                {% endif %}
+                
+                {% if accountStatusFilter %}
+                    <span class="filter-tag">
+                        Status: {{ accountStatusFilter|title }}
+                        <a href="?{{ app.request.query.all|filter((v, k) => k != 'accountStatus')|url_encode }}">
+                            <i class="bi bi-x"></i>
+                        </a>
+                    </span>
+                {% endif %}
+                
+                {% if statusFilter %}
+                    <span class="filter-tag">
+                        Activity: {{ statusFilter|title }}
+                        <a href="?{{ app.request.query.all|filter((v, k) => k != 'status')|url_encode }}">
+                            <i class="bi bi-x"></i>
+                        </a>
+                    </span>
+                {% endif %}
+                
+                <a href="{{ path('app_staff_crud_index') }}" style="margin-left: auto; font-size: 0.875rem; color: var(--primary); text-decoration: none;">
+                    Clear all
+                </a>
+            </div>
+        {% endif %}
+    </form>
+    
+    <div class="results-count">
+        <i class="bi bi-people-fill"></i>
+        {{ staffList|length }} staff member(s)
+    </div>
+</div>
+
+<!-- Staff Table -->
+<div style="overflow-x: auto;">
+    <table class="table-modern">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Last Active</th>
+                {% if is_granted('ROLE_ADMIN') %}
+                    <th style="text-align: right;">Actions</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for staff_member in staffList %}
+                <tr>
+                    <td style="font-family: 'SF Mono', monospace; font-size: 0.75rem; color: var(--text-light);">
+                        #{{ staff_member.id }}
+                    </td>
+                    <td style="font-weight: 500;">
+                        {{ staff_member.firstName }} {{ staff_member.lastName }}
+                        {% if app.user and app.user.staff and app.user.staff.id == staff_member.id %}
+                            <span style="color: var(--primary); font-size: 0.75rem;">(You)</span>
+                        {% endif %}
+                    </td>
+                    <td style="color: var(--text-light); font-size: 0.875rem;">
+                        {% if staff_member.user %}
+                            {{ staff_member.user.email }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if staff_member.user and staff_member.user.roles is defined %}
+                            {% for role in staff_member.user.roles %}
+                                {% if role == 'ROLE_ADMIN' %}
+                                    <span class="badge badge-admin">Admin</span>
+                                {% elseif role == 'ROLE_STAFF' %}
+                                    <span class="badge badge-staff">Staff</span>
+                                {% elseif role == 'ROLE_USER' %}
+                                    <span class="badge badge-user">User</span>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <span class="badge badge-secondary">No role</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if staff_member.status == 'active' %}
+                            <span class="badge badge-success">Active</span>
+                        {% elseif staff_member.status == 'disabled' %}
+                            <span class="badge badge-warning">Disabled</span>
+                        {% elseif staff_member.status == 'archived' %}
+                            <span class="badge badge-secondary">Archived</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if staff_member.user %}
+                            {% if staff_member.user.lastLogin %}
+                                {% set daysSinceLogin = date().diff(staff_member.user.lastLogin).days %}
+                                {% set hoursSinceLogin = date().diff(staff_member.user.lastLogin).h %}
+                                {% set minutesSinceLogin = date().diff(staff_member.user.lastLogin).i %}
+                                
+                                {% if minutesSinceLogin < 5 %}
+                                    <span class="status-indicator status-online"></span>
+                                    <span style="color: var(--success); font-size: 0.875rem;">Online</span>
+                                    <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.25rem;">
+                                        {{ staff_member.user.lastLogin|date('M d, h:i A') }}
+                                    </div>
+                                {% elseif hoursSinceLogin < 24 %}
+                                    <span class="status-indicator status-active"></span>
+                                    <span style="font-size: 0.875rem;">Today</span>
+                                    <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.25rem;">
+                                        {{ staff_member.user.lastLogin|date('h:i A') }}
+                                    </div>
+                                {% elseif daysSinceLogin <= 7 %}
+                                    <span style="font-size: 0.875rem;">{{ daysSinceLogin }}d ago</span>
+                                    <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.25rem;">
+                                        {{ staff_member.user.lastLogin|date('M d') }}
+                                    </div>
+                                {% elseif daysSinceLogin <= 30 %}
+                                    <span class="status-indicator status-idle"></span>
+                                    <span style="font-size: 0.875rem;">{{ daysSinceLogin }}d ago</span>
+                                {% else %}
+                                    <span class="status-indicator status-inactive"></span>
+                                    <span style="font-size: 0.875rem;">{{ daysSinceLogin }}d ago</span>
+                                {% endif %}
+                            {% else %}
+                                <span style="color: var(--text-light); font-size: 0.875rem;">Never</span>
+                            {% endif %}
+                        {% else %}
+                            <span style="color: var(--text-light); font-size: 0.875rem;">—</span>
+                        {% endif %}
+                    </td>
+                    
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <td>
+                            <div class="action-group">
+                                {% if app.user and app.user.staff and app.user.staff.id == staff_member.id %}
+                                    <a href="{{ path('app_admin_profile') }}" class="btn-icon" data-tooltip="My Profile">
+                                        <i class="bi bi-person"></i>
+                                    </a>
+                                {% else %}
+                                    <a href="{{ path('app_staff_crud_show', {'id': staff_member.id}) }}" class="btn-icon" data-tooltip="View Profile">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                {% endif %}
+                                
+                                <a href="{{ path('app_staff_crud_edit', {'id': staff_member.id}) }}" class="btn-icon" data-tooltip="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                
+                                {% if staff_member.status == 'active' %}
+                                    <form method="post" action="{{ path('app_staff_crud_disable', {'id': staff_member.id}) }}" 
+                                          onsubmit="return confirm('Disable this staff member?');" style="display: inline;">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('disable' ~ staff_member.id) }}">
+                                        <button type="submit" class="btn-icon" data-tooltip="Disable">
+                                            <i class="bi bi-slash-circle"></i>
+                                        </button>
+                                    </form>
+                                {% elseif staff_member.status == 'disabled' %}
+                                    <form method="post" action="{{ path('app_staff_crud_enable', {'id': staff_member.id}) }}" 
+                                          onsubmit="return confirm('Enable this staff member?');" style="display: inline;">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('enable' ~ staff_member.id) }}">
+                                        <button type="submit" class="btn-icon" data-tooltip="Enable">
+                                            <i class="bi bi-check-circle"></i>
+                                        </button>
+                                    </form>
+                                {% endif %}
+                                
+                                <form method="post" action="{{ path('app_staff_crud_delete', {'id': staff_member.id}) }}" 
+                                      onsubmit="return confirm('Permanently delete this staff member?');" style="display: inline;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ staff_member.id) }}">
+                                    <button type="submit" class="btn-icon" data-tooltip="Delete" style="color: var(--danger);">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    {% endif %}
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="{{ is_granted('ROLE_ADMIN') ? 7 : 6 }}">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <h3 class="empty-state-title">
+                                {% if search or roleFilter or statusFilter or accountStatusFilter %}
+                                    No matching staff members
+                                {% else %}
+                                    No staff members yet
+                                {% endif %}
+                            </h3>
+                            <p class="empty-state-description">
+                                {% if search or roleFilter or statusFilter or accountStatusFilter %}
+                                    Try adjusting your search or filters
+                                {% else %}
+                                    Get started by adding your first staff member
+                                {% endif %}
+                            </p>
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <a href="{{ path('app_staff_crud_new') }}" class="btn-modern btn-primary">
+                                    <i class="bi bi-plus-lg"></i> Add Staff
+                                </a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<a href="{{ path('app_staff_overview') }}" class="btn-modern" style="background: transparent; color: var(--text-light); margin-top: 2rem; border: 1px solid var(--border);" data-tooltip="Return to overview">
+    <i class="bi bi-arrow-left"></i> Back to Overview
+</a>
+
+{% endblock %}

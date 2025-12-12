@@ -2,6 +2,106 @@
 
 {% block admin_title %}Fleet{% endblock %}
 
+
+{% block stylesheets %} 
+{{ parent() }}
+ <style>
+ /* Style for disabled button that looks like readonly input */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.form-input.readonly {
+    width: 120px; /* Adjust width as needed */
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #6c757d;
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.input-group {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    width: 120px; /* Match input width */
+}
+
+.input-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.form-help {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.8125rem;
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* Button styles */
+.section-link {
+    background: none;
+    border: none;
+    padding: 0.375rem 0.75rem;
+    font: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 0.875rem;
+    border-radius: 0.25rem;
+    transition: all 0.2s;
+}
+
+.section-link-warning {
+    color: #e67e22;
+    background-color: transparent;
+}
+
+.section-link-warning:hover {
+    color: #d35400;
+    background-color: rgba(230, 126, 34, 0.1);
+}
+
+.section-link-success {
+    color: #27ae60;
+    background-color: transparent;
+}
+
+.section-link-success:hover {
+    color: #229954;
+    background-color: rgba(39, 174, 96, 0.1);
+}
+
+.section-link-danger {
+    color: #e74c3c;
+    background-color: transparent;
+}
+
+.section-link-danger:hover {
+    color: #c0392b;
+    background-color: rgba(231, 76, 60, 0.1);
+}
+</style>
+
+{% endblock %}
+
+
 {% block admin_content %}
     <section id="fleet" class="dashboard-section" data-dashboard-section>
         <div class="section-header">
@@ -46,17 +146,78 @@
                                     <span class="bi bi-pencil-square"></span>
                                     Edit
                                 </a>
-                                <form method="post" action="{{ path('app_car_delete', { id: car.id }) }}" class="inline-delete-form">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ car.id) }}">
-                                    <button type="submit"
-                                            class="section-link section-link-danger confirm-delete-btn"
-                                            data-confirm-title="Delete this vehicle?"
-                                            data-confirm-text="This vehicle and its related rentals will be removed. This action cannot be undone."
-                                            data-confirm-button="Yes, Delete It">
-                                        <span class="bi bi-trash"></span>
-                                        Delete
-                                    </button>
-                                </form>
+                                
+                                {% if car.canBeDeleted() %}
+    {# Show Delete button only if no rental history and not rented #}
+    <form method="post" action="{{ path('app_car_delete', { id: car.id }) }}" class="inline-delete-form">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ car.id) }}">
+        <button type="submit"
+                class="section-link section-link-danger confirm-delete-btn"
+                data-confirm-title="Delete this vehicle?"
+                data-confirm-text="This vehicle will be permanently removed. This action cannot be undone."
+                data-confirm-button="Yes, Delete It">
+            <span class="bi bi-trash"></span>
+            Delete
+        </button>
+    </form>
+{% else %}
+    {# Show Disable/Enable buttons #}
+    {% if car.getStatusCode() != 'disabled' %}
+        {# Check if car is currently rented #}
+        {% if car.isCurrentlyRented() %}
+            {# Rented car: Show disabled styled input field #}
+            <div class="form-group">
+                <label class="form-label" for="disable-button-{{ car.id }}">Disable</label>
+                <div class="input-group">
+                    <input id="disable-button-{{ car.id }}" 
+                           type="text" 
+                           class="form-input readonly" 
+                           value="Disable" 
+                           readonly 
+                           aria-readonly="true"
+                           aria-label="Disable button">
+                    <span class="input-icon bi bi-slash-circle text-muted"></span>
+                </div>
+                <span class="form-help">Cannot disable while car is rented</span>
+            </div>
+        {% else %}
+            {# Not rented: Show active disable button #}
+            <form method="post" action="{{ path('app_car_toggle_status', { id: car.id }) }}" class="inline-disable-form">
+                <input type="hidden" name="_token" value="{{ csrf_token('toggle-status' ~ car.id) }}">
+                <input type="hidden" name="action" value="disable">
+                <button type="submit"
+                        class="section-link section-link-warning confirm-disable-btn"
+                        data-confirm-title="Disable this vehicle?"
+                        data-confirm-text="
+                            {% if car.hasRentalHistory() %}
+                                This vehicle has rental history and cannot be deleted. It will be disabled instead.
+                            {% else %}
+                                This vehicle will be disabled and removed from the available fleet.
+                            {% endif %}
+                            You can re-enable it later."
+                        data-confirm-button="Yes, Disable It">
+                    <span class="bi bi-slash-circle"></span>
+                    Disable
+                </button>
+            </form>
+        {% endif %}
+    {% else %}
+        {# Already disabled: Show enable button #}
+        <form method="post" action="{{ path('app_car_toggle_status', { id: car.id }) }}" class="inline-enable-form">
+            <input type="hidden" name="_token" value="{{ csrf_token('toggle-status' ~ car.id) }}">
+            <input type="hidden" name="action" value="enable">
+            <button type="submit"
+                    class="section-link section-link-success confirm-enable-btn"
+                    data-confirm-title="Enable this vehicle?"
+                    data-confirm-text="This vehicle will be re-activated and made available for rental."
+                    data-confirm-button="Yes, Enable It">
+                <span class="bi bi-check-circle"></span>
+                Enable
+            </button>
+        </form>
+    {% endif %}
+{% endif %}
+                                
                             </div>
                         </div>
                     </article>
@@ -70,3 +231,4 @@
         {% endif %}
     </section>
 {% endblock %}
+

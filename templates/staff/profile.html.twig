@@ -1,0 +1,305 @@
+{# templates/staff/profile.html.twig #}
+{% extends 'admin/layout.html.twig' %}
+
+{% block admin_title %}My Profile{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    /* Profile Page Styles */
+    .profile-container {
+        background: #ffffff;
+        min-height: 100vh;
+    }
+    
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-size: 24px;
+        font-weight: 600;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 20px;
+        flex-shrink: 0;
+    }
+    
+    .profile-header {
+        border-bottom: 2px solid #f1f3f5;
+        padding-bottom: 20px;
+        margin-bottom: 30px;
+        color: black !important;
+    }
+    
+    .profile-card {
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        background: #ffffff;
+        transition: all 0.3s ease;
+       color: black !important;
+
+    }
+    
+    .profile-card:hover {
+        border-color: #dee2e6;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        color: black !important;
+
+    }
+    
+    .profile-info-section {
+        padding: 24px;
+        color: black !important;
+
+    }
+    
+    .profile-info-label {
+        font-weight: 600;
+        color: #495057;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+    }
+    
+    .profile-info-value {
+        color: #212529;
+        font-size: 16px;
+        font-weight: 500;
+    }
+    
+    .profile-section-divider {
+        border: none;
+        height: 1px;
+        background: #e9ecef;
+        margin: 20px 0;
+    }
+    
+    .quick-actions-card {
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        background: #ffffff;
+    }
+    
+    .quick-actions-header {
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+        padding: 16px 24px;
+        border-radius: 12px 12px 0 0;
+    }
+    
+    .action-item {
+        border: none;
+        border-bottom: 1px solid #f1f3f5;
+        padding: 14px 24px;
+        color: #495057;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        transition: all 0.2s ease;
+    }
+    
+    .action-item:last-child {
+        border-bottom: none;
+    }
+    
+    .action-item:hover {
+        background: #f8f9fa;
+        color: #212529;
+        padding-left: 28px;
+    }
+    
+    .action-icon {
+        width: 20px;
+        margin-right: 12px;
+        color: #6c757d;
+    }
+    
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+    
+    .status-active {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-inactive {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    
+    @media (max-width: 768px) {
+        .profile-avatar {
+            width: 60px;
+            height: 60px;
+            font-size: 20px;
+            margin-right: 15px;
+        }
+        
+        .profile-info-section {
+            padding: 16px;
+        }
+        
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .action-item {
+            padding: 12px 16px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="profile-container">
+    <div class="container-fluid px-4 py-4">
+        <!-- Profile Header -->
+        <div class="profile-header" style="color: black !important;">
+            <div class="d-flex justify-content-between align-items-center" >
+                <div class="d-flex align-items-center">
+                    <div class="profile-avatar" style="color: black !important;">
+                        {{ staff.firstName|first|upper }}{{ staff.lastName|first|upper }}
+                    </div>
+                    <div>
+                        <h1 class="h3 mb-1" style="color: black !important;">{{ staff.firstName }} {{ staff.lastName }}</h1>
+                        <p class="text-muted mb-0">{{ staff.getEmail()|default('No email') }}</p>
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{{ path('app_staff_change_password') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-key me-1"></i> Change Password
+                    </a>
+                    <a href="{{ path('app_staff_profile_edit') }}" class="btn btn-primary">
+                        <i class="bi bi-pencil me-1"></i> Edit Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Main Profile Information -->
+            <div class="col-lg-8">
+                <div class="profile-card">
+                    <div class="profile-info-section">
+                        <h5 class="mb-4 fw-semibold" style="color: black !important;">Profile Information</h5>
+                        
+                        <div class="info-grid">
+                            <div>
+                                <div class="profile-info-label">Staff ID</div>
+                                <div class="profile-info-value">#{{ staff.id }}</div>
+                            </div>
+                            
+                            <div>
+                                <div class="profile-info-label">Phone Number</div>
+                                <div class="profile-info-value">
+                                    {% if staff.phoneNumber is defined and staff.phoneNumber %}
+                                        {{ staff.phoneNumber }}
+                                    {% else %}
+                                        <span class="text-muted">Not specified</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="profile-info-label">Department</div>
+                                <div class="profile-info-value">
+                                    {{ staff.department|default('Not specified') }}
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="profile-info-label">Position</div>
+                                <div class="profile-info-value">
+                                    {{ staff.position|default('Not specified') }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr class="profile-section-divider">
+                        
+                        <div class="info-grid">
+                            <div>
+                                <div class="profile-info-label">Status</div>
+                                <div>
+                                    {% if staff.isActive %}
+                                        <span class="status-badge status-active " style="color: black !important;">Active</span>
+                                    {% else %}
+                                        <span class="status-badge status-inactive">Inactive</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="profile-info-label">Hire Date</div>
+                                <div class="profile-info-value">
+                                    {{ staff.hireDate ? staff.hireDate|date('F d, Y') : 'Not specified' }}
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="profile-info-label">Account Created</div>
+                                <div class="profile-info-value">
+                                    {{ staff.createdAt ? staff.createdAt|date('F d, Y') : 'N/A' }}
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="profile-info-label">Last Updated</div>
+                                <div class="profile-info-value">
+                                    {{ staff.updatedAt ? staff.updatedAt|date('F d, Y') : 'N/A' }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions Sidebar -->
+            <div class="col-lg-4">
+                <div class="quick-actions-card">
+                    <div class="quick-actions-header">
+                        <h6 class="mb-0 fw-semibold" style="color: black !important;">Quick Actions</h6>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a href="{{ path('app_staff_dashboard') }}" class="action-item">
+                            <i class="bi bi-speedometer2 action-icon"></i>
+                            <span>Staff Dashboard</span>
+                        </a>
+                        <a href="{{ path('app_rental_request_index') }}" class="action-item">
+                            <i class="bi bi-clipboard-check action-icon"></i>
+                            <span>Rental Requests</span>
+                        </a>
+                        <a href="{{ path('app_car_index') }}" class="action-item">
+                            <i class="bi bi-car-front action-icon"></i>
+                            <span>View Cars</span>
+                        </a>
+                        <a href="{{ path('app_customer_index') }}" class="action-item">
+                            <i class="bi bi-people action-icon"></i>
+                            <span>View Customers</span>
+                        </a>
+                        <a href="{{ path('app_logout') }}" class="action-item text-danger">
+                            <i class="bi bi-box-arrow-right action-icon"></i>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
