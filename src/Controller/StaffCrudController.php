@@ -389,79 +389,99 @@ class StaffCrudController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_staff_crud_delete', methods: ['POST'])]
-    public function delete(
-        Request $request, 
-        Staff $staff, 
-        EntityManagerInterface $entityManager
-    ): Response {
-        if ($this->isCsrfTokenValid('delete'.$staff->getId(), $request->request->get('_token'))) {
-            $staffName = $staff->getFullName();
-            $staffEmail = $staff->getUser()?->getEmail();
-            
-            // Log before deletion
-            $this->activityLogger->log(
-                $this->getUser()->getEmail(),
-                'DELETE_STAFF',
-                'Deleted staff member: ' . $staffName,
-                [
-                    'staff_id' => $staff->getId(),
-                    'staff_name' => $staffName,
-                    'staff_email' => $staffEmail,
-                    'staff_status' => $staff->getStatus()
-                ],
-                'ADMIN'
-            );
-            
-            // Also delete the associated User
-            $user = $staff->getUser();
-            if ($user) {
-                $entityManager->remove($user);
-            }
-            
-            $entityManager->remove($staff);
-            $entityManager->flush();
-            
-            $this->addFlash('success', 'Staff member deleted successfully!');
-        }
-
+   #[Route('/{id}', name: 'app_staff_crud_delete', methods: ['POST'])]
+public function delete(
+    Request $request, 
+    Staff $staff, 
+    EntityManagerInterface $entityManager
+): Response {
+    $currentUser = $this->getUser();
+    $targetUser = $staff->getUser();
+    
+    // Check if trying to delete another admin
+    if ($targetUser && in_array('ROLE_ADMIN', $targetUser->getRoles()) 
+        && $targetUser !== $currentUser) {
+        $this->addFlash('error', 'You cannot delete another administrator.');
         return $this->redirectToRoute('app_staff_crud_index');
     }
-
-    #[Route('/{id}/disable', name: 'app_staff_crud_disable', methods: ['POST'])]
-    public function disable(
-        Request $request, 
-        Staff $staff, 
-        EntityManagerInterface $entityManager
-    ): Response {
-        if ($this->isCsrfTokenValid('disable'.$staff->getId(), $request->request->get('_token'))) {
-            $staff->setStatus('disabled');
-            $staff->setIsActive(false);
-            $staff->setArchivedAt(new \DateTime());
-            $staff->setArchivedBy($this->getUser()->getEmail());
-            $staff->setUpdatedAt(new \DateTimeImmutable());
-            
-            $entityManager->flush();
-            
-            // Log activity
-            $this->activityLogger->log(
-                $this->getUser()->getEmail(),
-                'DISABLE_STAFF',
-                'Disabled staff member: ' . $staff->getFirstName() . ' ' . $staff->getLastName(),
-                [
-                    'staff_id' => $staff->getId(),
-                    'staff_name' => $staff->getFullName(),
-                    'disabled_by' => $this->getUser()->getEmail(),
-                    'timestamp' => (new \DateTime())->format('Y-m-d H:i:s')
-                ],
-                'ADMIN'
-            );
-            
-            $this->addFlash('warning', 'Staff member has been disabled.');
+    
+    if ($this->isCsrfTokenValid('delete'.$staff->getId(), $request->request->get('_token'))) {
+        $staffName = $staff->getFullName();
+        $staffEmail = $staff->getUser()?->getEmail();
+        
+        // Log before deletion
+        $this->activityLogger->log(
+            $this->getUser()->getEmail(),
+            'DELETE_STAFF',
+            'Deleted staff member: ' . $staffName,
+            [
+                'staff_id' => $staff->getId(),
+                'staff_name' => $staffName,
+                'staff_email' => $staffEmail,
+                'staff_status' => $staff->getStatus()
+            ],
+            'ADMIN'
+        );
+        
+        // Also delete the associated User
+        $user = $staff->getUser();
+        if ($user) {
+            $entityManager->remove($user);
         }
         
+        $entityManager->remove($staff);
+        $entityManager->flush();
+        
+        $this->addFlash('success', 'Staff member deleted successfully!');
+    }
+
+    return $this->redirectToRoute('app_staff_crud_index');
+}
+
+   #[Route('/{id}/disable', name: 'app_staff_crud_disable', methods: ['POST'])]
+public function disable(
+    Request $request, 
+    Staff $staff, 
+    EntityManagerInterface $entityManager
+): Response {
+    $currentUser = $this->getUser();
+    $targetUser = $staff->getUser();
+    
+    // Check if trying to disable another admin
+    if ($targetUser && in_array('ROLE_ADMIN', $targetUser->getRoles()) 
+        && $targetUser !== $currentUser) {
+        $this->addFlash('error', 'You cannot disable another administrator.');
         return $this->redirectToRoute('app_staff_crud_index');
     }
+    
+    if ($this->isCsrfTokenValid('disable'.$staff->getId(), $request->request->get('_token'))) {
+        $staff->setStatus('disabled');
+        $staff->setIsActive(false);
+        $staff->setArchivedAt(new \DateTime());
+        $staff->setArchivedBy($this->getUser()->getEmail());
+        $staff->setUpdatedAt(new \DateTimeImmutable());
+        
+        $entityManager->flush();
+        
+        // Log activity
+        $this->activityLogger->log(
+            $this->getUser()->getEmail(),
+            'DISABLE_STAFF',
+            'Disabled staff member: ' . $staff->getFirstName() . ' ' . $staff->getLastName(),
+            [
+                'staff_id' => $staff->getId(),
+                'staff_name' => $staff->getFullName(),
+                'disabled_by' => $this->getUser()->getEmail(),
+                'timestamp' => (new \DateTime())->format('Y-m-d H:i:s')
+            ],
+            'ADMIN'
+        );
+        
+        $this->addFlash('warning', 'Staff member has been disabled.');
+    }
+    
+    return $this->redirectToRoute('app_staff_crud_index');
+}
     
     #[Route('/{id}/enable', name: 'app_staff_crud_enable', methods: ['POST'])]
     public function enable(

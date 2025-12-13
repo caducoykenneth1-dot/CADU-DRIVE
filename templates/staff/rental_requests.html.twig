@@ -3,6 +3,9 @@
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         .rental-requests-container {
             max-width: 1400px;
@@ -40,7 +43,7 @@
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
         
         .section-header h2 {
@@ -61,9 +64,6 @@
             font-weight: 500;
             min-width: 24px;
             height: 24px;
-        }
-        
-        .badge {
             background: #f3f4f6;
             color: #6b7280;
         }
@@ -83,16 +83,50 @@
             border-radius: 8px;
             overflow: hidden;
             border: 1px solid #e5e7eb;
+            padding: 1.5rem;
         }
         
-        table {
+        /* DataTables Custom Styling */
+        .dataTables_wrapper {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+        
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter {
+            margin-bottom: 1rem;
+        }
+        
+        .dataTables_wrapper .dataTables_length select {
+            padding: 0.375rem 2rem 0.375rem 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            background: white;
+            cursor: pointer;
+        }
+        
+        .dataTables_wrapper .dataTables_filter input {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            margin-left: 0.5rem;
+            width: 250px;
+        }
+        
+        .dataTables_wrapper .dataTables_filter input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        table.dataTable {
             width: 100%;
             border-collapse: collapse;
             font-size: 0.875rem;
-            min-width: 900px;
         }
         
-        thead th {
+        table.dataTable thead th {
             background: #fafafa;
             text-align: left;
             padding: 0.875rem 1rem;
@@ -103,18 +137,54 @@
             white-space: nowrap;
         }
         
-        tbody td {
+        table.dataTable tbody td {
             padding: 1rem;
             border-bottom: 1px solid #f3f4f6;
             vertical-align: middle;
         }
         
-        tbody tr:last-child td {
-            border-bottom: none;
+        table.dataTable tbody tr:hover {
+            background: #fafafa;
         }
         
-        tbody tr:hover {
-            background: #fafafa;
+        .dataTables_wrapper .dataTables_paginate {
+            margin-top: 1.5rem;
+            text-align: right;
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            padding: 0.375rem 0.75rem;
+            margin: 0 0.125rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            background: white;
+            color: #6b7280;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.15s ease;
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: #f9fafb;
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .dataTables_wrapper .dataTables_info {
+            padding-top: 1rem;
+            font-size: 0.875rem;
+            color: #6b7280;
         }
         
         .request-id {
@@ -165,7 +235,7 @@
         
         .status-pending {
             background: #fef3c7;
-            color: black !important;
+            color: orange !important;
         }
         
         .status-approved {
@@ -221,22 +291,22 @@
         
         .btn-view:hover {
             color: #2563eb;
-            border-color: #3b82f6;
+            border-color: blue;
         }
         
         .btn-approve:hover {
-            color: #059669;
-            border-color: #10b981;
+            color: green;
+            border-color: green;
         }
         
         .btn-reject:hover {
-            color: #dc2626;
-            border-color: #ef4444;
+            color: red;
+            border-color: red;
         }
         
         .btn-delete:hover {
-            color: #1f2937;
-            border-color: #9ca3af;
+            color: red;
+            border-color: red;
         }
         
         .alert {
@@ -305,8 +375,17 @@
                 font-size: 1.5rem;
             }
             
-            .requests-table {
-                overflow-x: auto;
+            .dataTables_wrapper .dataTables_filter input {
+                width: 100%;
+                margin-left: 0;
+                margin-top: 0.5rem;
+            }
+            
+            .dataTables_wrapper .dataTables_length,
+            .dataTables_wrapper .dataTables_filter,
+            .dataTables_wrapper .dataTables_info,
+            .dataTables_wrapper .dataTables_paginate {
+                text-align: center;
             }
             
             .action-buttons {
@@ -317,11 +396,6 @@
                 width: 28px;
                 height: 28px;
                 font-size: 0.875rem;
-            }
-            
-            thead th, tbody td {
-                padding: 0.75rem 0.625rem;
-                font-size: 0.8125rem;
             }
         }
     </style>
@@ -353,16 +427,16 @@
         </div>
         {% if pendingRequests|length > 0 %}
             <div class="requests-table">
-                <table>
+                <table id="pendingTable" class="display responsive nowrap" style="width:100%">
                     <thead>
                     <tr>
-                        <th scope="col">Request</th>
-                        <th scope="col">Customer</th>
-                        <th scope="col">Vehicle</th>
-                        <th scope="col">Dates</th>
-                        <th scope="col">Total</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Actions</th>
+                        <th>Request</th>
+                        <th>Customer</th>
+                        <th>Vehicle</th>
+                        <th>Dates</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Actions</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -392,7 +466,7 @@
                                 {% set daysDifference = date(request.endDate).diff(date(request.startDate)).days %}
                                 <small class="date-days">{{ daysDifference }} day{% if daysDifference != 1 %}s{% endif %}</small>
                             </td>
-                            <td>
+                            <td data-order="{{ (daysDifference + 1) * request.car.dailyRate|default(0) }}">
                                 {% if request.car and request.startDate and request.endDate %}
                                     {% set totalDays = daysDifference + 1 %}
                                     {% set dailyRate = request.car.dailyRate|default(0) %}
@@ -407,12 +481,9 @@
                                 <span class="status-badge status-pending">Pending</span>
                             </td>
                             <td>
-                                <div class="action-buttons" role="group" aria-label="Actions for rental request #{{ request.id }}">
+                                <div class="action-buttons">
                                     <a href="{{ path('app_staff_rental_request_show', {'id': request.id}) }}" class="btn-view" title="View Details">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                    <a href="{{ path('app_rental_request_edit', {'id': request.id}) }}" class="btn-edit" title="Edit Request">
-                                        <i class="bi bi-pencil"></i>
+                                        <i class="bi bi-eye" style="color: blue !important;"></i>
                                     </a>
                                     <form action="{{ path('app_rental_request_approve', {'id': request.id}) }}" method="post" class="inline-form" onsubmit="return confirm('Approve rental request #{{ request.id }}?');">
                                         <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ request.id) }}">
@@ -424,13 +495,6 @@
                                         <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ request.id) }}">
                                         <button type="submit" class="btn-reject" title="Reject Request">
                                             <i class="bi bi-x-lg"></i>
-                                        </button>
-                                    </form>
-                                    <form action="{{ path('app_staff_rental_request_delete', {'id': request.id}) }}" method="post" class="inline-form" onsubmit="return confirm('Delete rental request #{{ request.id }}?');">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ request.id) }}">
-                                        <input type="hidden" name="_method" value="DELETE">
-                                        <button type="submit" class="btn-delete" title="Delete Request">
-                                            <i class="bi bi-trash"></i>
                                         </button>
                                     </form>
                                 </div>
@@ -455,16 +519,16 @@
         </div>
         {% if approvedRequests|length > 0 %}
             <div class="requests-table">
-                <table>
+                <table id="approvedTable" class="display responsive nowrap" style="width:100%">
                     <thead>
                     <tr>
-                        <th scope="col">Request</th>
-                        <th scope="col">Customer</th>
-                        <th scope="col">Vehicle</th>
-                        <th scope="col">Dates</th>
-                        <th scope="col">Total</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Actions</th>
+                        <th>Request</th>
+                        <th>Customer</th>
+                        <th>Vehicle</th>
+                        <th>Dates</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Actions</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -494,7 +558,7 @@
                                 {% set daysDifference = date(request.endDate).diff(date(request.startDate)).days %}
                                 <small class="date-days">{{ daysDifference }} day{% if daysDifference != 1 %}s{% endif %}</small>
                             </td>
-                            <td>
+                            <td data-order="{{ (daysDifference + 1) * request.car.dailyRate|default(0) }}">
                                 {% if request.car and request.startDate and request.endDate %}
                                     {% set totalDays = daysDifference + 1 %}
                                     {% set dailyRate = request.car.dailyRate|default(0) %}
@@ -509,22 +573,65 @@
                                 <span class="status-badge status-approved">Approved</span>
                                 <small class="approved-date">{{ request.approvedAt|date('M d, Y') }}</small>
                             </td>
-                            <td>
-                                <div class="action-buttons" role="group">
-                                    <a href="{{ path('app_staff_rental_request_show', {'id': request.id}) }}" class="btn-view" title="View Details">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                    <a href="{{ path('app_rental_request_edit', {'id': request.id}) }}" class="btn-edit" title="Edit Request">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <form action="{{ path('app_staff_rental_request_delete', {'id': request.id}) }}" method="post" class="inline-form" onsubmit="return confirm('Delete rental request #{{ request.id }}?');">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ request.id) }}">
-                                        <button type="submit" class="btn-delete" title="Delete Request">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
+                           <td>
+                <div class="action-buttons">
+                    {# View button - visible to all #}
+                    <a href="{{ path('app_staff_rental_request_show', {'id': request.id}) }}" class="btn-view" title="View Details">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                    
+                    {# Edit button - visible to all #}
+                    <a href="{{ path('app_rental_request_edit', {'id': request.id}) }}" class="btn-edit" title="Edit Request">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    
+                    {# Complete button - ONLY for staff (not admins) #}
+                    {% if is_granted('ROLE_STAFF') and not is_granted('ROLE_ADMIN') %}
+                        <form action="{{ path('app_walk_in_rental_complete', {'id': request.id}) }}" 
+                            method="post" 
+                            class="inline-form" 
+                            onsubmit="return confirm('Complete rental request #{{ request.id }}?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('complete' ~ request.id) }}">
+                            <button type="submit" class="btn-icon success" title="Complete">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </form>
+                    {% endif %}
+                    
+                    {# Approve/Reject buttons - ONLY for staff (not admins) in pending section #}
+                    {% if request.status == 'pending' and is_granted('ROLE_STAFF') and not is_granted('ROLE_ADMIN') %}
+                        <form action="{{ path('app_rental_request_approve', {'id': request.id}) }}" 
+                            method="post" 
+                            class="inline-form" 
+                            onsubmit="return confirm('Approve rental request #{{ request.id }}?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ request.id) }}">
+                            <button type="submit" class="btn-approve" title="Approve Request">
+                                <i class="bi bi-check-lg"></i>
+                            </button>
+                        </form>
+                        <form action="{{ path('app_rental_request_reject', {'id': request.id}) }}" 
+                            method="post" 
+                            class="inline-form" 
+                            onsubmit="return confirm('Reject rental request #{{ request.id }}?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ request.id) }}">
+                            <button type="submit" class="btn-reject" title="Reject Request">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </form>
+                    {% endif %}
+                    
+                    {# Delete button - visible to all (or restrict if needed) #}
+                    <form action="{{ path('app_staff_rental_request_delete', {'id': request.id}) }}" 
+                        method="post" 
+                        class="inline-form" 
+                        onsubmit="return confirm('Delete rental request #{{ request.id }}?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ request.id) }}">
+                        <button type="submit" class="btn-delete" title="Delete Request">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            </td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -545,17 +652,17 @@
         </div>
         {% if rejectedRequests|length > 0 %}
             <div class="requests-table">
-                <table>
+                <table id="rejectedTable" class="display responsive nowrap" style="width:100%">
                     <thead>
                     <tr>
-                        <th scope="col">Request</th>
-                        <th scope="col">Customer</th>
-                        <th scope="col">Vehicle</th>
-                        <th scope="col">Dates</th>
-                        <th scope="col">Total</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Rejected On</th>
-                        <th scope="col">Actions</th>
+                        <th>Request</th>
+                        <th>Customer</th>
+                        <th>Vehicle</th>
+                        <th>Dates</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Rejected On</th>
+                        <th>Actions</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -585,7 +692,7 @@
                                 {% set daysDifference = date(request.endDate).diff(date(request.startDate)).days %}
                                 <small class="date-days">{{ daysDifference }} day{% if daysDifference != 1 %}s{% endif %}</small>
                             </td>
-                            <td>
+                            <td data-order="{{ (daysDifference + 1) * request.car.dailyRate|default(0) }}">
                                 {% if request.car and request.startDate and request.endDate %}
                                     {% set totalDays = daysDifference + 1 %}
                                     {% set dailyRate = request.car.dailyRate|default(0) %}
@@ -608,7 +715,7 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <div class="action-buttons" role="group">
+                                <div class="action-buttons">
                                     <a href="{{ path('app_staff_rental_request_show', {'id': request.id}) }}" class="btn-view" title="View Details">
                                         <i class="bi bi-eye"></i>
                                     </a>
@@ -637,4 +744,51 @@
         {% endif %}
     </section>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            const tableConfig = {
+                responsive: true,
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                order: [[0, 'desc']],
+                language: {
+                    search: "Search:",
+                    lengthMenu: "Show _MENU_ entries",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                    infoFiltered: "(filtered from _MAX_ total entries)",
+                    paginate: {
+                        first: "First",
+                        last: "Last",
+                        next: "Next",
+                        previous: "Previous"
+                    },
+                    zeroRecords: "No matching records found"
+                },
+                columnDefs: [
+                    { orderable: false, targets: -1 } // Disable sorting on Actions column
+                ]
+            };
+            
+            // Initialize all tables
+            {% if pendingRequests|length > 0 %}
+                $('#pendingTable').DataTable(tableConfig);
+            {% endif %}
+            
+            {% if approvedRequests|length > 0 %}
+                $('#approvedTable').DataTable(tableConfig);
+            {% endif %}
+            
+            {% if rejectedRequests|length > 0 %}
+                $('#rejectedTable').DataTable(tableConfig);
+            {% endif %}
+        });
+    </script>
 {% endblock %}

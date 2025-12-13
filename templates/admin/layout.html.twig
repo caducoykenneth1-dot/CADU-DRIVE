@@ -64,13 +64,31 @@
     {% endif %}
 
                 {# Rental Requests - For Staff to manage customer requests #}
-            {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
-                <a href="{{ path('app_staff_rental_requests') }}" 
-                data-section="rental-requests" 
-                class="admin-nav-link {{ 'app_staff_rental_requests' in app.request.attributes.get('_route') ? 'is-active' : '' }}">
-                <span class="bi bi-clipboard-check text-base"></span> Rental Requests
-                </a>
-            {% endif %}
+    {% if is_granted('ROLE_ADMIN') %}
+        {# Admin gets VIEW-ONLY page #}
+        <a href="{{ path('app_admin_rental_requests_view') }}" 
+           data-section="rental-requests" 
+           class="admin-nav-link">
+           <span class="bi bi-clipboard-check text-base"></span> Rental Requests (View)
+        </a>
+    {% elseif is_granted('ROLE_STAFF') %}
+        {# Staff gets MANAGEMENT page #}
+        <a href="{{ path('app_staff_rental_requests') }}" 
+           data-section="rental-requests" 
+           class="admin-nav-link">
+           <span class="bi bi-clipboard-check text-base"></span> Rental Requests (Online)
+        </a>
+    {% endif %}
+  
+   {% if is_granted('ROLE_STAFF') and not is_granted('ROLE_ADMIN') %}
+    <a href="{{ path('app_walk_in_rental_index') }}"
+       data-section="walk-in-rental"
+       class="admin-nav-link">
+        <span class="bi bi-clipboard-check text-base"></span>
+        Walk-In Rental
+    </a>
+{% endif %}
+
 
             <form action="{{ path('app_logout') }}" method="post" class="pt-4 border-t border-gray-800 mt-4">
     <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">

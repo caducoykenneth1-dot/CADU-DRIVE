@@ -1,0 +1,444 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Walk-in Rental{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    body {
+        background: #f5f7fa;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .page-header {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        margin-bottom: 2rem;
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0;
+    }
+
+    .rental-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .card {
+        background: white;
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.25rem 1.5rem;
+        border: none;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .card-header h5 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .card-body {
+        padding: 2rem 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: black !important;
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 0.65rem 0.875rem;
+        font-size: 0.95rem;
+        transition: all 0.2s;
+        background: white;
+        color: black !important;
+    }
+    
+    .form-control::placeholder {
+        color: #9ca3af;
+    }
+    
+    .form-select option {
+        color: #000000;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        outline: none;
+    }
+
+    .customer-toggle {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        padding: 0.375rem;
+        background: #f3f4f6;
+        border-radius: 8px;
+    }
+
+    .toggle-btn {
+        flex: 1;
+        padding: 0.625rem;
+        border: none;
+        background: transparent;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: #6b7280;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .toggle-btn.active {
+        background: white;
+        color: #667eea;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .field-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .price-summary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+        padding: 1.25rem;
+        color: white;
+        margin-top: 1.5rem;
+    }
+
+    .price-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.625rem;
+        padding-bottom: 0.625rem;
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .price-row:last-child {
+        border-bottom: none;
+        border-top: 2px solid rgba(255,255,255,0.3);
+        padding-top: 0.625rem;
+        margin-bottom: 0;
+        font-weight: 700;
+    }
+
+    .price-label {
+        font-size: 0.875rem;
+    }
+
+    .price-value {
+        font-weight: 600;
+    }
+
+    .price-total {
+        font-size: 1.5rem;
+    }
+
+    .btn-modern {
+        border-radius: 8px;
+        padding: 0.625rem 1.25rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: none;
+        transition: all 0.2s;
+    }
+
+    .btn-primary-modern {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-primary-modern:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-outline-modern {
+        background: white;
+        border: 2px solid #e5e7eb;
+        color: #6b7280;
+    }
+
+    .btn-outline-modern:hover {
+        background: #f9fafb;
+        border-color: #d1d5db;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+    }
+
+    .divider {
+        height: 1px;
+        background: #e5e7eb;
+        margin: 1.5rem 0;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #667eea;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: color 0.2s;
+    }
+
+    .back-link:hover {
+        color: #764ba2;
+    }
+
+    @media (max-width: 768px) {
+        .rental-container {
+            padding: 0 1rem;
+        }
+        
+        .card-body {
+            padding: 1.5rem 1rem;
+        }
+    }
+
+    #rentalForm .form-select option {
+        color: #000000 !important;
+        background-color: white !important;
+    }
+    
+    /* Fix any help text */
+    #rentalForm .form-text,
+    #rentalForm small,
+    #rentalForm .help-text {
+        color: #000000 !important;
+        opacity: 1 !important;
+    }
+    .form-label,
+label,
+.form-control,
+.form-control::placeholder,
+.form-select,
+.form-select option,
+.text-muted,
+.form-text,
+small,
+.help-text,
+input,
+select,
+textarea {
+    color: #000000 !important;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="page-header">
+        <a href="{{ path('app_walk_in_rental_index') }}" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <div class="rental-container">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-file-invoice me-2"></i>New Walk-in Rental</h5>
+            </div>
+            <div class="card-body">
+                {{ form_start(form, {'attr': {'id': 'rentalForm'}}) }}
+
+                <!-- Customer Type Toggle -->
+                <div class="field-group">
+                    <label class="form-label" >Customer Type</label>
+                    <div class="customer-toggle">
+                        <button type="button" class="toggle-btn active" id="newCustomerBtn" onclick="switchCustomerType('new')">
+                            New Customer
+                        </button>
+                        <button type="button" class="toggle-btn" id="existingCustomerBtn" onclick="switchCustomerType('existing')">
+                            Existing Customer
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Existing Customer -->
+                <div id="existing-customer" style="display: none;">
+                    <div class="field-group">
+                        <label class="form-label">Select Customer</label>
+                        {{ form_widget(form.existingCustomer, {'attr': {'class': 'form-select'}}) }}
+                        {{ form_errors(form.existingCustomer) }}
+                    </div>
+                </div>
+
+                <!-- New Customer -->
+                <div id="new-customer">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="field-group">
+                                <label class="form-label">First Name</label>
+                                {{ form_widget(form.customerFirstName, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(form.customerFirstName) }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="field-group">
+                                <label class="form-label">Last Name</label>
+                                {{ form_widget(form.customerLastName, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(form.customerLastName) }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="field-group">
+                                <label class="form-label">Email</label>
+                                {{ form_widget(form.customerEmail, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(form.customerEmail) }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="field-group">
+                                <label class="form-label">Phone</label>
+                                {{ form_widget(form.customerPhone, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(form.customerPhone) }}
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="field-group">
+                                <label class="form-label">License Number</label>
+                                {{ form_widget(form.customerLicense, {'attr': {'class': 'form-control'}}) }}
+                                {{ form_errors(form.customerLicense) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- Vehicle & Dates -->
+                <div class="field-group">
+                    <label class="form-label">Select Vehicle</label>
+                    {{ form_widget(form.car, {'attr': {'class': 'form-select', 'onchange': 'calculatePrice()'}}) }}
+                    {{ form_errors(form.car) }}
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="field-group">
+                            <label class="form-label">Start Date</label>
+                            {{ form_widget(form.startDate, {'attr': {'class': 'form-control', 'onchange': 'calculatePrice()'}}) }}
+                            {{ form_errors(form.startDate) }}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="field-group">
+                            <label class="form-label">End Date</label>
+                            {{ form_widget(form.endDate, {'attr': {'class': 'form-control', 'onchange': 'calculatePrice()'}}) }}
+                            {{ form_errors(form.endDate) }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Price Summary -->
+                <div class="price-summary">
+                    <div class="price-row">
+                        <span class="price-label">Daily Rate</span>
+                        <span class="price-value" id="dailyRateDisplay">₱0.00</span>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-label">Number of Days</span>
+                        <span class="price-value" id="daysDisplay">0</span>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-label">Total</span>
+                        <span class="price-value price-total" id="totalPriceDisplay">₱0.00</span>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary-modern btn-modern flex-grow-1">
+                        <i class="fas fa-check"></i> Create Rental
+                    </button>
+                    <a href="{{ path('app_walk_in_rental_index') }}" class="btn btn-outline-modern btn-modern" style="color: black !important;">
+                        Cancel
+                    </a>
+                </div>
+
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+function switchCustomerType(type) {
+    const newBtn = document.getElementById('newCustomerBtn');
+    const existingBtn = document.getElementById('existingCustomerBtn');
+    const newFields = document.getElementById('new-customer');
+    const existingFields = document.getElementById('existing-customer');
+    
+    if (type === 'new') {
+        newBtn.classList.add('active');
+        existingBtn.classList.remove('active');
+        newFields.style.display = 'block';
+        existingFields.style.display = 'none';
+    } else {
+        newBtn.classList.remove('active');
+        existingBtn.classList.add('active');
+        newFields.style.display = 'none';
+        existingFields.style.display = 'block';
+    }
+}
+
+function calculatePrice() {
+    const carSelect = document.querySelector('select[name*="[car]"]');
+    const startDateInput = document.querySelector('input[name*="[startDate]"]');
+    const endDateInput = document.querySelector('input[name*="[endDate]"]');
+    
+    if (!carSelect || !startDateInput || !endDateInput) return;
+    
+    const selectedOption = carSelect.options[carSelect.selectedIndex];
+    const dailyRate = selectedOption ? parseFloat(selectedOption.dataset.price || 0) : 0;
+    
+    const startDate = new Date(startDateInput.value);
+    const endDate = new Date(endDateInput.value);
+    
+    if (startDate && endDate && startDate <= endDate) {
+        const days = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+        const totalPrice = dailyRate * days;
+        
+        document.getElementById('dailyRateDisplay').textContent = '₱' + dailyRate.toLocaleString('en-PH', {minimumFractionDigits: 2});
+        document.getElementById('daysDisplay').textContent = days;
+        document.getElementById('totalPriceDisplay').textContent = '₱' + totalPrice.toLocaleString('en-PH', {minimumFractionDigits: 2});
+    } else {
+        document.getElementById('dailyRateDisplay').textContent = '₱0.00';
+        document.getElementById('daysDisplay').textContent = '0';
+        document.getElementById('totalPriceDisplay').textContent = '₱0.00';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', calculatePrice);
+</script>
+{% endblock %}

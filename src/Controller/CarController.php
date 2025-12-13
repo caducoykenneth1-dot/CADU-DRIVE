@@ -19,6 +19,9 @@ final class CarController extends AbstractController
     #[Route('/', name: 'app_car_index', methods: ['GET'])]
     public function index(CarRepository $carRepository): Response
     {
+        if (!$this->getUser()) {
+            return $this->redirectToRoute('app_login');
+        }
         return $this->render('car/index.html.twig', [
             'cars' => $carRepository->findAll(),
         ]);

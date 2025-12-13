@@ -40,30 +40,32 @@
                         {{ car.description ? car.description|slice(0, 120) ~ (car.description|length > 120 ? '…' : '') : 'No description available for this vehicle yet.' }}
                     </p>
 
-                    <div class="card-actions">
-                        <a href="{{ path('app_car_show', {'id': car.id}) }}" class="btn btn-compact btn-details">
-                            View Details
-                        </a>
-
-                                {% if status_code == 'available' %}
-                            <a href="{{ path('app_rental_request_new', {'id': car.id}) }}" class="btn btn-primary">
-                            Rent This Car
-                        </a>
-                        {% else %}
-                            <span class="unavailable-note">
-                                Currently unavailable. Check back soon!
-                            </span>
-                        {% endif %}
-                    </div>
-                </div>
-            </article>
+                <div class="card-actions">
+    <a href="{{ path('app_car_show', {'id': car.id}) }}" class="btn btn-compact btn-details">
+        View Details
+    </a>
+    
+    {% if car.status.code == 'available' %}
+        {% if is_granted('PUBLIC_ACCESS') %}
+            <a href="{{ path('app_rental_request_new', {'id': car.id}) }}" class="btn btn-primary">
+                Rent This Car
+            </a>
+        {% elseif is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF') %}
+            <span class="btn btn-secondary disabled" aria-disabled="true">
+                Staff/Admin View Only
+            </span>
+        {% endif %}
+    {% else %}
+        <span class="unavailable-note">
+            Currently unavailable. Check back soon!
+        </span>
+    {% endif %}
+</div>
+ </div>
+    </article>
         {% else %}
-            <p class="text-center mt-5">No cars available yet. <a href="{{ path('app_car_new') }}">Add one now</a>.</p>
+           <p class="no-cars-message">No cars available at the moment. Please check back later.</p>
         {% endfor %}
     </div>
 </div>
-
-<div class="footer-wrapper">
-        {% include 'home/_footer.html.twig' %}
-    </div>
 {% endblock %}

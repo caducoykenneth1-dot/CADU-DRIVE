@@ -372,10 +372,6 @@
                         <span class="info-value">₱{{ rentalRequest.car.price|number_format(2) }}</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">Status</span>
-                        <span class="status-badge {{ rentalRequest.car.status.code == 'available' ? 'available' : 'unavailable' }}">
-                            {{ rentalRequest.car.status.name|default('Unknown') }}
-                        </span>
                     </div>
                 </div>
             </div>

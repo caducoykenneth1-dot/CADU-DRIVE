@@ -1,3 +1,5 @@
+{% extends 'admin/layout.html.twig' %}
+
 {% block stylesheets %}
     <style>
         /* Minimal, clean, professional design */
@@ -8,7 +10,7 @@
             justify-content: center;
             min-height: calc(100vh - 180px);
             padding: 2rem 1rem;
-            background: #f9fafb;
+            background: #111827 !important;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #1f2937;
         }
@@ -355,25 +357,25 @@
             </div>
 
             <div class="form-section" aria-labelledby="account-status-label">
-                <span id="account-status-label" class="section-label">Account Status</span>
+                <span id="account-status-label" class="section-label" style="color: black !important;">Account Status</span>
 
                 <div class="status-badges" role="list">
-                    <span class="status-badge badge-staff" role="listitem">
-                        <i class="bi bi-person-badge" aria-hidden="true"></i> Staff Member
+                    <span class="status-badge badge-staff" role="listitem" style="color: black !important;">
+                        <i class="bi bi-person-badge" aria-hidden="true" style="color: black !important;"></i> Staff Member
                     </span>
 
                     {% if staff.isActive %}
-                        <span class="status-badge badge-active" role="listitem">
-                            <i class="bi bi-check-circle" aria-hidden="true"></i> Active Account
+                        <span class="status-badge badge-active" role="listitem" style="color: black !important;">
+                            <i class="bi bi-check-circle" aria-hidden="true" style="color: black !important;":></i> Active Account
                         </span>
                     {% else %}
-                        <span class="status-badge badge-inactive" role="listitem">
-                            <i class="bi bi-x-circle" aria-hidden="true"></i> Inactive
+                        <span class="status-badge badge-inactive" role="listitem" style="color: red !important;">
+                            <i class="bi bi-x-circle" aria-hidden="true" style="color: red !important;":></i> Inactive
                         </span>
                     {% endif %}
 
-                    <span class="status-badge badge-joined" role="listitem">
-                        <i class="bi bi-calendar" aria-hidden="true"></i> Joined {{ staff.createdAt ? staff.createdAt|date('M Y') : '' }}
+                    <span class="status-badge badge-joined" role="listitem" style="color: black !important;">
+                        <i class="bi bi-calendar" aria-hidden="true" style="color: black !important;"></i> Joined {{ staff.createdAt ? staff.createdAt|date('M Y') : '' }}
                     </span>
                 </div>
             </div>

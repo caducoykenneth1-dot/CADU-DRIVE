@@ -42,7 +42,7 @@
         .page-header h1 {
             font-size: 2rem;
             font-weight: 600;
-            color: #1a1a1a;
+            color: white !important;
             margin: 0 0 0.5rem 0;
             letter-spacing: -0.02em;
         }
@@ -503,11 +503,6 @@
                 </button>
             </form>
         {% endif %}
-        
-        <a href="{{ path('app_rental_request_edit', {'id': rentalRequest.id}) }}" class="btn btn-secondary" style="color: black !important">
-            <i class="bi bi-pencil" style="color: black !important"></i>
-            Edit Request
-        </a>
     </div>
 </div>
 {% endblock %}

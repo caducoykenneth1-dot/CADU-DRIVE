@@ -1,11 +1,13 @@
+{# templates/admin/rental_requests/view.html.twig #}
 {% extends 'admin/layout.html.twig' %}
-{% block admin_title %}Rental Requests - Staff{% endblock %}
+
+{% block admin_title %}Rental Requests - Admin View{% endblock %}
+
 {% block stylesheets %}
     {{ parent() }}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         .rental-requests-container {
             max-width: 1400px;
@@ -254,11 +256,7 @@
             justify-content: flex-end;
         }
         
-        .action-buttons form {
-            margin: 0;
-        }
-        
-        .action-buttons a, .action-buttons button {
+        .btn-view {
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -274,39 +272,12 @@
             text-decoration: none;
         }
         
-        .action-buttons button {
-            padding: 0;
-        }
-        
-        .action-buttons a:hover, .action-buttons button:hover {
+        .btn-view:hover {
             background: #f9fafb;
             border-color: #d1d5db;
             transform: translateY(-1px);
-        }
-        
-        .btn-edit:hover {
-            color: #d97706;
-            border-color: #fbbf24;
-        }
-        
-        .btn-view:hover {
             color: #2563eb;
-            border-color: blue;
-        }
-        
-        .btn-approve:hover {
-            color: green;
-            border-color: green;
-        }
-        
-        .btn-reject:hover {
-            color: red;
-            border-color: red;
-        }
-        
-        .btn-delete:hover {
-            color: red;
-            border-color: red;
+            border-color: #3b82f6;
         }
         
         .alert {
@@ -366,6 +337,25 @@
             margin: 0;
         }
         
+        .admin-view-badge {
+            display: inline-block;
+            background: #3b82f6;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-left: 0.5rem;
+        }
+        
+        .read-only-note {
+            background: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0 4px 4px 0;
+        }
+        
         @media (max-width: 768px) {
             .rental-requests-container {
                 padding: 1.5rem 1rem;
@@ -387,25 +377,23 @@
             .dataTables_wrapper .dataTables_paginate {
                 text-align: center;
             }
-            
-            .action-buttons {
-                gap: 0.25rem;
-            }
-            
-            .action-buttons a, .action-buttons button {
-                width: 28px;
-                height: 28px;
-                font-size: 0.875rem;
-            }
         }
     </style>
 {% endblock %}
+
 {% block admin_content %}
+<a href="{{ path('app_walk_in_rental_history') }}" class="btn btn-secondary-clean" style="color: white !important;">
+                <i class="fas fa-history me-2"></i>History
+            </a>
 <div class="rental-requests-container" role="main" aria-label="Rental Requests Management">
     <header class="page-header">
-        <h1>Rental Requests</h1>
-        <p class="page-subtitle">Manage customer rental submissions</p>
+        <h1>Rental Requests <span class="admin-view-badge">Admin View Only</span></h1>
+        <p class="page-subtitle">View all rental submissions (Read-only mode for administrators)</p>
     </header>
+    
+    <div class="read-only-note">
+        <p><i class="bi bi-info-circle"></i> <strong>Note:</strong> This is a read-only view. Staff members manage approvals/rejections.</p>
+    </div>
     
     {% for message in app.flashes('success') %}
         <div class="alert alert-success alert-dismissible fade show" role="alert" aria-live="polite">
@@ -425,12 +413,13 @@
             <h2 id="pending-requests-header" style="color: black">Pending Review</h2>
             <span class="badge" aria-label="{{ pendingRequests|length }} pending requests">{{ pendingRequests|length }}</span>
         </div>
+        
         {% if pendingRequests|length > 0 %}
             <div class="requests-table">
                 <table id="pendingTable" class="display responsive nowrap" style="width:100%">
                     <thead>
                     <tr>
-                        <th>Request</th>
+                        <th>Request ID</th>
                         <th>Customer</th>
                         <th>Vehicle</th>
                         <th>Dates</th>
@@ -464,7 +453,7 @@
                             <td>
                                 <div class="date-range">{{ request.startDate|date('M d, Y') }} – {{ request.endDate|date('M d, Y') }}</div>
                                 {% set daysDifference = date(request.endDate).diff(date(request.startDate)).days %}
-                                <small class="date-days">{{ daysDifference }} day{% if daysDifference != 1 %}s{% endif %}</small>
+                                <small class="date-days">{{ daysDifference + 1 }} days</small>
                             </td>
                             <td data-order="{{ (daysDifference + 1) * request.car.dailyRate|default(0) }}">
                                 {% if request.car and request.startDate and request.endDate %}
@@ -472,31 +461,24 @@
                                     {% set dailyRate = request.car.dailyRate|default(0) %}
                                     {% set calculatedTotal = totalDays * dailyRate %}
                                     <div class="price-total">₱{{ calculatedTotal|number_format(2) }}</div>
-                                    <small class="text-muted">{{ totalDays }} day{% if totalDays != 1 %}s{% endif %} × ₱{{ dailyRate|number_format(2) }}/day</small>
+                                    <small class="text-muted">₱{{ dailyRate|number_format(2) }}/day</small>
                                 {% else %}
                                     <span class="text-muted">-</span>
                                 {% endif %}
                             </td>
                             <td>
-                                <span class="status-badge status-pending">Pending</span>
+                                <span class="status-badge status-pending">
+                                    <i class="bi bi-clock"></i> Pending
+                                </span>
+                                <small class="submitted-date">{{ request.createdAt|date('M d, Y') }}</small>
                             </td>
                             <td>
                                 <div class="action-buttons">
-                                    <a href="{{ path('app_staff_rental_request_show', {'id': request.id}) }}" class="btn-view" title="View Details">
-                                        <i class="bi bi-eye" style="color: blue !important;"></i>
+                                    <a href="{{ path('app_admin_rental_request_view', {'id': request.id}) }}" 
+                                       class="btn-view" 
+                                       title="View Details (Read-only)">
+                                        <i class="bi bi-eye"></i>
                                     </a>
-                                    <form action="{{ path('app_rental_request_approve', {'id': request.id}) }}" method="post" class="inline-form" onsubmit="return confirm('Approve rental request #{{ request.id }}?');">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ request.id) }}">
-                                        <button type="submit" class="btn-approve" title="Approve Request">
-                                            <i class="bi bi-check-lg"></i>
-                                        </button>
-                                    </form>
-                                    <form action="{{ path('app_rental_request_reject', {'id': request.id}) }}" method="post" class="inline-form" onsubmit="return confirm('Reject rental request #{{ request.id }}?');">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ request.id) }}">
-                                        <button type="submit" class="btn-reject" title="Reject Request">
-                                            <i class="bi bi-x-lg"></i>
-                                        </button>
-                                    </form>
                                 </div>
                             </td>
                         </tr>
@@ -514,7 +496,7 @@
     
     <section class="requests-section" aria-labelledby="approved-requests-header">
         <div class="section-header">
-            <h2 id="approved-requests-header" style="color: black">Approved</h2>
+            <h2 id="approved-requests-header" style="color: black">Approved Requests</h2>
             <span class="badge badge-approved">{{ approvedRequests|length }}</span>
         </div>
         {% if approvedRequests|length > 0 %}
@@ -522,7 +504,7 @@
                 <table id="approvedTable" class="display responsive nowrap" style="width:100%">
                     <thead>
                     <tr>
-                        <th>Request</th>
+                        <th>Request ID</th>
                         <th>Customer</th>
                         <th>Vehicle</th>
                         <th>Dates</th>
@@ -556,7 +538,7 @@
                             <td>
                                 <div class="date-range">{{ request.startDate|date('M d, Y') }} – {{ request.endDate|date('M d, Y') }}</div>
                                 {% set daysDifference = date(request.endDate).diff(date(request.startDate)).days %}
-                                <small class="date-days">{{ daysDifference }} day{% if daysDifference != 1 %}s{% endif %}</small>
+                                <small class="date-days">{{ daysDifference + 1 }} days</small>
                             </td>
                             <td data-order="{{ (daysDifference + 1) * request.car.dailyRate|default(0) }}">
                                 {% if request.car and request.startDate and request.endDate %}
@@ -564,74 +546,26 @@
                                     {% set dailyRate = request.car.dailyRate|default(0) %}
                                     {% set calculatedTotal = totalDays * dailyRate %}
                                     <div class="price-total">₱{{ calculatedTotal|number_format(2) }}</div>
-                                    <small class="text-muted">{{ totalDays }} day{% if totalDays != 1 %}s{% endif %} × ₱{{ dailyRate|number_format(2) }}/day</small>
+                                    <small class="text-muted">₱{{ dailyRate|number_format(2) }}/day</small>
                                 {% else %}
                                     <span class="text-muted">-</span>
                                 {% endif %}
                             </td>
                             <td>
-                                <span class="status-badge status-approved">Approved</span>
+                                <span class="status-badge status-approved">
+                                    <i class="bi bi-check-circle"></i> Approved
+                                </span>
                                 <small class="approved-date">{{ request.approvedAt|date('M d, Y') }}</small>
                             </td>
-                           <td>
-                <div class="action-buttons">
-                    {# View button - visible to all #}
-                    <a href="{{ path('app_staff_rental_request_show', {'id': request.id}) }}" class="btn-view" title="View Details">
-                        <i class="bi bi-eye"></i>
-                    </a>
-                    
-                    {# Edit button - visible to all #}
-                    <a href="{{ path('app_rental_request_edit', {'id': request.id}) }}" class="btn-edit" title="Edit Request">
-                        <i class="bi bi-pencil"></i>
-                    </a>
-                    
-                    {# Complete button - ONLY for staff (not admins) #}
-                    {% if is_granted('ROLE_STAFF') and not is_granted('ROLE_ADMIN') %}
-                        <form action="{{ path('app_walk_in_rental_complete', {'id': request.id}) }}" 
-                            method="post" 
-                            class="inline-form" 
-                            onsubmit="return confirm('Complete rental request #{{ request.id }}?');">
-                            <input type="hidden" name="_token" value="{{ csrf_token('complete' ~ request.id) }}">
-                            <button type="submit" class="btn-icon success" title="Complete">
-                                <i class="fas fa-check"></i>
-                            </button>
-                        </form>
-                    {% endif %}
-                    
-                    {# Approve/Reject buttons - ONLY for staff (not admins) in pending section #}
-                    {% if request.status == 'pending' and is_granted('ROLE_STAFF') and not is_granted('ROLE_ADMIN') %}
-                        <form action="{{ path('app_rental_request_approve', {'id': request.id}) }}" 
-                            method="post" 
-                            class="inline-form" 
-                            onsubmit="return confirm('Approve rental request #{{ request.id }}?');">
-                            <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ request.id) }}">
-                            <button type="submit" class="btn-approve" title="Approve Request">
-                                <i class="bi bi-check-lg"></i>
-                            </button>
-                        </form>
-                        <form action="{{ path('app_rental_request_reject', {'id': request.id}) }}" 
-                            method="post" 
-                            class="inline-form" 
-                            onsubmit="return confirm('Reject rental request #{{ request.id }}?');">
-                            <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ request.id) }}">
-                            <button type="submit" class="btn-reject" title="Reject Request">
-                                <i class="bi bi-x-lg"></i>
-                            </button>
-                        </form>
-                    {% endif %}
-                    
-                    {# Delete button - visible to all (or restrict if needed) #}
-                    <form action="{{ path('app_staff_rental_request_delete', {'id': request.id}) }}" 
-                        method="post" 
-                        class="inline-form" 
-                        onsubmit="return confirm('Delete rental request #{{ request.id }}?');">
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ request.id) }}">
-                        <button type="submit" class="btn-delete" title="Delete Request">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </form>
-                </div>
-            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{{ path('app_admin_rental_request_view', {'id': request.id}) }}" 
+                                       class="btn-view" 
+                                       title="View Details (Read-only)">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </div>
+                            </td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -647,7 +581,7 @@
     
     <section class="requests-section" aria-labelledby="rejected-requests-header">
         <div class="section-header">
-            <h2 id="rejected-requests-header" style="color: black">Rejected</h2>
+            <h2 id="rejected-requests-header" style="color: black">Rejected Requests</h2>
             <span class="badge badge-rejected">{{ rejectedRequests|length }}</span>
         </div>
         {% if rejectedRequests|length > 0 %}
@@ -655,7 +589,7 @@
                 <table id="rejectedTable" class="display responsive nowrap" style="width:100%">
                     <thead>
                     <tr>
-                        <th>Request</th>
+                        <th>Request ID</th>
                         <th>Customer</th>
                         <th>Vehicle</th>
                         <th>Dates</th>
@@ -690,7 +624,7 @@
                             <td>
                                 <div class="date-range">{{ request.startDate|date('M d, Y') }} – {{ request.endDate|date('M d, Y') }}</div>
                                 {% set daysDifference = date(request.endDate).diff(date(request.startDate)).days %}
-                                <small class="date-days">{{ daysDifference }} day{% if daysDifference != 1 %}s{% endif %}</small>
+                                <small class="date-days">{{ daysDifference + 1 }} days</small>
                             </td>
                             <td data-order="{{ (daysDifference + 1) * request.car.dailyRate|default(0) }}">
                                 {% if request.car and request.startDate and request.endDate %}
@@ -698,13 +632,15 @@
                                     {% set dailyRate = request.car.dailyRate|default(0) %}
                                     {% set calculatedTotal = totalDays * dailyRate %}
                                     <div class="price-total">₱{{ calculatedTotal|number_format(2) }}</div>
-                                    <small class="text-muted">{{ totalDays }} day{% if totalDays != 1 %}s{% endif %} × ₱{{ dailyRate|number_format(2) }}/day</small>
+                                    <small class="text-muted">₱{{ dailyRate|number_format(2) }}/day</small>
                                 {% else %}
                                     <span class="text-muted">-</span>
                                 {% endif %}
                             </td>
                             <td>
-                                <span class="status-badge status-rejected">Rejected</span>
+                                <span class="status-badge status-rejected">
+                                    <i class="bi bi-x-circle"></i> Rejected
+                                </span>
                             </td>
                             <td>
                                 {% if request.rejectedAt %}
@@ -716,19 +652,11 @@
                             </td>
                             <td>
                                 <div class="action-buttons">
-                                    <a href="{{ path('app_staff_rental_request_show', {'id': request.id}) }}" class="btn-view" title="View Details">
+                                    <a href="{{ path('app_admin_rental_request_view', {'id': request.id}) }}" 
+                                       class="btn-view" 
+                                       title="View Details (Read-only)">
                                         <i class="bi bi-eye"></i>
                                     </a>
-                                    <a href="{{ path('app_rental_request_edit', {'id': request.id}) }}" class="btn-edit" title="Edit Request">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <form action="{{ path('app_staff_rental_request_delete', {'id': request.id}) }}" method="post" class="inline-form" onsubmit="return confirm('Delete rental request #{{ request.id }}?');">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ request.id) }}">
-                                        <input type="hidden" name="_method" value="DELETE">
-                                        <button type="submit" class="btn-delete" title="Delete Request">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
                                 </div>
                             </td>
                         </tr>
@@ -743,6 +671,12 @@
             </div>
         {% endif %}
     </section>
+    
+    <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb;">
+        <p style="text-align: center; font-size: 0.875rem; color: #6b7280;">
+            <i class="bi bi-shield-lock"></i> Admin view-only mode • Last updated: {{ "now"|date("F d, Y h:i A") }}
+        </p>
+    </div>
 </div>
 {% endblock %}
 

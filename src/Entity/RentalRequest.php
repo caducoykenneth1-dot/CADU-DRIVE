@@ -53,8 +53,40 @@ class RentalRequest
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
     private ?string $totalPrice = null;
 
-    // REMOVED: No __construct needed for customer since it's not a Collection anymore
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?User $approvedBy = null;
 
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true)]
+private ?User $rejectedBy = null;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]  // Already correct
+    private ?\DateTime $returnedAt = null;
+
+
+
+    public function getApprovedBy(): ?User
+{
+    return $this->approvedBy;
+}
+
+public function setApprovedBy(?User $approvedBy): self
+{
+    $this->approvedBy = $approvedBy;
+    return $this;
+}
+
+public function getRejectedBy(): ?User
+{
+    return $this->rejectedBy;
+}
+
+public function setRejectedBy(?User $rejectedBy): self
+{
+    $this->rejectedBy = $rejectedBy;
+    return $this;
+}
     public function getId(): ?int
     {
         return $this->id;
@@ -200,6 +232,17 @@ public function getTotalPrice(): ?string
     {
         $this->totalPrice = $totalPrice;
 
+        return $this;
+    }
+
+    public function getReturnedAt(): ?\DateTime
+    {
+        return $this->returnedAt;
+    }
+
+    public function setReturnedAt(?\DateTime $returnedAt): static
+    {
+        $this->returnedAt = $returnedAt;
         return $this;
     }
 }

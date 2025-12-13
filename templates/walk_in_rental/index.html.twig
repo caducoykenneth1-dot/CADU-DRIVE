@@ -1,0 +1,401 @@
+{% extends 'admin/layout.html.twig' %}
+{% block stylesheets %}
+    {{ parent() }}
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+{% endblock %}
+{% block admin_title %}Walk-in Rentals{% endblock %}
+
+{% block admin_content %}
+<style>
+
+    body {
+        background: #fafafa;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e0e0e0;
+        transition: all 0.2s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    .btn-primary-clean {
+        background: #1a1a1a;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.6rem 1.2rem;
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+    .btn-primary-clean:hover {
+        background: #333;
+        transform: translateY(-1px);
+    }
+
+    .btn-secondary-clean {
+        background: white;
+        color: #1a1a1a;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 0.6rem 1.2rem;
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+    }
+
+    .btn-secondary-clean:hover {
+        background: #f5f5f5;
+        border-color: #ccc;
+    }
+
+    .content-card {
+        background: white;
+        border-radius: 12px;
+        border: 1px solid #e0e0e0;
+    }
+
+    .card-header-clean {
+        padding: 1.5rem;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin: 0;
+    }
+
+    .card-subtitle {
+        font-size: 0.85rem;
+        color: #666;
+        margin: 0;
+    }
+
+    .table-clean {
+        margin: 0;
+    }
+
+    .table-clean thead th {
+        background: #fafafa;
+        border: none;
+        padding: 1rem 1.5rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .table-clean tbody td {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #f0f0f0;
+        vertical-align: middle;
+        font-size: 0.9rem;
+    }
+
+    .table-clean tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .table-clean tbody tr:hover {
+        background: #fafafa;
+    }
+
+    .badge-clean {
+        padding: 0.4rem 0.75rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.75rem;
+    }
+
+    .badge-light-clean {
+        background: #f5f5f5;
+        color: #666;
+    }
+
+    .badge-success-clean {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .text-primary {
+        color: #1a1a1a;
+    }
+
+    .text-secondary {
+        color: #666;
+    }
+
+    .car-list-item {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #f0f0f0;
+        transition: all 0.2s ease;
+    }
+
+    .car-list-item:last-child {
+        border-bottom: none;
+    }
+
+    .car-list-item:hover {
+        background: #fafafa;
+    }
+
+    .btn-icon {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        border: 1px solid #e0e0e0;
+        background: white;
+        color: #666;
+        transition: all 0.2s ease;
+    }
+
+    .btn-icon:hover {
+        background: #f5f5f5;
+        color: #1a1a1a;
+        border-color: #ccc;
+    }
+
+    .btn-icon.success {
+        background: #e8f5e9;
+        color: #2e7d32;
+        border-color: #c8e6c9;
+    }
+
+    .btn-icon.success:hover {
+        background: #c8e6c9;
+    }
+
+    .empty-state {
+        padding: 3rem 1.5rem;
+        text-align: center;
+    }
+
+    .empty-icon {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 1rem;
+        background: #f5f5f5;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+    }
+
+    .page-header {
+        margin-bottom: 2rem;
+    }
+
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin: 0 0 0.25rem 0;
+    }
+
+    .page-subtitle {
+        font-size: 0.9rem;
+        color: #666;
+        margin: 0;
+    }
+</style>
+
+<div class="container-fluid py-4" style="max-width: 1400px;">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h1 class="page-title" style="color: white !important;">Walk-in Rentals</h1>
+                <p class="page-subtitle">Manage immediate rentals for in-store customers</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ path('app_walk_in_rental_new') }}" class="btn btn-primary-clean">New Rental</a>
+                 <a href="{{ path('app_walk_in_rental_history') }}" class="btn btn-secondary-clean" style="color: black !important;">
+                <i class="fas fa-history me-2"></i>History
+            </a>
+                <a href="{{ path('app_rental_request_index') }}" class="btn btn-secondary-clean" style="color: black !important;">
+                    All Requests
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="stat-card p-4">
+                <div class="stat-label">Available Cars</div>
+                <div class="stat-number">{{ availableCars|length }}</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card p-4">
+                <div class="stat-label">Today's Rentals</div>
+                <div class="stat-number">{{ todayRentals|length }}</div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card p-4">
+                <div class="stat-label">Total Customers</div>
+                <div class="stat-number">{{ customers|length }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row g-3">
+        <!-- Today's Rentals -->
+        <div class="col-lg-8">
+            <div class="content-card">
+                <div class="card-header-clean">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="card-title">Today's Rentals</h2>
+                            <p class="card-subtitle mt-1">{{ today|date('l, F j, Y') }}</p>
+                        </div>
+                        {% if todayRentals|length > 0 %}
+                        <span class="badge-clean badge-light-clean">{{ todayRentals|length }} Active</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% if todayRentals|length > 0 %}
+                    <table class="table table-clean">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Customer</th>
+                                <th>Vehicle</th>
+                                <th>Period</th>
+                                <th>Total</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rental in todayRentals %}
+                            <tr>
+                                <td>
+                                    <span class="badge-clean badge-light-clean">#{{ rental.id }}</span>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold text-primary">{{ rental.customer.firstName }} {{ rental.customer.lastName }}</div>
+                                    <div class="text-secondary" style="font-size: 0.85rem;">{{ rental.customer.email }}</div>
+                                </td>
+                                <td>
+                                    <div class="text-primary">{{ rental.car.year }} {{ rental.car.make }}</div>
+                                    <div class="text-secondary" style="font-size: 0.85rem;">{{ rental.car.model }}</div>
+                                </td>
+                                <td>
+                                    <div class="text-primary">{{ rental.startDate|date('M d') }} - {{ rental.endDate|date('M d') }}</div>
+                                    <div class="text-secondary" style="font-size: 0.85rem;">{{ rental.startDate|date('Y') }}</div>
+                                </td>
+                                <td>
+                                    <span class="badge-clean badge-success-clean">₱{{ rental.totalPrice|number_format(2) }}</span>
+                                </td>
+                                <td>
+                            <div class="d-flex gap-2">
+                                        <form method="post" action="{{ path('app_walk_in_rental_complete', {'id': rental.id}) }}" 
+                                            onsubmit="return confirm('Mark this rental as returned?')" 
+                                            class="d-inline">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('complete' ~ rental.id) }}">
+                                            <button type="submit" class="btn-icon success" title="Complete">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </form>
+                                        <a href="{{ path('app_rental_request_edit', {'id': rental.id}) }}" 
+                                        class="btn-icon" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-calendar-times fa-2x"></i>
+                        </div>
+                        <h3 class="h6 fw-semibold mb-2">No rentals today</h3>
+                        <p class="text-secondary mb-3" style="color: white !important;">Create a new walk-in rental to get started</p>
+                        <button type="button" class="btn btn-primary-clean" data-bs-toggle="modal" data-bs-target="#quickRentalModal">
+                            Create First Rental
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Available Cars -->
+        <div class="col-lg-4">
+            <div class="content-card">
+                <div class="card-header-clean">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="card-title">Available Fleet</h2>
+                            <p class="card-subtitle mt-1">Ready for rental</p>
+                        </div>
+                        <span class="badge-clean badge-success-clean">{{ availableCars|length }}</span>
+                    </div>
+                </div>
+                
+                {% if availableCars|length > 0 %}
+                    {% for car in availableCars %}
+                    <div class="car-list-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-semibold text-primary mb-1">{{ car.year }} {{ car.make }} {{ car.model }}</div>
+                                <div class="text-secondary" style="font-size: 0.85rem;">₱{{ car.price }}/day</div>
+                            </div>
+                            <span class="badge-clean badge-success-clean" style="font-size: 0.7rem;">Available</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-car fa-2x"></i>
+                        </div>
+                        <h3 class="h6 fw-semibold mb-2">No cars available</h3>
+                        <p class="text-secondary mb-0">All vehicles are currently rented</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -65,11 +65,42 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: ActivityLog::class, mappedBy: 'user')]
     private Collection $activityLogs;
 
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?User $approvedBy = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true)]
+
+
+private ?User $rejectedBy = null;
+
     public function __construct()
     {
         $this->rentalRequests = new ArrayCollection();
         $this->action = new ArrayCollection();
     }
+    public function getApprovedBy(): ?User
+{
+    return $this->approvedBy;
+}
+
+public function setApprovedBy(?User $approvedBy): self
+{
+    $this->approvedBy = $approvedBy;
+    return $this;
+}
+
+public function getRejectedBy(): ?User
+{
+    return $this->rejectedBy;
+}
+
+public function setRejectedBy(?User $rejectedBy): self
+{
+    $this->rejectedBy = $rejectedBy;
+    return $this;
+}
 
     public function getId(): ?int
     {

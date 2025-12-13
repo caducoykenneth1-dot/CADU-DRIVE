@@ -21,6 +21,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted; // ADD THIS LINE
 
 
 
+
 class AdminController extends AbstractController
 {
     private ActivityLogger $activityLogger;
@@ -304,4 +305,53 @@ public function changePassword(
             'recentLogs' => $recentLogs,
         ]);
     }
+
+    // SIMPLER VERSION - Add this to your existing controller
+#[Route('/admin/rental-requests/view', name: 'app_admin_rental_requests_view')]
+#[IsGranted('ROLE_ADMIN')]
+public function adminRentalView(RentalRequestRepository $rentalRequestRepository): Response
+{
+    // Use parameter injection
+    $pendingRequests = $rentalRequestRepository->findBy(
+        ['status' => 'pending'],
+        ['createdAt' => 'DESC']
+    );
+    
+    $approvedRequests = $rentalRequestRepository->findBy(
+        ['status' => 'approved'],
+        ['approvedAt' => 'DESC']
+    );
+    
+    $rejectedRequests = $rentalRequestRepository->findBy(
+        ['status' => 'rejected'],
+        ['rejectedAt' => 'DESC']
+    );
+
+    return $this->render('admin/rental_requests_view.html.twig', [
+        'pendingRequests' => $pendingRequests,
+        'approvedRequests' => $approvedRequests,
+        'rejectedRequests' => $rejectedRequests,
+    ]);
+}
+// Also add this method for the detail view
+// src/Controller/AdminController.php
+
+
+// Change your method to accept the repository as parameter:
+#[Route('/admin/rental-requests/view/{id}', name: 'app_admin_rental_request_view')]
+#[IsGranted('ROLE_ADMIN')]
+public function adminRentalViewDetail(int $id, RentalRequestRepository $rentalRequestRepository): Response
+{
+    $rentalRequest = $rentalRequestRepository->find($id);
+    
+    if (!$rentalRequest) {
+        throw $this->createNotFoundException('Rental request not found');
+    }
+
+    return $this->render('admin/view_detail.html.twig', [
+        'rentalRequest' => $rentalRequest,
+    ]);
+}
+
+
 }

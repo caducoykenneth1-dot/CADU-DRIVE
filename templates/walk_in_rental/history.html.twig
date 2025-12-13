@@ -1,0 +1,542 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+    
+    <style>
+        body {
+            background: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .page-header {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #000000;
+            margin: 0 0 0.25rem 0;
+        }
+
+        .page-subtitle {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin: 0;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            transition: all 0.2s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #000000;
+            line-height: 1;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+
+        .card-header-clean {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #000000;
+            margin: 0;
+        }
+
+        .btn-primary-clean {
+            background: #000000;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.625rem 1.25rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary-clean:hover {
+            background: #333333;
+            transform: translateY(-1px);
+            color: white;
+        }
+
+        .dataTables_wrapper {
+            padding: 1.5rem;
+        }
+
+        .dataTables_wrapper .row {
+            margin-bottom: 1rem;
+        }
+
+        .dataTables_length {
+            float: left;
+        }
+
+        .dataTables_filter {
+            float: right;
+        }
+
+        .dataTables_length label,
+        .dataTables_filter label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #000000;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .dataTables_length select,
+        .dataTables_filter input {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            margin: 0;
+            transition: all 0.2s ease;
+        }
+
+        .dataTables_length select:focus,
+        .dataTables_filter input:focus {
+            border-color: #000000;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+        }
+
+        .dataTables_filter input {
+            width: 250px;
+        }
+
+        table.dataTable {
+            border-collapse: separate !important;
+            border-spacing: 0;
+        }
+
+        table.dataTable thead th {
+            background: #f8f9fa;
+            border: none;
+            padding: 1rem 1.5rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #000000;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        table.dataTable tbody td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: middle;
+            font-size: 0.9rem;
+            color: #000000;
+        }
+
+        table.dataTable tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .dataTables_info {
+            font-size: 0.875rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .dataTables_wrapper .dataTables_paginate {
+            padding-top: 0;
+        }
+
+        .dataTables_wrapper .row:last-child {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e9ecef;
+            margin-top: 1rem;
+        }
+
+        .dataTables_paginate {
+            display: flex;
+            justify-content: center;
+            gap: 0.25rem;
+        }
+
+        .dataTables_paginate .paginate_button {
+            min-width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            padding: 0 0.75rem;
+            margin: 0;
+            font-weight: 600;
+            font-size: 0.875rem;
+            border: none;
+            background: transparent;
+            color: #000000 !important;
+            transition: all 0.2s ease;
+        }
+
+        .dataTables_paginate .paginate_button:hover:not(.disabled):not(.current) {
+            background: #f8f9fa;
+            color: #000000 !important;
+        }
+
+        .dataTables_paginate .paginate_button.current {
+            background: #000000 !important;
+            color: white !important;
+        }
+
+        .dataTables_paginate .paginate_button.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .dataTables_paginate .paginate_button.previous,
+        .dataTables_paginate .paginate_button.next {
+            font-weight: 600;
+        }
+
+        .dataTables_paginate .paginate_button.first,
+        .dataTables_paginate .paginate_button.last {
+            display: none;
+        }
+
+        .badge-custom {
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            display: inline-block;
+        }
+
+        .badge-id {
+            background: #f8f9fa;
+            color: #495057;
+        }
+
+        .badge-days {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-price {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .badge-completed {
+            background: #d1e7dd;
+            color: #0f5132;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+            background: white;
+            color: #6c757d;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-icon:hover {
+            background: #f8f9fa;
+            color: #000000;
+            border-color: #dee2e6;
+        }
+
+        .btn-icon.info {
+            background: #e7f3ff;
+            color: #0056b3;
+            border-color: #b3d9ff;
+        }
+
+        .btn-icon.info:hover {
+            background: #cce5ff;
+        }
+
+        .text-primary-custom {
+            color: #000000;
+            font-weight: 600;
+        }
+
+        .text-secondary-custom {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+
+        .empty-state {
+            padding: 3rem 1.5rem;
+            text-align: center;
+        }
+
+        .empty-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 1rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #adb5bd;
+        }
+
+        /* Modal Styling */
+        .modal-header {
+            border-bottom: 1px solid #e9ecef;
+            padding: 1.25rem 1.5rem;
+        }
+
+        .modal-title {
+            font-weight: 700;
+            color: #000000;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-body h6 {
+            font-weight: 700;
+            color: #000000;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-body p {
+            margin-bottom: 0.5rem;
+            color: #000000;
+        }
+
+        .modal-body strong {
+            color: #6c757d;
+            font-weight: 600;
+        }
+    </style>
+{% endblock %}
+
+{% block admin_title %}Completed Rentals{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid py-4" style="max-width: 1400px;">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h1 class="page-title">Completed Rentals History</h1>
+                {% if not is_granted('ROLE_ADMIN') %}
+                <p class="page-subtitle">View all returned walk-in rentals</p>
+                {% elseif is_granted('ROLE_ADMIN') %}
+                <p class="page-subtitle">View all completed rentals from walk-in and online requests</p>
+                {% endif %}
+            </div>
+            {% if not is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_walk_in_rental_index') }}" class="btn btn-primary-clean">
+                <i class="fas fa-arrow-left me-2"></i>Back to Active Rentals
+            </a>
+            {% elseif is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_admin_rental_requests_view') }}" class="btn btn-primary-clean">
+                <i class="fas fa-arrow-left me-2"></i>Back to View Rental Requests
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-label">Total Completed</div>
+                <div class="stat-number">{{ completedRentals|length }}</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-label">This Month</div>
+                <div class="stat-number">{{ monthlyCount }}</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-label">Total Revenue</div>
+                <div class="stat-number">₱{{ totalRevenue|number_format(2) }}</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-label">Avg. Rental Days</div>
+                <div class="stat-number">{{ avgRentalDays|number_format(1) }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content-card">
+        <div class="card-header-clean">
+            <h2 class="card-title">Completed Rentals</h2>
+        </div>
+        
+        {% if completedRentals|length > 0 %}
+            <div class="table-responsive">
+                <table id="completedRentalsTable" class="table table-hover w-100">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Customer</th>
+                            <th>Vehicle</th>
+                            <th>Rental Period</th>
+                            <th>Returned</th>
+                            <th>Days</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rental in completedRentals %}
+                        <tr>
+                            <td>
+                                <span class="badge-custom badge-id">#{{ rental.id }}</span>
+                            </td>
+                            <td>
+                                <div class="text-primary-custom">{{ rental.customer.firstName }} {{ rental.customer.lastName }}</div>
+                                <div class="text-secondary-custom">{{ rental.customer.email }}</div>
+                            </td>
+                            <td>
+                                <div class="text-primary-custom">{{ rental.car.year }} {{ rental.car.make }}</div>
+                                <div class="text-secondary-custom">{{ rental.car.model }}</div>
+                            </td>
+                            <td>
+                                <div class="text-primary-custom">{{ rental.startDate|date('M d, Y') }}</div>
+                                <div class="text-secondary-custom">to {{ rental.endDate|date('M d, Y') }}</div>
+                            </td>
+                            <td>
+                                <div class="text-primary-custom">{{ rental.returnedAt|date('M d, Y') }}</div>
+                                <div class="text-secondary-custom">{{ rental.returnedAt|date('h:i A') }}</div>
+                            </td>
+                            <td>
+                                {% set days = rental.startDate.diff(rental.endDate).days + 1 %}
+                                <span class="badge-custom badge-days">{{ days }} day{{ days > 1 ? 's' : '' }}</span>
+                            </td>
+                            <td>
+                                <span class="badge-custom badge-price">₱{{ rental.totalPrice|number_format(2) }}</span>
+                            </td>
+                            <td>
+                                <span class="badge-custom badge-completed">Completed</span>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <a href="{{ path('app_staff_rental_request_show', {'id': rental.id}) }}" class="btn-icon info" title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-history fa-2x"></i>
+                </div>
+                <h3 class="h6 fw-semibold mb-2" style="color: #000000;">No completed rentals yet</h3>
+                <p class="text-secondary-custom mb-3">Completed rentals will appear here</p>
+
+                
+                <a href="{{ path('app_walk_in_rental_index') }}" class="btn btn-primary-clean">
+                    Go to Active Rentals
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            $('#completedRentalsTable').DataTable({
+                responsive: true,
+                order: [[4, 'desc']], // Sort by returned date (newest first)
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+                language: {
+                    search: "Search:",
+                    lengthMenu: "Show _MENU_ entries",
+                    info: "Showing _START_ to _END_ of _TOTAL_ rentals",
+                    infoEmpty: "Showing 0 to 0 of 0 rentals",
+                    infoFiltered: "(filtered from _MAX_ total rentals)",
+                    paginate: {
+                        first: "First",
+                        last: "Last",
+                        next: "Next",
+                        previous: "Previous"
+                    }
+                },
+                columnDefs: [
+                    { orderable: false, targets: -1 } // Disable sorting on Actions column
+                ]
+            });
+        });
+    </script>
+{% endblock %}

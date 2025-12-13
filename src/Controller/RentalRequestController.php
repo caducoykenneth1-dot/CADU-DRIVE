@@ -129,111 +129,119 @@ class RentalRequestController extends AbstractController
     /**
      * Approve rental request
      */
-    #[Route('/rental-request/{id}/approve', name: 'app_rental_request_approve', methods: ['POST'])]
-    public function approve(RentalRequest $rentalRequest, Request $request, EntityManagerInterface $entityManager): Response
-    {
-        // Only staff can approve
-        $this->denyAccessUnlessGranted('ROLE_STAFF');
+   #[Route('/rental-request/{id}/approve', name: 'app_rental_request_approve', methods: ['POST'])]
+public function approve(RentalRequest $rentalRequest, Request $request, EntityManagerInterface $entityManager): Response
+{
+    // Only staff can approve
+    $this->denyAccessUnlessGranted('ROLE_STAFF');
 
-        if ($this->isCsrfTokenValid('approve'.$rentalRequest->getId(), $request->request->get('_token'))) {
-            // Store old status for logging
-            $oldStatus = $rentalRequest->getStatus();
-            
-            // Update rental request status
-            $rentalRequest->setStatus('approved');
-            $rentalRequest->setApprovedAt(new \DateTime());
+    if ($this->isCsrfTokenValid('approve'.$rentalRequest->getId(), $request->request->get('_token'))) {
+        // Store old status for logging
+        $oldStatus = $rentalRequest->getStatus();
+        
+        // UPDATE: Set who approved this request
+        $rentalRequest->setApprovedBy($this->getUser()); // ADD THIS LINE
+        
+        // Update rental request status
+        $rentalRequest->setStatus('approved');
+        $rentalRequest->setApprovedAt(new \DateTime());
 
-            // Update the car status using CarStatus entity
-            $car = $rentalRequest->getCar();
+        // Update the car status using CarStatus entity
+        $car = $rentalRequest->getCar();
 
-            if ($car) {
-                // Fetch CarStatus entity where code = 'rented'
-                $carStatus = $entityManager->getRepository(CarStatus::class)
-                    ->findOneBy(['code' => 'rented']);
+        if ($car) {
+            // Fetch CarStatus entity where code = 'rented'
+            $carStatus = $entityManager->getRepository(CarStatus::class)
+                ->findOneBy(['code' => 'rented']);
 
-                if ($carStatus) {
-                    $car->setStatus($carStatus);
-                    $car->setUpdatedAt(new \DateTime());
-                } else {
-                    $this->addFlash('error', 'CarStatus "rented" not found in database.');
-                }
+            if ($carStatus) {
+                $car->setStatus($carStatus);
+                $car->setUpdatedAt(new \DateTime());
+            } else {
+                $this->addFlash('error', 'CarStatus "rented" not found in database.');
             }
-
-            $entityManager->flush();
-            
-            // Log APPROVAL activity
-            $this->activityLogger->log(
-                $this->getUser()->getEmail(),
-                'APPROVE_RENTAL_REQUEST',
-                'Approved rental request #' . $rentalRequest->getId(),
-                [
-                    'rental_request_id' => $rentalRequest->getId(),
-                    'car_id' => $rentalRequest->getCar()->getId(),
-                    'car_make' => $rentalRequest->getCar()->getMake(),
-                    'car_model' => $rentalRequest->getCar()->getModel(),
-                    'customer_id' => $rentalRequest->getCustomer()->getId(),
-                    'customer_name' => $rentalRequest->getCustomer()->getFirstName() . ' ' . $rentalRequest->getCustomer()->getLastName(),
-                    'customer_email' => $rentalRequest->getCustomer()->getEmail(),
-                    'old_status' => $oldStatus,
-                    'new_status' => 'approved'
-                ],
-                'STAFF'
-            );
-
-            $this->addFlash('success', 'Rental request approved! Car marked as rented.');
         }
 
-        return $this->redirectToRoute('app_rental_request_index');
+        $entityManager->flush();
+        
+        // Log APPROVAL activity - UPDATE LOG TO INCLUDE APPROVER
+        $this->activityLogger->log(
+            $this->getUser()->getEmail(),
+            'APPROVE_RENTAL_REQUEST',
+            'Approved rental request #' . $rentalRequest->getId(),
+            [
+                'rental_request_id' => $rentalRequest->getId(),
+                'car_id' => $rentalRequest->getCar()->getId(),
+                'car_make' => $rentalRequest->getCar()->getMake(),
+                'car_model' => $rentalRequest->getCar()->getModel(),
+                'customer_id' => $rentalRequest->getCustomer()->getId(),
+                'customer_name' => $rentalRequest->getCustomer()->getFirstName() . ' ' . $rentalRequest->getCustomer()->getLastName(),
+                'customer_email' => $rentalRequest->getCustomer()->getEmail(),
+                'old_status' => $oldStatus,
+                'new_status' => 'approved',
+                'approved_by' => $this->getUser()->getEmail() // ADD THIS
+            ],
+            'STAFF'
+        );
+
+        $this->addFlash('success', 'Rental request approved! Car marked as rented.');
     }
+
+    return $this->redirectToRoute('app_rental_request_index');
+}
     
     /**
      * Reject rental request
      */
-    #[Route('/rental-request/{id}/reject', name: 'app_rental_request_reject', methods: ['POST'])]
-    public function reject(
-        RentalRequest $rentalRequest,
-        Request $request,
-        EntityManagerInterface $entityManager
-    ): Response
-    {
-        // Check if staff is logged in
-        $this->denyAccessUnlessGranted('ROLE_STAFF');
+  #[Route('/rental-request/{id}/reject', name: 'app_rental_request_reject', methods: ['POST'])]
+public function reject(
+    RentalRequest $rentalRequest,
+    Request $request,
+    EntityManagerInterface $entityManager
+): Response
+{
+    // Check if staff is logged in
+    $this->denyAccessUnlessGranted('ROLE_STAFF');
+    
+    // Check CSRF token
+    if ($this->isCsrfTokenValid('reject'.$rentalRequest->getId(), $request->request->get('_token'))) {
+        // Store old status for logging
+        $oldStatus = $rentalRequest->getStatus();
         
-        // Check CSRF token
-        if ($this->isCsrfTokenValid('reject'.$rentalRequest->getId(), $request->request->get('_token'))) {
-            // Store old status for logging
-            $oldStatus = $rentalRequest->getStatus();
-            
-            $rentalRequest->setStatus('rejected');
-            $rentalRequest->setRejectedAt(new \DateTime());
-            
-            $entityManager->persist($rentalRequest);
-            $entityManager->flush();
-            
-            // Log REJECTION activity
-            $this->activityLogger->log(
-                $this->getUser()->getEmail(),
-                'REJECT_RENTAL_REQUEST',
-                'Rejected rental request #' . $rentalRequest->getId(),
-                [
-                    'rental_request_id' => $rentalRequest->getId(),
-                    'car_id' => $rentalRequest->getCar()->getId(),
-                    'car_make' => $rentalRequest->getCar()->getMake(),
-                    'car_model' => $rentalRequest->getCar()->getModel(),
-                    'customer_id' => $rentalRequest->getCustomer()->getId(),
-                    'customer_name' => $rentalRequest->getCustomer()->getFirstName() . ' ' . $rentalRequest->getCustomer()->getLastName(),
-                    'customer_email' => $rentalRequest->getCustomer()->getEmail(),
-                    'old_status' => $oldStatus,
-                    'new_status' => 'rejected'
-                ],
-                'STAFF'
-            );
-            
-            $this->addFlash('success', 'Rental request rejected.');
-        }
+        // UPDATE: Set who rejected this request
+        $rentalRequest->setRejectedBy($this->getUser()); // ADD THIS LINE
         
-        return $this->redirectToRoute('app_rental_request_index');
+        $rentalRequest->setStatus('rejected');
+        $rentalRequest->setRejectedAt(new \DateTime());
+        
+        $entityManager->persist($rentalRequest);
+        $entityManager->flush();
+        
+        // Log REJECTION activity - UPDATE LOG TO INCLUDE REJECTER
+        $this->activityLogger->log(
+            $this->getUser()->getEmail(),
+            'REJECT_RENTAL_REQUEST',
+            'Rejected rental request #' . $rentalRequest->getId(),
+            [
+                'rental_request_id' => $rentalRequest->getId(),
+                'car_id' => $rentalRequest->getCar()->getId(),
+                'car_make' => $rentalRequest->getCar()->getMake(),
+                'car_model' => $rentalRequest->getCar()->getModel(),
+                'customer_id' => $rentalRequest->getCustomer()->getId(),
+                'customer_name' => $rentalRequest->getCustomer()->getFirstName() . ' ' . $rentalRequest->getCustomer()->getLastName(),
+                'customer_email' => $rentalRequest->getCustomer()->getEmail(),
+                'old_status' => $oldStatus,
+                'new_status' => 'rejected',
+                'rejected_by' => $this->getUser()->getEmail() // ADD THIS
+            ],
+            'STAFF'
+        );
+        
+        $this->addFlash('success', 'Rental request rejected.');
     }
+    
+    return $this->redirectToRoute('app_rental_request_index');
+}
     
     /**
      * Index page - List all rental requests
@@ -297,11 +305,14 @@ class RentalRequestController extends AbstractController
             // Set default values
             if (!$rentalRequest->getCreatedAt()) {
                 $rentalRequest->setCreatedAt(new \DateTime());
+                $rentalRequest->setApprovedBy($this->getUser()); // ADD THIS LINE
             }
             
             // If approved/rejected, set timestamps
             if ($rentalRequest->getStatus() === 'approved') {
                 $rentalRequest->setApprovedAt(new \DateTime());
+                $rentalRequest->setRejectedBy($this->getUser());
+
                 
                 // Update car status to rented
                 $car = $rentalRequest->getCar();
@@ -481,6 +492,8 @@ public function edit(Request $request, RentalRequest $rentalRequest, EntityManag
         // If approving, set timestamp and update car status
         if ($newStatus === 'approved' && $originalData['status'] !== 'approved') {
             $rentalRequest->setApprovedAt(new \DateTime());
+            $rentalRequest->setApprovedBy($this->getUser()); // ADD THIS LINE
+
             
             if ($newCar) {
                 $rentedStatus = $entityManager->getRepository(CarStatus::class)
@@ -495,6 +508,8 @@ public function edit(Request $request, RentalRequest $rentalRequest, EntityManag
         // If rejecting, set timestamp
         if ($newStatus === 'rejected' && $originalData['status'] !== 'rejected') {
             $rentalRequest->setRejectedAt(new \DateTime());
+            $rentalRequest->setRejectedBy($this->getUser()); // ADD THIS LINE
+
             
             // If previously approved, make car available
             if ($originalData['status'] === 'approved' && $oldCar) {

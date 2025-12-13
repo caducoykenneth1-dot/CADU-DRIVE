@@ -178,15 +178,7 @@ class StaffController extends AbstractController
         
         $user = $this->getUser();
         $isAdmin = $this->isGranted('ROLE_ADMIN');
-        
-        $this->activityLogger->log(
-            $user->getEmail(),
-            'VIEW_STAFF_DASHBOARD',
-            ($isAdmin ? 'Admin' : 'Staff') . ' accessed dashboard',
-            ['user_email' => $user->getEmail()],
-            $isAdmin ? 'ADMIN' : 'STAFF'
-        );
-        
+      
         // Get fresh pending requests
         $pendingRequests = $rentalRequestRepo->findBy(
             ['status' => 'pending'],
