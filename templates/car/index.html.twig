@@ -46,7 +46,7 @@
     </a>
     
     {% if car.status.code == 'available' %}
-        {% if is_granted('PUBLIC_ACCESS') %}
+        {% if not is_granted('ROLE_STAFF') %}
             <a href="{{ path('app_rental_request_new', {'id': car.id}) }}" class="btn btn-primary">
                 Rent This Car
             </a>

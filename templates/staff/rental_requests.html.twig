@@ -719,9 +719,7 @@
                                     <a href="{{ path('app_staff_rental_request_show', {'id': request.id}) }}" class="btn-view" title="View Details">
                                         <i class="bi bi-eye"></i>
                                     </a>
-                                    <a href="{{ path('app_rental_request_edit', {'id': request.id}) }}" class="btn-edit" title="Edit Request">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
+                                    
                                     <form action="{{ path('app_staff_rental_request_delete', {'id': request.id}) }}" method="post" class="inline-form" onsubmit="return confirm('Delete rental request #{{ request.id }}?');">
                                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ request.id) }}">
                                         <input type="hidden" name="_method" value="DELETE">

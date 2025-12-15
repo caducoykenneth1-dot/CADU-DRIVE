@@ -89,7 +89,13 @@
                         <a href="{{ path('app_car_index') }}" class="drawer-link">Cars</a>
                         <a href="{{ path('app_contact') }}" class="drawer-link">Contact</a>
                         <a href="{{ path('app_customer_register') }}" class="drawer-link">Register</a>
-                        <a href="{{ path('app_admin_dashboard') }}" class="btn mt-4 w-full text-center">Admin Panel</a>
+                             {% if is_granted('ROLE_ADMIN') %}
+                            <a href="{{ path('app_admin_dashboard') }}" class="btn">Admin Panel</a>
+                            {% elseif is_granted('ROLE_STAFF') %}
+                            <a href="{{ path('app_staff_dashboard') }}" class="btn">Staff Panel</a>
+                            {% elseif is_granted('ROLE_USER') %}
+                            <a href="{{ path('app_customer_my_profile') }}" class="btn">My Profile</a>
+                            {% endif %}
                         <a href="{{ path('app_car_index') }}" class="btn mt-4 w-full text-center">Book a Ride</a>
                     </nav>
                 </nav>
