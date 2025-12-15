@@ -2,8 +2,6 @@ security:
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
     
-    session_fixation_strategy: migrate
-    
     providers:
         app_user_provider:
             entity:
@@ -31,10 +29,8 @@ security:
             entry_point: App\Security\UserAuthenticator
             remember_me:
                 secret: '%kernel.secret%'
-                lifetime: 604800 # 1 week in seconds
+                lifetime: 604800
                 path: /
-            # Configure CSRF token options
-            csrf_token_generator: security.csrf.token_manager
 
             access_denied_handler: App\Service\AccessDeniedHandler
 

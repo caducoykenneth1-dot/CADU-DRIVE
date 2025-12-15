@@ -1,15 +1,21 @@
 # config/packages/framework.yaml
 framework:
     secret: '%env(APP_SECRET)%'
-    session: true
-    
-    # CRITICAL: Add this for ALL environments, not just test
 
-    
-    # ... rest of your config
+    trusted_proxies: '127.0.0.1,REMOTE_ADDR'
+    trusted_headers:
+        - x-forwarded-for
+        - x-forwarded-proto
+        - x-forwarded-host
+        - x-forwarded-port
+
+    session:
+        enabled: true
+        cookie_secure: auto
+        cookie_samesite: lax
+        cookie_httponly: true
 
 when@test:
     framework:
-        # This can stay, but http_method_override should be above
         session:
             storage_factory_id: session.storage.factory.mock_file
