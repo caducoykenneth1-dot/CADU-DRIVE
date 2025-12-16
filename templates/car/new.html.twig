@@ -7,7 +7,10 @@
     <h1>Create new Car</h1>
 
     {{ include('car/_form.html.twig', {'button_class': 'btn-save'}) }}
-
-<a href="{{ path('app_admin_dashboard') }}" class="btn">Back to Dashboard</a>
+{% if is_granted('ROLE_ADMIN') %}
+<a href="{{ path('app_admin_dashboard') }}" class="btn">Back to Admin Dashboard</a>
+{% elseif is_granted('ROLE_STAFF') %}
+<a href="{{ path('app_staff_dashboard') }}" class="btn">Back to Staff Dashboard</a>
+{% endif %}
 </div>
 {% endblock %}

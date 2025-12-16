@@ -20,6 +20,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\Regex;
+
 
 class WalkInRentalType extends AbstractType
 {
@@ -125,18 +127,34 @@ class WalkInRentalType extends AbstractType
                 ],
                 'label' => 'Email'
             ])
-            ->add('customerPhone', TelType::class, [
-                'mapped' => false,
-                'required' => false,
-                'constraints' => [
-                    new Length(['max' => 30])
+            ->add('customerPhone', TextType::class, [
+    'mapped' => false,
+    'required' => true, // set to false if optional
+    'constraints' => [
+        new NotBlank([
+            'message' => 'Phone number is required',
+                    ]),
+                    new Length([
+                        'min' => 11,
+                        'max' => 11,
+                        'exactMessage' => 'Phone number must be exactly 11 digits',
+                    ]),
+                    new Regex([
+                        'pattern' => '/^\d{11}$/',
+                        'message' => 'Phone number must contain exactly 11 digits',
+                    ]),
                 ],
                 'attr' => [
                     'class' => 'form-control new-customer-field',
-                    'placeholder' => '(123) 456-7890'
+                    'placeholder' => 'Place phone number',
+                    'maxlength' => 11,
+                    'inputmode' => 'numeric',
+                    'pattern' => '[0-9]{11}',
+                    'oninput' => "this.value=this.value.replace(/[^0-9]/g,'')",
                 ],
-                'label' => 'Phone (Optional)'
+                'label' => 'Phone Number',
             ])
+
             ->add('customerLicense', TextType::class, [
                 'mapped' => false,
                 'required' => false,

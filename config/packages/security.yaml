@@ -54,7 +54,10 @@ security:
         - { path: ^/staff/rental-requests/\d+/delete$, roles: [ROLE_ADMIN, ROLE_STAFF] }
         - { path: ^/staff/crud/, roles: ROLE_ADMIN }
         - { path: ^/staff/crud/\d+$, roles: ROLE_ADMIN }
-        - { path: ^/admin/cars, roles: ROLE_ADMIN }
+        - { path: ^/admin/cars, roles: [ROLE_ADMIN, ROLE_STAFF] }
+        - { path: ^/car/new$, roles: [ROLE_ADMIN, ROLE_STAFF] }
+        - { path: ^/car/\d+/edit$, roles: [ROLE_ADMIN, ROLE_STAFF] }
+        - { path: ^/car/\d+/delete$, roles: [ROLE_ADMIN, ROLE_STAFF] }
         
         # Customer routes
         - { path: ^/customer, roles: [ROLE_ADMIN, ROLE_STAFF] }
@@ -68,9 +71,6 @@ security:
         
         # ADMIN-ONLY routes LAST
         - { path: ^/admin/staff/overview, roles: ROLE_ADMIN }
-        - { path: ^/car/new$, roles: ROLE_ADMIN }
-        - { path: ^/car/\d+/edit$, roles: ROLE_ADMIN }
-        - { path: ^/car/\d+/delete$, roles: ROLE_ADMIN }
         - { path: ^/staff/crud/new$, roles: ROLE_ADMIN }
         - { path: ^/staff/crud/\d+/edit$, roles: ROLE_ADMIN }
         - { path: ^/staff/crud/\d+/delete$, roles: ROLE_ADMIN }

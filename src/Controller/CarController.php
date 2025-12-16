@@ -35,8 +35,7 @@ final class CarController extends AbstractController
         ActivityLogger $activityLogger
     ): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
-        
+
         $car = new Car();
         if (null !== ($defaultStatus = $statusRepository->findOneByCode('available'))) {
             $car->setStatus($defaultStatus);
@@ -95,7 +94,6 @@ final class CarController extends AbstractController
         ActivityLogger $activityLogger
     ): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         
         // Store old values for comparison
         $oldData = [
@@ -105,57 +103,79 @@ final class CarController extends AbstractController
             'price' => $car->getPrice(),
             'status' => $car->getStatus()->getLabel()  // ← CHANGED: getLabel()
         ];
+        $oldImage = $car->getImage();
+
         
         $form = $this->createForm(CarType::class, $car);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $imageFile = $form->get('imageFile')->getData();
 
-            if ($imageFile) {
-                if ($car->getImage()) {
-                    @unlink($this->getParameter('car_images_directory') . '/' . $car->getImage());
-                }
+    $changes = []; // ✅ initialize ONCE
 
-                $newFilename = uniqid().'.'.$imageFile->guessExtension();
-                $imageFile->move($this->getParameter('car_images_directory'), $newFilename);
-                $car->setImage($newFilename);
-            }
+    $imageFile = $form->get('imageFile')->getData();
 
-            $em->flush();
-
-            // Get new values for comparison
-            $newData = [
-                'make' => $car->getMake(),
-                'model' => $car->getModel(),
-                'year' => $car->getYear(),
-                'price' => $car->getPrice(),
-                'status' => $car->getStatus()->getLabel()  // ← CHANGED: getLabel()
-            ];
-
-            // Detect changes
-            $changes = [];
-            foreach ($oldData as $key => $oldValue) {
-                if ($oldData[$key] != $newData[$key]) {
-                    $changes[] = sprintf('%s: "%s" → "%s"', 
-                        ucfirst($key), $oldValue, $newData[$key]
-                    );
-                }
-            }
-
-            // ✅ LOG: Car updated
-            $activityLogger->log(
-                'CAR_UPDATED',
-                'Admin updated car details',
-                sprintf('ID: %d | Changes: %s',
-                    $car->getId(),
-                    empty($changes) ? 'No changes detected' : implode(', ', $changes)
-                )
-            );
-
-            $this->addFlash('success', 'Car updated successfully!');
-            return $this->redirectToRoute('app_admin_cars');
+    if ($imageFile) {
+        if ($oldImage) {
+            @unlink($this->getParameter('car_images_directory') . '/' . $oldImage);
         }
+
+        $newFilename = uniqid().'.'.$imageFile->guessExtension();
+        $imageFile->move($this->getParameter('car_images_directory'), $newFilename);
+        $car->setImage($newFilename);
+    }
+
+    // ✅ IMAGE CHANGE DETECTION
+    $newImage = $car->getImage();
+
+    if ($oldImage !== $newImage) {
+        if ($oldImage && $newImage) {
+            $changes[] = 'Image updated';
+        } elseif (!$oldImage && $newImage) {
+            $changes[] = 'Image added';
+        } elseif ($oldImage && !$newImage) {
+            $changes[] = 'Image removed';
+        }
+    }
+
+    $em->flush();
+
+    // Get new values
+    $newData = [
+        'make' => $car->getMake(),
+        'model' => $car->getModel(),
+        'year' => $car->getYear(),
+        'price' => $car->getPrice(),
+        'status' => $car->getStatus()->getLabel()
+    ];
+
+    // Detect field changes
+    foreach ($oldData as $key => $oldValue) {
+        if ($oldValue != $newData[$key]) {
+            $changes[] = sprintf(
+                '%s: "%s" → "%s"',
+                ucfirst($key),
+                $oldValue,
+                $newData[$key]
+            );
+        }
+    }
+
+    // ✅ LOG
+    $activityLogger->log(
+        'CAR_UPDATED',
+        'Admin updated car details',
+        sprintf(
+            'ID: %d | Changes: %s',
+            $car->getId(),
+            empty($changes) ? 'No changes detected' : implode(', ', $changes)
+        )
+    );
+
+    $this->addFlash('success', 'Car updated successfully!');
+    return $this->redirectToRoute('app_admin_cars');
+}
+
 
         return $this->render('car/edit.html.twig', [
             'form' => $form,
@@ -170,7 +190,6 @@ final class CarController extends AbstractController
         ActivityLogger $activityLogger
     ): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         
         if ($this->isCsrfTokenValid('delete'.$car->getId(), $request->getPayload()->getString('_token'))) {
             
@@ -213,7 +232,6 @@ final class CarController extends AbstractController
         ActivityLogger $activityLogger
     ): Response
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         
         if ($this->isCsrfTokenValid('toggle-status'.$car->getId(), $request->request->get('_token'))) {
             $oldStatus = $car->getStatus() ? $car->getStatus()->getLabel() : 'Unknown';

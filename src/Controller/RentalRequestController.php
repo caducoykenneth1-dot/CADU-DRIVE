@@ -24,224 +24,148 @@ class RentalRequestController extends AbstractController
     /**
      * Create rental request from car page
      */
-    #[Route('/car/{id}/request-rental', name: 'app_rental_request_new')]
+     #[Route('/car/{id}/request-rental', name: 'app_rental_request_new')]
     public function new(
-        Car $car, 
-        Request $request, 
+        Car $car,
+        Request $request,
         EntityManagerInterface $entityManager
-    ): Response
-    {
-        // Check if user is logged in
+    ): Response {
         $user = $this->getUser();
         if (!$user) {
             return $this->redirectToRoute('app_login');
         }
-        
-        // Method 1: Get customer from user relationship
-        $customer = $user->getCustomer();
-        
-        // Method 2: If not linked, find by email
-        if (!$customer) {
-            $customerRepository = $entityManager->getRepository(Customer::class);
-            $customer = $customerRepository->findOneBy(['email' => $user->getEmail()]);
-        }
-        
-        // Method 3: If still not found, check database manually
-        if (!$customer) {
-            $customer = $entityManager->getRepository(Customer::class)
-                ->createQueryBuilder('c')
-                ->where('c.email = :email')
-                ->setParameter('email', $user->getEmail())
-                ->getQuery()
-                ->getOneOrNullResult();
-        }
-        
-        // If customer exists but not linked to user, link them
-        if ($customer && !$customer->getUser()) {
-            $customer->setUser($user);
-            $entityManager->persist($customer);
-        }
-        
-        // Only create new customer if absolutely doesn't exist
+
+        $customer = $user->getCustomer()
+            ?? $entityManager->getRepository(Customer::class)
+                ->findOneBy(['email' => $user->getEmail()]);
+
         if (!$customer) {
             $customer = new Customer();
             $customer->setEmail($user->getEmail());
-            $customer->setFirstName('');
-            $customer->setLastName('');
             $customer->setUser($user);
             $customer->setCreatedAt(new \DateTimeImmutable());
             $customer->setUpdatedAt(new \DateTimeImmutable());
-            
             $entityManager->persist($customer);
         }
-        
-        // Create new rental request
+
         $rentalRequest = new RentalRequest();
         $rentalRequest->setCustomer($customer);
         $rentalRequest->setCar($car);
         $rentalRequest->setCreatedAt(new \DateTime());
         $rentalRequest->setStatus('pending');
-        
-        // Create form (regular users don't need is_staff option)
+
         $form = $this->createForm(RentalRequestType::class, $rentalRequest, [
             'is_staff' => false
         ]);
         $form->handleRequest($request);
-        
+
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($rentalRequest);
             $entityManager->flush();
 
-            // Log CREATE activity
             $this->activityLogger->log(
                 $user->getEmail(),
                 'CREATE_RENTAL_REQUEST',
-                'Rental request created for car: ' . $car->getMake() . ' ' . $car->getModel(),
-                [
-                    'rental_request_id' => $rentalRequest->getId(),
-                    'car_id' => $car->getId(),
-                    'car_make' => $car->getMake(),
-                    'car_model' => $car->getModel(),
-                    'customer_id' => $customer->getId(),
-                    'customer_name' => $customer->getFirstName() . ' ' . $customer->getLastName(),
-                    'customer_email' => $customer->getEmail(),
-                    'start_date' => $rentalRequest->getStartDate() ? $rentalRequest->getStartDate()->format('Y-m-d') : null,
-                    'end_date' => $rentalRequest->getEndDate() ? $rentalRequest->getEndDate()->format('Y-m-d') : null,
-                    'status' => $rentalRequest->getStatus()
-                ],
-                $user->getStaff() ? 'STAFF' : 'USER'
+                'Rental request created',
+                ['rental_request_id' => $rentalRequest->getId()],
+                'USER'
             );
-            
-            $this->addFlash('success', 
-                'Your rental request has been submitted! ' .
-                'Our staff will review and approve it within 24 hours.'
-            );
-            
+
+            $this->addFlash('success', 'Rental request submitted.');
             return $this->redirectToRoute('app_car_show', ['id' => $car->getId()]);
         }
-        
+
         return $this->render('rental_request/new.html.twig', [
             'form' => $form->createView(),
             'car' => $car,
         ]);
     }
-    
     /**
      * Approve rental request
      */
    #[Route('/rental-request/{id}/approve', name: 'app_rental_request_approve', methods: ['POST'])]
-public function approve(RentalRequest $rentalRequest, Request $request, EntityManagerInterface $entityManager): Response
-{
-    // Only staff can approve
-    $this->denyAccessUnlessGranted('ROLE_STAFF');
+    #[IsGranted('ROLE_STAFF')]
+    public function approve(
+        RentalRequest $rentalRequest,
+        Request $request,
+        EntityManagerInterface $entityManager
+    ): Response {
+        if (!$this->isCsrfTokenValid('approve' . $rentalRequest->getId(), $request->request->get('_token'))) {
+            return $this->redirectToRoute('app_rental_request_index');
+        }
 
-    if ($this->isCsrfTokenValid('approve'.$rentalRequest->getId(), $request->request->get('_token'))) {
-        // Store old status for logging
-        $oldStatus = $rentalRequest->getStatus();
-        
-        // UPDATE: Set who approved this request
-        $rentalRequest->setApprovedBy($this->getUser()); // ADD THIS LINE
-        
-        // Update rental request status
         $rentalRequest->setStatus('approved');
         $rentalRequest->setApprovedAt(new \DateTime());
+        $rentalRequest->setApprovedBy($this->getUser());
 
-        // Update the car status using CarStatus entity
+        // ✅ CALCULATE TOTAL PRICE (ONLY HERE)
         $car = $rentalRequest->getCar();
+        $start = $rentalRequest->getStartDate();
+        $end = $rentalRequest->getEndDate();
 
-        if ($car) {
-            // Fetch CarStatus entity where code = 'rented'
-            $carStatus = $entityManager->getRepository(CarStatus::class)
-                ->findOneBy(['code' => 'rented']);
+        if ($car && $start && $end) {
+            $dailyRate = $car->getDailyRate() ?? $car->getPrice() ?? 0;
+            $days = $start->diff($end)->days + 1;
+            $rentalRequest->setTotalPrice((string) ($dailyRate * $days));
+        }
 
-            if ($carStatus) {
-                $car->setStatus($carStatus);
-                $car->setUpdatedAt(new \DateTime());
-            } else {
-                $this->addFlash('error', 'CarStatus "rented" not found in database.');
-            }
+        // Update car status
+        $rentedStatus = $entityManager->getRepository(CarStatus::class)
+            ->findOneBy(['code' => 'rented']);
+
+        if ($rentedStatus) {
+            $car->setStatus($rentedStatus);
+            $car->setUpdatedAt(new \DateTime());
         }
 
         $entityManager->flush();
-        
-        // Log APPROVAL activity - UPDATE LOG TO INCLUDE APPROVER
+
         $this->activityLogger->log(
             $this->getUser()->getEmail(),
             'APPROVE_RENTAL_REQUEST',
-            'Approved rental request #' . $rentalRequest->getId(),
+            'Approved rental request',
             [
                 'rental_request_id' => $rentalRequest->getId(),
-                'car_id' => $rentalRequest->getCar()->getId(),
-                'car_make' => $rentalRequest->getCar()->getMake(),
-                'car_model' => $rentalRequest->getCar()->getModel(),
-                'customer_id' => $rentalRequest->getCustomer()->getId(),
-                'customer_name' => $rentalRequest->getCustomer()->getFirstName() . ' ' . $rentalRequest->getCustomer()->getLastName(),
-                'customer_email' => $rentalRequest->getCustomer()->getEmail(),
-                'old_status' => $oldStatus,
-                'new_status' => 'approved',
-                'approved_by' => $this->getUser()->getEmail() // ADD THIS
+                'total_price' => $rentalRequest->getTotalPrice()
             ],
             'STAFF'
         );
 
-        $this->addFlash('success', 'Rental request approved! Car marked as rented.');
+        $this->addFlash('success', 'Rental request approved.');
+        return $this->redirectToRoute('app_rental_request_index');
     }
 
-    return $this->redirectToRoute('app_rental_request_index');
-}
     
     /**
      * Reject rental request
      */
-  #[Route('/rental-request/{id}/reject', name: 'app_rental_request_reject', methods: ['POST'])]
-public function reject(
-    RentalRequest $rentalRequest,
-    Request $request,
-    EntityManagerInterface $entityManager
-): Response
-{
-    // Check if staff is logged in
-    $this->denyAccessUnlessGranted('ROLE_STAFF');
-    
-    // Check CSRF token
-    if ($this->isCsrfTokenValid('reject'.$rentalRequest->getId(), $request->request->get('_token'))) {
-        // Store old status for logging
-        $oldStatus = $rentalRequest->getStatus();
-        
-        // UPDATE: Set who rejected this request
-        $rentalRequest->setRejectedBy($this->getUser()); // ADD THIS LINE
-        
-        $rentalRequest->setStatus('rejected');
-        $rentalRequest->setRejectedAt(new \DateTime());
-        
-        $entityManager->persist($rentalRequest);
-        $entityManager->flush();
-        
-        // Log REJECTION activity - UPDATE LOG TO INCLUDE REJECTER
-        $this->activityLogger->log(
-            $this->getUser()->getEmail(),
-            'REJECT_RENTAL_REQUEST',
-            'Rejected rental request #' . $rentalRequest->getId(),
-            [
-                'rental_request_id' => $rentalRequest->getId(),
-                'car_id' => $rentalRequest->getCar()->getId(),
-                'car_make' => $rentalRequest->getCar()->getMake(),
-                'car_model' => $rentalRequest->getCar()->getModel(),
-                'customer_id' => $rentalRequest->getCustomer()->getId(),
-                'customer_name' => $rentalRequest->getCustomer()->getFirstName() . ' ' . $rentalRequest->getCustomer()->getLastName(),
-                'customer_email' => $rentalRequest->getCustomer()->getEmail(),
-                'old_status' => $oldStatus,
-                'new_status' => 'rejected',
-                'rejected_by' => $this->getUser()->getEmail() // ADD THIS
-            ],
-            'STAFF'
-        );
-        
-        $this->addFlash('success', 'Rental request rejected.');
+    #[Route('/rental-request/{id}/reject', name: 'app_rental_request_reject', methods: ['POST'])]
+    #[IsGranted('ROLE_STAFF')]
+    public function reject(
+        RentalRequest $rentalRequest,
+        Request $request,
+        EntityManagerInterface $entityManager
+    ): Response {
+        if ($this->isCsrfTokenValid('reject' . $rentalRequest->getId(), $request->request->get('_token'))) {
+            $rentalRequest->setStatus('rejected');
+            $rentalRequest->setRejectedAt(new \DateTime());
+            $rentalRequest->setRejectedBy($this->getUser());
+
+            $entityManager->flush();
+
+            $this->activityLogger->log(
+                $this->getUser()->getEmail(),
+                'REJECT_RENTAL_REQUEST',
+                'Rejected rental request',
+                ['rental_request_id' => $rentalRequest->getId()],
+                'STAFF'
+            );
+
+            $this->addFlash('success', 'Rental request rejected.');
+        }
+
+        return $this->redirectToRoute('app_rental_request_index');
     }
-    
-    return $this->redirectToRoute('app_rental_request_index');
-}
     
     /**
      * Index page - List all rental requests

@@ -55,7 +55,7 @@
 
 
     {# Cars: Admin and Staff can see #}
-    {% if is_granted('ROLE_ADMIN' )  %}
+    {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_STAFF')  %}
         <a href="{{ path('app_admin_cars') }}" 
            data-section="cars" 
            class="admin-nav-link {{ 'app_admin_cars' == app.request.attributes.get('_route') ? 'is-active' : '' }}">
